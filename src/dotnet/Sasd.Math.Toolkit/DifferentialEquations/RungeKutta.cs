@@ -27,11 +27,7 @@ public static class RungeKutta
         while (x < xEnd)
         {
             var h = System.Math.Min(step, xEnd - x);
-            var k1 = derivative(x, y);
-            var k2 = derivative(x + (h / 2.0), y + (h * k1 / 2.0));
-            var k3 = derivative(x + (h / 2.0), y + (h * k2 / 2.0));
-            var k4 = derivative(x + h, y + (h * k3));
-            y += (h / 6.0) * (k1 + (2.0 * k2) + (2.0 * k3) + k4);
+            y = FourthOrderSingleStep(derivative, x, y, h);
             x += h;
             points.Add(new OdePoint(x, y));
         }
@@ -75,6 +71,23 @@ public static class RungeKutta
         }
 
         return points;
+    }
+
+    /// <summary>
+    /// Performs one classical fourth-order Runge-Kutta step. This internal primitive
+    /// is shared with multistep methods that require RK4 startup values.
+    /// </summary>
+    internal static double FourthOrderSingleStep(
+        Func<double, double, double> derivative,
+        double x,
+        double y,
+        double step)
+    {
+        var k1 = derivative(x, y);
+        var k2 = derivative(x + (step / 2.0), y + (step * k1 / 2.0));
+        var k3 = derivative(x + (step / 2.0), y + (step * k2 / 2.0));
+        var k4 = derivative(x + step, y + (step * k3));
+        return y + ((step / 6.0) * (k1 + (2.0 * k2) + (2.0 * k3) + k4));
     }
 
     private static double[] AddScaled(IReadOnlyList<double> y, IReadOnlyList<double> k, double scale)

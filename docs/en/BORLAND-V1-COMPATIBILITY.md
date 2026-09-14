@@ -35,8 +35,8 @@ Status legend: **done** = callable implementation exists now; **partial** = doma
 | Power method + Wielandt deflation | done | `WielandtDeflation` / `EigenSolvers.WielandtSecondEigenpair` |
 | Cyclic Jacobi symmetric eigensystem | done | `EigenSolvers.CyclicJacobi` / `SymmetricEigendecomposition` |
 | RK4 first-order ODE | done | `RungeKutta.FourthOrder` |
-| Runge-Kutta-Fehlberg first-order ODE | done | `RungeKuttaFehlberg.Integrate` with adaptive error control |
-| Adams-Bashforth/Adams-Moulton predictor-corrector | planned | multistep ODE module |
+| Runge-Kutta-Fehlberg first-order ODE | done | `RungeKuttaFehlberg.Integrate` with adaptive RKF45 step control |
+| Adams-Bashforth/Adams-Moulton predictor-corrector | done | `AdamsBashforthMoulton.Integrate` (AB4 predictor + AM4 corrector, RK4 startup) |
 | RK4 second-order ODE | partial | represent as first-order system today; convenience API planned |
 | RK4 nth-order ODE | partial | represent as first-order system today; convenience API planned |
 | Coupled first-order ODE system | done | `FourthOrderSystem` |
