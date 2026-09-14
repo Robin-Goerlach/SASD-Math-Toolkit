@@ -7,9 +7,9 @@ Status legend: **done** = callable implementation exists now; **partial** = doma
 | Bisection root finding | done | `RootSolvers.Bisection` |
 | Newton-Raphson root finding | done | `RootSolvers.NewtonRaphson` |
 | Secant root finding | done | `RootSolvers.Secant` |
-| Newton-Horner with deflation | planned | polynomial root module |
-| Muller complex root method | planned | complex root module |
-| Laguerre polynomial roots + deflation | planned | complex polynomial module |
+| Newton-Horner with deflation | done | `PolynomialRootSolvers.NewtonHorner` + `Polynomial.Deflate` |
+| Muller complex root method | done | `ComplexRootSolvers.Muller` |
+| Laguerre polynomial roots + deflation | done | `PolynomialRootSolvers.Laguerre` / `FindAllRootsLaguerre` |
 | Lagrange interpolation | done | `InterpolationAlgorithms.Lagrange` |
 | Newton divided differences | done | `NewtonDividedDifference` |
 | Free/natural cubic spline | done | `NaturalCubicSpline` |

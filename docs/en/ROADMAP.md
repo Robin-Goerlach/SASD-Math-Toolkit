@@ -8,15 +8,17 @@
 - Clean-room policy
 - Common iteration status/result conventions
 
-## M1 — Broad numerical foundation (in progress; first vertical slice implemented)
+## M1 — Broad numerical foundation (in progress; vertical slice expanded)
 
-Implemented across the major domains: scalar roots, polynomial/spline interpolation, differentiation, integration, dense linear algebra, basic eigen solvers, RK4 ODE integration, least squares and radix-2 FFT.
+Implemented across the major domains: scalar and complex roots, reusable polynomial/Horner/deflation support, polynomial/spline interpolation, differentiation, integration, dense linear algebra, basic eigen solvers, RK4 ODE integration, least squares and radix-2 FFT.
 
-The intent is to validate architecture across the whole product before filling every historical routine.
+The root-finding slice now includes the complete historical V1 root catalog: bisection, Newton-Raphson, secant, Newton-Horner, Muller and Laguerre with deflation.
+
+The intent remains to validate architecture across the whole product before filling every historical routine.
 
 ## M2 — Complete V1 compatibility catalog
 
-Close every item marked `planned` in `BORLAND-V1-COMPATIBILITY.md`, including complex root methods, LU factorization API, Jacobi/Wielandt eigensystems, RKF/Adams methods, shooting methods and the remaining FFT variants.
+Close every item marked `planned` in `BORLAND-V1-COMPATIBILITY.md`, including tabular differentiation, reusable LU factorization, Jacobi/Wielandt eigensystems, RKF/Adams methods, shooting methods and the remaining FFT variants.
 
 Quality gate for V1:
 

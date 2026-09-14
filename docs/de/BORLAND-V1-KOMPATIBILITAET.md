@@ -15,3 +15,5 @@ Die Hauptbereiche sind:
 - Least-Squares-Approximation
 - FFT, Faltung und Kreuzkorrelation
 - Beispiel-/Demonstrationsprogramme
+
+Der Bereich **Nullstellensuche** ist inzwischen vollständig für das historische V1-Ziel implementiert: Bisektion, Newton-Raphson, Sekantenverfahren, Newton-Horner, Muller sowie Laguerre inklusive Polynomdeflation. Die wiederverwendbare Polynom-Basis ist unter [`POLYNOM-NULLSTELLEN.md`](POLYNOM-NULLSTELLEN.md) beschrieben.

@@ -42,11 +42,12 @@ SASD-Math-Toolkit/
 
 Future language trees will be peers of `dotnet`, for example `src/cpp`, `src/fortran`, `src/java` and `src/javascript`. Language-neutral behavior belongs in `spec/`, not in one language implementation.
 
-## Current C# foundation (0.1.0)
+## Current C# foundation (0.1.0 development line)
 
 Implemented now:
 
-- Root finding: bisection, Newton-Raphson and secant methods
+- Root finding: bisection, Newton-Raphson, secant, Newton-Horner, complex Muller and Laguerre with polynomial deflation/all-roots support
+- Polynomial foundation: immutable complex-capable coefficients, Horner evaluation, first/second derivative evaluation, formal derivative and synthetic deflation
 - Interpolation: Lagrange, Newton divided differences, natural cubic spline and clamped cubic spline
 - Numerical differentiation: central finite differences, Richardson refinement and five-point formulas
 - Numerical integration: composite trapezoid, composite Simpson, adaptive Simpson, Romberg, 5-point Gauss-Legendre and adaptive Gauss-Legendre
@@ -83,8 +84,8 @@ Target framework: **.NET 10**.
 
 Start with:
 
-- English: [`docs/en/ARCHITECTURE.md`](docs/en/ARCHITECTURE.md), [`docs/en/ROADMAP.md`](docs/en/ROADMAP.md)
-- Deutsch: [`docs/de/ARCHITECTURE.md`](docs/de/ARCHITECTURE.md), [`docs/de/ROADMAP.md`](docs/de/ROADMAP.md)
+- English: [`docs/en/ARCHITECTURE.md`](docs/en/ARCHITECTURE.md), [`docs/en/ROADMAP.md`](docs/en/ROADMAP.md), [`docs/en/POLYNOMIAL-ROOTS.md`](docs/en/POLYNOMIAL-ROOTS.md)
+- Deutsch: [`docs/de/ARCHITECTURE.md`](docs/de/ARCHITECTURE.md), [`docs/de/ROADMAP.md`](docs/de/ROADMAP.md), [`docs/de/POLYNOM-NULLSTELLEN.md`](docs/de/POLYNOM-NULLSTELLEN.md)
 - Clean-room policy: [`docs/en/CLEAN-ROOM.md`](docs/en/CLEAN-ROOM.md)
 
 ## License
