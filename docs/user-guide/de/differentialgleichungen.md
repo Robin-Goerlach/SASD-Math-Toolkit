@@ -85,6 +85,39 @@ Jeder `NthOrderOdePoint` speichert einen schreibgeschützten Snapshot `[y, y', .
 
 Diese API ist besonders praktisch, wenn die ursprüngliche Gleichung natürlich in höherer Ordnung formuliert ist. Besteht das Modell bereits aus mehreren wechselwirkenden Variablen erster Ordnung, ist `FourthOrderSystem` die passendere direkte Schnittstelle.
 
+## Gekoppelte Systeme zweiter Ordnung mit RK4
+
+Viele physikalische Modelle besitzen mehrere Variablen zweiter Ordnung, die sich gegenseitig beeinflussen. Ein solches System wird als
+
+`Y'' = G(x, Y, Y')`
+
+geschrieben. `FourthOrderSecondOrderSystem` hält Werte und erste Ableitungen an der öffentlichen API bewusst in getrennten Vektoren und reduziert das Problem intern auf ein gewöhnliches System erster Ordnung.
+
+```csharp
+using Sasd.Numerics.DifferentialEquations;
+
+var end = Math.PI / (2.0 * Math.Sqrt(2.0));
+var points = RungeKutta.FourthOrderSecondOrderSystem(
+    (_, values, _) =>
+    {
+        var difference = values[0] - values[1];
+        return [-difference, difference];
+    },
+    x0: 0.0,
+    initialValues: [1.0, -1.0],
+    initialFirstDerivatives: [0.0, 0.0],
+    xEnd: end,
+    step: 0.01);
+
+var final = points[^1];
+Console.WriteLine(final.GetValue(0));
+Console.WriteLine(final.GetFirstDerivative(0));
+```
+
+Das Beispiel beschreibt zwei gekoppelte Oszillatoren. Beide Anfangsvektoren müssen dieselbe Dimension besitzen, und der Callback muss genau eine zweite Ableitung pro Gleichung zurückgeben. `SecondOrderSystemOdePoint` kopiert seine Vektoren, sodass spätere Änderungen an aufrufereigenen Arrays die berechnete Trajektorie nicht verändern.
+
+Diese API passt besonders zu Modellen, die natürlich als Gruppe von Gleichungen zweiter Ordnung formuliert sind, etwa gekoppelte mechanische Koordinaten. Liegt das Modell bereits als allgemeiner Zustandsvektor erster Ordnung vor, ist `FourthOrderSystem` die direktere Schnittstelle.
+
 ## Adaptives RKF45
 
 RKF45 ist besonders nützlich, wenn sich die Lösung innerhalb des Intervalls unterschiedlich schnell ändert oder wenn lieber eine Fehlertoleranz vorgegeben werden soll als eine einzige feste Schrittweite.
@@ -146,7 +179,7 @@ Von 0 bis 1 mit `maximumStep: 0.3` entstehen beispielsweise vier Intervalle mit 
 
 ## Wahl zwischen den Verfahren
 
-RK4 eignet sich als einfache feste Referenzrechnung. RKF45 ist sinnvoll, wenn automatische lokale Fehlerkontrolle und variable Schrittweiten wichtiger sind. Adams-Bashforth/Moulton passt gut, wenn ein regelmäßiges Gitter und die Wiederverwendung der Ableitungshistorie erwünscht sind. Für skalare Gleichungen zweiter oder höherer Ordnung sind die passenden RK4-Komfort-APIs meist klarer, als Ableitungen manuell in einen generischen Zustandsvektor zu verpacken, sofern die allgemeine Systemschnittstelle nicht ausdrücklich benötigt wird.
+RK4 eignet sich als einfache feste Referenzrechnung. RKF45 ist sinnvoll, wenn automatische lokale Fehlerkontrolle und variable Schrittweiten wichtiger sind. Adams-Bashforth/Moulton passt gut, wenn ein regelmäßiges Gitter und die Wiederverwendung der Ableitungshistorie erwünscht sind. Für skalare Gleichungen zweiter oder höherer Ordnung sowie gekoppelte Systeme zweiter Ordnung sind die passenden RK4-Komfort-APIs meist klarer, als den entsprechenden Zustand erster Ordnung selbst zu packen, sofern die allgemeine Systemschnittstelle nicht ausdrücklich benötigt wird.
 
 Keines dieser Verfahren ist automatisch die richtige Wahl für steife Differentialgleichungen. Ändert sich das Ergebnis stark, wenn Schrittweite oder Toleranz verschärft werden, sollte die numerische Stabilität untersucht werden, statt zusätzliche Nachkommastellen mit zusätzlicher Genauigkeit gleichzusetzen.
 
@@ -164,4 +197,4 @@ Verworfene Schritte sind bei einem adaptiven Verfahren zunächst normal. Einige 
 
 ## Derzeitige Grenzen
 
-Die adaptive Implementierung behandelt skalare Differentialgleichungen erster Ordnung und integriert vorwärts. RK4 unterstützt skalare Gleichungen erster, zweiter und n-ter Ordnung sowie gekoppelte Systeme erster Ordnung. Die Adams-Implementierung ist skalar und arbeitet mit fester Schrittweite. Eine eigene Komfort-API für gekoppelte Systeme zweiter Ordnung sowie lineare und nichtlineare Shooting-Verfahren sind noch V1-Arbeitspunkte und werden erst dokumentiert, wenn die APIs tatsächlich vorhanden sind.
+Die adaptive Implementierung behandelt skalare Differentialgleichungen erster Ordnung und integriert vorwärts. RK4 deckt nun skalare Gleichungen erster, zweiter und n-ter Ordnung sowie gekoppelte Systeme erster und zweiter Ordnung ab. Die Adams-Implementierung ist skalar und arbeitet mit fester Schrittweite. Als wesentliche V1-Arbeitspunkte im ODE-/Randwertbereich verbleiben jetzt die linearen und nichtlinearen Shooting-Verfahren; dokumentiert werden sie hier erst, wenn ihre öffentlichen APIs tatsächlich vorhanden sind.

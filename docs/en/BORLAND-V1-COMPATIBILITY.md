@@ -40,7 +40,7 @@ Status legend: **done** = callable implementation exists now; **partial** = doma
 | RK4 second-order ODE | done | `RungeKutta.FourthOrderSecondOrder` + `SecondOrderOdePoint` |
 | RK4 nth-order ODE | done | `RungeKutta.FourthOrderNthOrder` + `NthOrderOdePoint` companion-system API |
 | Coupled first-order ODE system | done | `FourthOrderSystem` |
-| Coupled second-order ODE system | partial | convert to first-order system; dedicated convenience API planned |
+| Coupled second-order ODE system | done | `RungeKutta.FourthOrderSecondOrderSystem` + `SecondOrderSystemOdePoint` |
 | Nonlinear shooting + RK for second-order BVP | planned | boundary-value module |
 | Linear shooting + RK for second-order BVP | planned | boundary-value module |
 | Least-squares approximation | partial | polynomial + arbitrary linear basis done; named historical model helpers planned |

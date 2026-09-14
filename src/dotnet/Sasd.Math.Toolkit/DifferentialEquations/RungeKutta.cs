@@ -7,7 +7,7 @@ public sealed record OdePoint(double X, double Y);
 /// <summary>
 /// Initial-value solvers based on the classical fourth-order Runge-Kutta method.
 /// </summary>
-public static class RungeKutta
+public static partial class RungeKutta
 {
     /// <summary>
     /// Solves a scalar first-order initial-value problem <c>y' = f(x, y)</c>.

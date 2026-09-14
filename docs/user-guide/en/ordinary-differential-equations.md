@@ -85,6 +85,39 @@ Each `NthOrderOdePoint` stores a read-only snapshot `[y, y', ..., y^(n-1)]`. `Ge
 
 This API is especially useful when the original equation is naturally written in higher-order form. If your model is already a set of interacting first-order variables, use `FourthOrderSystem` directly instead of forcing it into an nth-order scalar representation.
 
+## Coupled second-order systems with RK4
+
+Many physical models contain several second-order variables that influence one another. Write the system as
+
+`Y'' = G(x, Y, Y')`.
+
+`FourthOrderSecondOrderSystem` keeps values and first derivatives in separate vectors at the API boundary, while internally reducing the problem to one ordinary first-order RK4 system.
+
+```csharp
+using Sasd.Numerics.DifferentialEquations;
+
+var end = Math.PI / (2.0 * Math.Sqrt(2.0));
+var points = RungeKutta.FourthOrderSecondOrderSystem(
+    (_, values, _) =>
+    {
+        var difference = values[0] - values[1];
+        return [-difference, difference];
+    },
+    x0: 0.0,
+    initialValues: [1.0, -1.0],
+    initialFirstDerivatives: [0.0, 0.0],
+    xEnd: end,
+    step: 0.01);
+
+var final = points[^1];
+Console.WriteLine(final.GetValue(0));
+Console.WriteLine(final.GetFirstDerivative(0));
+```
+
+The example represents two coupled oscillators. Both initial vectors must have the same dimension, and the callback must return exactly one second derivative per equation. `SecondOrderSystemOdePoint` copies its vectors, so the returned trajectory is not affected by later changes to caller-owned arrays.
+
+Use this API when your model is naturally a group of second-order equations such as coupled mechanical coordinates. Use `FourthOrderSystem` directly when your model is already expressed as a general first-order state.
+
 ## Adaptive RKF45
 
 Use RKF45 when the solution changes at different rates over the interval or when you prefer to state an error tolerance instead of manually choosing one fixed step size.
@@ -146,7 +179,7 @@ For example, integrating from 0 to 1 with `maximumStep: 0.3` produces four inter
 
 ## Choosing between the methods
 
-Use RK4 when a simple fixed-step reference calculation is desirable. Use RKF45 when automatic local error control and variable steps are more important. Use Adams-Bashforth/Moulton when a regular grid and derivative-history reuse fit the problem well. For scalar second- or higher-order equations, the typed RK4 convenience APIs are clearer than manually packing derivatives into a generic state array unless you specifically need the general system interface.
+Use RK4 when a simple fixed-step reference calculation is desirable. Use RKF45 when automatic local error control and variable steps are more important. Use Adams-Bashforth/Moulton when a regular grid and derivative-history reuse fit the problem well. For scalar second- or higher-order equations and coupled second-order systems, the dedicated RK4 convenience APIs are clearer than manually packing the equivalent first-order state unless you specifically need the generic system interface.
 
 None of these methods is a universal answer for stiff differential equations. If results change strongly when the step or tolerance is tightened, investigate numerical stability rather than assuming more printed digits imply more accuracy.
 
@@ -164,4 +197,4 @@ Rejected steps are not failures by themselves. They are part of normal adaptive 
 
 ## Current limits
 
-The adaptive implementation is for scalar first-order equations and forward integration. RK4 supports scalar first-order, scalar second-order, scalar nth-order and coupled first-order systems. The Adams implementation is scalar and fixed-step. A dedicated convenience API for coupled second-order systems and linear/nonlinear shooting methods are still V1 work items and will be documented here only after their public APIs exist.
+The adaptive implementation is for scalar first-order equations and forward integration. RK4 now covers scalar first-order, scalar second-order, scalar nth-order, coupled first-order and coupled second-order systems. The Adams implementation is scalar and fixed-step. Linear and nonlinear shooting methods remain the main V1 ODE/boundary-value work items and will be documented here only after their public APIs exist.
