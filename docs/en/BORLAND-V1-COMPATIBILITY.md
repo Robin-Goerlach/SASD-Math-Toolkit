@@ -37,7 +37,7 @@ Status legend: **done** = callable implementation exists now; **partial** = doma
 | RK4 first-order ODE | done | `RungeKutta.FourthOrder` |
 | Runge-Kutta-Fehlberg first-order ODE | done | `RungeKuttaFehlberg.Integrate` with adaptive RKF45 step control |
 | Adams-Bashforth/Adams-Moulton predictor-corrector | done | `AdamsBashforthMoulton.Integrate` (AB4 predictor + AM4 corrector, RK4 startup) |
-| RK4 second-order ODE | partial | represent as first-order system today; convenience API planned |
+| RK4 second-order ODE | done | `RungeKutta.FourthOrderSecondOrder` + `SecondOrderOdePoint` |
 | RK4 nth-order ODE | partial | represent as first-order system today; convenience API planned |
 | Coupled first-order ODE system | done | `FourthOrderSystem` |
 | Coupled second-order ODE system | partial | convert to first-order system; dedicated convenience API planned |

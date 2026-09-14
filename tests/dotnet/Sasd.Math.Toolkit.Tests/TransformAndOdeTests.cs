@@ -23,6 +23,59 @@ public sealed class TransformAndOdeTests
     }
 
     [Fact]
+    public void RungeKuttaSecondOrder_SolvesHarmonicOscillator()
+    {
+        // y'' = -y, y(0) = 0, y'(0) = 1 has y = sin(x), y' = cos(x).
+        // At pi/2 the displacement is one and the velocity is zero.
+        var points = RungeKutta.FourthOrderSecondOrder(
+            (_, y, _) => -y,
+            x0: 0.0,
+            y0: 0.0,
+            firstDerivative0: 1.0,
+            xEnd: System.Math.PI / 2.0,
+            step: 0.01);
+
+        var final = points[^1];
+        Assert.Equal(System.Math.PI / 2.0, final.X, 12);
+        Assert.InRange(final.Y, 1.0 - 2e-9, 1.0 + 2e-9);
+        Assert.InRange(final.FirstDerivative, -2e-9, 2e-9);
+    }
+
+    [Fact]
+    public void RungeKuttaSecondOrder_HandlesVelocityDependentAccelerationAndShortFinalStep()
+    {
+        // y'' = 2 - y' with y(0)=0, y'(0)=0 has
+        // y' = 2(1-e^-x) and y = 2x - 2 + 2e^-x.
+        var points = RungeKutta.FourthOrderSecondOrder(
+            (_, _, firstDerivative) => 2.0 - firstDerivative,
+            x0: 0.0,
+            y0: 0.0,
+            firstDerivative0: 0.0,
+            xEnd: 1.0,
+            step: 0.3);
+
+        var expectedY = 2.0 / System.Math.E;
+        var expectedDerivative = 2.0 * (1.0 - (1.0 / System.Math.E));
+        var final = points[^1];
+
+        Assert.Equal(1.0, final.X, 12);
+        Assert.InRange(final.Y, expectedY - 2e-4, expectedY + 2e-4);
+        Assert.InRange(final.FirstDerivative, expectedDerivative - 2e-4, expectedDerivative + 2e-4);
+    }
+
+    [Fact]
+    public void RungeKuttaSecondOrder_RejectsNonFiniteAcceleration()
+    {
+        Assert.Throws<ArithmeticException>(() => RungeKutta.FourthOrderSecondOrder(
+            (_, _, _) => double.NaN,
+            x0: 0.0,
+            y0: 0.0,
+            firstDerivative0: 0.0,
+            xEnd: 1.0,
+            step: 0.1));
+    }
+
+    [Fact]
     public void RungeKuttaFehlberg_AdaptivelySolvesExponentialGrowth()
     {
         var result = RungeKuttaFehlberg.Integrate(

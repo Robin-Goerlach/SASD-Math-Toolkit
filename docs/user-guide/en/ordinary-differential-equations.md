@@ -1,10 +1,10 @@
 # Ordinary differential equations
 
-This chapter describes the currently stable C# APIs for first-order initial-value problems. It will grow as the remaining V1 ODE and boundary-value routines are implemented.
+This chapter describes the currently stable C# APIs for initial-value problems. It grows as the remaining V1 ODE and boundary-value routines are implemented.
 
-## The problem
+## First-order initial-value problems
 
-A first-order initial-value problem specifies a derivative and one starting value:
+A scalar first-order problem specifies
 
 `y' = f(x, y)` and `y(x0) = y0`.
 
@@ -28,6 +28,33 @@ Console.WriteLine(points[^1].Y); // approximately e
 ```
 
 The solver shortens only the final step when necessary so the trajectory ends exactly at `xEnd`.
+
+## Second-order equations with RK4
+
+A scalar second-order problem has the form
+
+`y'' = g(x, y, y')`
+
+and needs two initial values: `y(x0)` and `y'(x0)`. You can always rewrite such a problem manually as a two-component first-order system. `FourthOrderSecondOrder` performs that standard transformation for you and returns both `y` and `y'`.
+
+```csharp
+using Sasd.Numerics.DifferentialEquations;
+
+// Harmonic oscillator: y'' = -y, y(0)=0, y'(0)=1.
+var points = RungeKutta.FourthOrderSecondOrder(
+    (_, y, _) => -y,
+    x0: 0.0,
+    y0: 0.0,
+    firstDerivative0: 1.0,
+    xEnd: Math.PI / 2.0,
+    step: 0.01);
+
+var final = points[^1];
+Console.WriteLine(final.Y);               // approximately 1
+Console.WriteLine(final.FirstDerivative); // approximately 0
+```
+
+This is a convenience API, not a second independent RK4 implementation. Internally the equation is transformed to `y'=v`, `v'=g(x,y,v)` and passed through the same tested system RK4 core.
 
 ## Adaptive RKF45
 
@@ -90,7 +117,7 @@ For example, integrating from 0 to 1 with `maximumStep: 0.3` produces four inter
 
 ## Choosing between the methods
 
-Use RK4 when a simple fixed-step reference calculation is desirable. Use RKF45 when automatic local error control and variable steps are more important. Use Adams-Bashforth/Moulton when a regular grid and derivative-history reuse fit the problem well.
+Use RK4 when a simple fixed-step reference calculation is desirable. Use RKF45 when automatic local error control and variable steps are more important. Use Adams-Bashforth/Moulton when a regular grid and derivative-history reuse fit the problem well. For a scalar second-order equation, the second-order RK4 convenience API is preferable to manually packing `y` and `y'` into an array unless you specifically need the generic system interface.
 
 None of these methods is a universal answer for stiff differential equations. If results change strongly when the step or tolerance is tightened, investigate numerical stability rather than assuming more printed digits imply more accuracy.
 
@@ -108,4 +135,4 @@ Rejected steps are not failures by themselves. They are part of normal adaptive 
 
 ## Current limits
 
-The adaptive implementation is for scalar first-order equations and forward integration. RK4 already supports coupled first-order systems. The Adams implementation is also scalar and fixed-step. Higher-order convenience APIs and linear/nonlinear shooting methods are still V1 work items and will be documented here only after their public APIs exist.
+The adaptive implementation is for scalar first-order equations and forward integration. RK4 supports scalar first-order, scalar second-order and coupled first-order systems. The Adams implementation is scalar and fixed-step. A general nth-order convenience API, a dedicated convenience API for coupled second-order systems, and linear/nonlinear shooting methods are still V1 work items and will be documented here only after their public APIs exist.

@@ -1,10 +1,10 @@
 # Gewöhnliche Differentialgleichungen
 
-Dieses Kapitel beschreibt die derzeit stabilen C#-APIs für Anfangswertprobleme erster Ordnung. Es wächst weiter, sobald die noch fehlenden V1-Verfahren für Differential- und Randwertprobleme implementiert sind.
+Dieses Kapitel beschreibt die derzeit stabilen C#-APIs für Anfangswertprobleme. Es wächst weiter, sobald die noch fehlenden V1-Verfahren für Differential- und Randwertprobleme implementiert sind.
 
-## Das Problem
+## Anfangswertprobleme erster Ordnung
 
-Ein Anfangswertproblem erster Ordnung besteht aus einer Differentialgleichung und einem Startwert:
+Ein skalares Anfangswertproblem erster Ordnung besteht aus
 
 `y' = f(x, y)` und `y(x0) = y0`.
 
@@ -28,6 +28,33 @@ Console.WriteLine(points[^1].Y); // ungefähr e
 ```
 
 Nur der letzte Schritt wird bei Bedarf verkürzt, damit die Folge genau bei `xEnd` endet.
+
+## Gleichungen zweiter Ordnung mit RK4
+
+Ein skalares Anfangswertproblem zweiter Ordnung hat die Form
+
+`y'' = g(x, y, y')`
+
+und benötigt zwei Anfangswerte: `y(x0)` und `y'(x0)`. Ein solches Problem lässt sich immer manuell als System aus zwei Gleichungen erster Ordnung formulieren. `FourthOrderSecondOrder` übernimmt diese Standardtransformation und liefert sowohl `y` als auch `y'` zurück.
+
+```csharp
+using Sasd.Numerics.DifferentialEquations;
+
+// Harmonischer Oszillator: y'' = -y, y(0)=0, y'(0)=1.
+var points = RungeKutta.FourthOrderSecondOrder(
+    (_, y, _) => -y,
+    x0: 0.0,
+    y0: 0.0,
+    firstDerivative0: 1.0,
+    xEnd: Math.PI / 2.0,
+    step: 0.01);
+
+var final = points[^1];
+Console.WriteLine(final.Y);               // ungefähr 1
+Console.WriteLine(final.FirstDerivative); // ungefähr 0
+```
+
+Das ist eine Komfort-API und keine zweite unabhängige RK4-Implementierung. Intern wird die Gleichung zu `y'=v`, `v'=g(x,y,v)` umgeformt und über denselben getesteten System-RK4-Kern integriert.
 
 ## Adaptives RKF45
 
@@ -90,7 +117,7 @@ Von 0 bis 1 mit `maximumStep: 0.3` entstehen beispielsweise vier Intervalle mit 
 
 ## Wahl zwischen den Verfahren
 
-RK4 eignet sich als einfache feste Referenzrechnung. RKF45 ist sinnvoll, wenn automatische lokale Fehlerkontrolle und variable Schrittweiten wichtiger sind. Adams-Bashforth/Moulton passt gut, wenn ein regelmäßiges Gitter und die Wiederverwendung der Ableitungshistorie erwünscht sind.
+RK4 eignet sich als einfache feste Referenzrechnung. RKF45 ist sinnvoll, wenn automatische lokale Fehlerkontrolle und variable Schrittweiten wichtiger sind. Adams-Bashforth/Moulton passt gut, wenn ein regelmäßiges Gitter und die Wiederverwendung der Ableitungshistorie erwünscht sind. Für eine skalare Gleichung zweiter Ordnung ist die neue RK4-Komfort-API in der Regel klarer, als `y` und `y'` selbst in einen Zustandsvektor zu verpacken, sofern die allgemeine Systemschnittstelle nicht ausdrücklich benötigt wird.
 
 Keines dieser Verfahren ist automatisch die richtige Wahl für steife Differentialgleichungen. Ändert sich das Ergebnis stark, wenn Schrittweite oder Toleranz verschärft werden, sollte die numerische Stabilität untersucht werden, statt zusätzliche Nachkommastellen mit zusätzlicher Genauigkeit gleichzusetzen.
 
@@ -108,4 +135,4 @@ Verworfene Schritte sind bei einem adaptiven Verfahren zunächst normal. Einige 
 
 ## Derzeitige Grenzen
 
-Die adaptive Implementierung behandelt skalare Differentialgleichungen erster Ordnung und integriert vorwärts. RK4 unterstützt bereits gekoppelte Systeme erster Ordnung. Die Adams-Implementierung ist ebenfalls skalar und arbeitet mit fester Schrittweite. Komfort-APIs für höhere Ordnung sowie lineare und nichtlineare Shooting-Verfahren sind noch V1-Arbeitspunkte und werden erst dokumentiert, wenn die APIs tatsächlich vorhanden sind.
+Die adaptive Implementierung behandelt skalare Differentialgleichungen erster Ordnung und integriert vorwärts. RK4 unterstützt skalare Gleichungen erster und zweiter Ordnung sowie gekoppelte Systeme erster Ordnung. Die Adams-Implementierung ist skalar und arbeitet mit fester Schrittweite. Eine allgemeine Komfort-API für n-te Ordnung, eine eigene Komfort-API für gekoppelte Systeme zweiter Ordnung sowie lineare und nichtlineare Shooting-Verfahren sind noch V1-Arbeitspunkte und werden erst dokumentiert, wenn die APIs tatsächlich vorhanden sind.
