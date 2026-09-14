@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>Sasd.Math.Toolkit</AssemblyName>
+    <RootNamespace>Sasd.Numerics</RootNamespace>
+    <PackageId>Sasd.Math.Toolkit</PackageId>
+    <Version>0.1.0</Version>
+    <Description>Reusable numerical methods and applied mathematics foundation for SASD projects.</Description>
+    <Authors>Robin Goerlach; SASD-GmbH</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+</Project>

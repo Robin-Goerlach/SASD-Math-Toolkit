@@ -1,9 +1,92 @@
-# SASD-Math-Toolkit
+# SASD Math Toolkit
 
-**SASD-Math-Toolkit** is a reusable mathematical foundation library for the SASD Toolbox ecosystem.
+**SASD Math Toolkit** is the reusable mathematical foundation for the SASD Toolbox ecosystem. The repository starts with a modern, independently implemented C# numerical-methods library and is intentionally structured so equivalent implementations can later be added for C++, Fortran, Java and JavaScript without redesigning the repository.
 
-It provides applied mathematics, numerical methods, geometry, statistics support and validation components that can be shared across multiple SASD projects. The library is intended to become the common base for the **SASD Game Toolkit**, **Fully Encrypted** and the **SASD Statistical Workbench**.
+The library is intended to become a common base for projects such as the **SASD Game Toolkit**, **Fully Encrypted**, the **SASD Statistical Workbench**, graphics/simulation software and future SASD scientific applications.
 
-The initial focus is practical and application-driven: vectors, matrices, geometry, interpolation, curves, tolerances, deterministic calculations, simple numerical methods and validation helpers. These areas directly support game development, graphics programming and simulation experiments.
+## V1 target: Numerical Methods compatibility set
 
-Long-term, the project may grow into a broader numerical and statistical foundation for SASD applications. It is not intended to replace established scientific libraries such as LAPACK, IMSL, GSL or mature cryptographic libraries. Instead, it provides a clean, understandable, documented and testable SASD-owned abstraction layer that can use such libraries as references or optional backends when appropriate.
+Version 1 targets the functional scope of Borland's historical *Turbo Pascal Numerical Methods Toolbox* as a compatibility/reference milestone, **not** as a source-code port. The implementation in this repository is new code with modern APIs, tests and documentation. Historical source code is neither required nor copied.
+
+The V1 catalog contains these areas:
+
+1. Roots of equations in one variable
+2. Interpolation
+3. Numerical differentiation
+4. Numerical integration
+5. Matrix routines
+6. Eigenvalues and eigenvectors
+7. Initial-value and boundary-value methods for ODEs
+8. Least-squares approximation
+9. Fast Fourier transform routines, convolution and correlation
+10. Demonstration/sample applications
+
+See [`docs/en/BORLAND-V1-COMPATIBILITY.md`](docs/en/BORLAND-V1-COMPATIBILITY.md) for the implementation matrix.
+
+## Repository architecture
+
+```text
+SASD-Math-Toolkit/
+├── src/
+│   └── dotnet/                 # C#/.NET implementation (first language)
+├── tests/
+│   └── dotnet/                 # automated numerical regression tests
+├── samples/
+│   └── dotnet/                 # small executable examples
+├── spec/                       # language-neutral contracts and algorithm catalog
+├── docs/
+│   ├── en/                     # primary documentation
+│   └── de/                     # German documentation
+└── .github/workflows/          # build and test automation
+```
+
+Future language trees will be peers of `dotnet`, for example `src/cpp`, `src/fortran`, `src/java` and `src/javascript`. Language-neutral behavior belongs in `spec/`, not in one language implementation.
+
+## Current C# foundation (0.1.0)
+
+Implemented now:
+
+- Root finding: bisection, Newton-Raphson and secant methods
+- Interpolation: Lagrange, Newton divided differences, natural cubic spline and clamped cubic spline
+- Numerical differentiation: central finite differences, Richardson refinement and five-point formulas
+- Numerical integration: composite trapezoid, composite Simpson, adaptive Simpson, Romberg, 5-point Gauss-Legendre and adaptive Gauss-Legendre
+- Linear algebra: determinant, Gaussian elimination, partial pivoting, inverse and Gauss-Seidel iteration
+- Eigenvalues: power method and inverse power method
+- Differential equations: fourth-order Runge-Kutta for scalar equations and systems
+- Least squares: polynomial and arbitrary linear-basis fitting
+- FFT: radix-2 complex/real FFT, inverse FFT, real convolution and real cross-correlation
+- Geometry seed: immutable `Vector2D`
+
+This is deliberately a useful vertical slice rather than a collection of placeholders. Missing V1 algorithms remain explicit roadmap items instead of methods that only throw `NotImplementedException`.
+
+## Build
+
+```bash
+dotnet restore Sasd.Math.Toolkit.slnx
+dotnet build Sasd.Math.Toolkit.slnx --configuration Release
+dotnet test Sasd.Math.Toolkit.slnx --configuration Release
+```
+
+Target framework: **.NET 10**.
+
+## Design rules
+
+- Numerical algorithms are deterministic and independent from UI, files and console I/O.
+- Input validation is explicit.
+- Iterative algorithms return termination status, iteration count and residual information where useful.
+- Public APIs use ordinary .NET data types and `System.Numerics.Complex` where appropriate.
+- Algorithms stay understandable and well documented before micro-optimization begins.
+- Large-scale/high-performance workloads may later use optional BLAS/LAPACK or other mature backends behind SASD abstractions.
+- A historical algorithm name is a mathematical reference, not a dependency on historical source code.
+
+## Documentation
+
+Start with:
+
+- English: [`docs/en/ARCHITECTURE.md`](docs/en/ARCHITECTURE.md), [`docs/en/ROADMAP.md`](docs/en/ROADMAP.md)
+- Deutsch: [`docs/de/ARCHITECTURE.md`](docs/de/ARCHITECTURE.md), [`docs/de/ROADMAP.md`](docs/de/ROADMAP.md)
+- Clean-room policy: [`docs/en/CLEAN-ROOM.md`](docs/en/CLEAN-ROOM.md)
+
+## License
+
+MIT. See [`LICENSE`](LICENSE).

@@ -1,0 +1,55 @@
+# V1 Numerical Methods compatibility matrix
+
+Status legend: **done** = callable implementation exists now; **partial** = domain exists but historical variants remain; **planned** = V1 work item.
+
+| Historical area / method | SASD V1 status | Current SASD API / plan |
+|---|---:|---|
+| Bisection root finding | done | `RootSolvers.Bisection` |
+| Newton-Raphson root finding | done | `RootSolvers.NewtonRaphson` |
+| Secant root finding | done | `RootSolvers.Secant` |
+| Newton-Horner with deflation | planned | polynomial root module |
+| Muller complex root method | planned | complex root module |
+| Laguerre polynomial roots + deflation | planned | complex polynomial module |
+| Lagrange interpolation | done | `InterpolationAlgorithms.Lagrange` |
+| Newton divided differences | done | `NewtonDividedDifference` |
+| Free/natural cubic spline | done | `NaturalCubicSpline` |
+| Clamped cubic spline | done | `ClampedCubicSpline` |
+| First derivative from tabular data (2/3/5 point) | planned | data finite-difference module |
+| Second derivative from tabular data (3/5 point) | planned | data finite-difference module |
+| Differentiation via cubic spline interpolant | partial | `CubicSpline.FirstDerivative` exists; convenience API planned |
+| First derivative of a function | done | Richardson-refined central formula |
+| Second derivative of a function | done | Richardson-refined central formula |
+| Composite Simpson integration | done | `CompositeSimpson` |
+| Composite trapezoid integration | done | `CompositeTrapezoid` |
+| Adaptive Simpson integration | done | `AdaptiveSimpson` |
+| Adaptive Gaussian quadrature | done | `AdaptiveGaussLegendre5` |
+| Romberg integration | done | `Romberg` |
+| Determinant | done | `LinearSystemSolvers.Determinant` |
+| Matrix inverse | done | `LinearSystemSolvers.Inverse` |
+| Gaussian elimination | done | `SolveGaussian(... partialPivoting:false)` |
+| Gaussian elimination + partial pivoting | done | `SolveGaussian(... partialPivoting:true)` |
+| Direct factoring / LU decompose + solve | planned | explicit reusable LU factorization object |
+| Gauss-Seidel iterative solve | done | `GaussSeidel` |
+| Dominant eigenpair / power method | done | `EigenSolvers.PowerMethod` |
+| Inverse power method | done | `EigenSolvers.InversePowerMethod` |
+| Power method + Wielandt deflation | planned | eigen module |
+| Cyclic Jacobi symmetric eigensystem | planned | eigen module |
+| RK4 first-order ODE | done | `RungeKutta.FourthOrder` |
+| Runge-Kutta-Fehlberg first-order ODE | planned | adaptive ODE module |
+| Adams-Bashforth/Adams-Moulton predictor-corrector | planned | multistep ODE module |
+| RK4 second-order ODE | partial | represent as first-order system today; convenience API planned |
+| RK4 nth-order ODE | partial | represent as first-order system today; convenience API planned |
+| Coupled first-order ODE system | done | `FourthOrderSystem` |
+| Coupled second-order ODE system | partial | convert to first-order system; dedicated convenience API planned |
+| Nonlinear shooting + RK for second-order BVP | planned | boundary-value module |
+| Linear shooting + RK for second-order BVP | planned | boundary-value module |
+| Least-squares approximation | partial | polynomial + arbitrary linear basis done; named historical model helpers planned |
+| Complex FFT | done | radix-2 `Forward` / `Inverse` |
+| Real FFT | done | `ForwardReal` (compact real-spectrum API planned) |
+| Complex convolution | planned | transform domain exists; public helper planned |
+| Real convolution | done | `ConvolveReal` |
+| Complex cross-correlation | planned | public helper planned |
+| Real cross-correlation | done | `CrossCorrelateReal` |
+| Graphics demo applications | planned | samples/visualization after numerical V1 core |
+
+The historical catalog is a minimum compatibility target. SASD APIs may expose safer defaults or more general forms rather than reproducing old procedure signatures literally.

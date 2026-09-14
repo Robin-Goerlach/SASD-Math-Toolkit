@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="src/dotnet/Sasd.Math.Toolkit/Sasd.Math.Toolkit.csproj" />
+  <Project Path="tests/dotnet/Sasd.Math.Toolkit.Tests/Sasd.Math.Toolkit.Tests.csproj" />
+  <Project Path="samples/dotnet/Sasd.Math.Toolkit.Sample/Sasd.Math.Toolkit.Sample.csproj" />
+</Solution>
