@@ -132,9 +132,12 @@ public static class EigenSolvers
 
         var deflation = WielandtDeflation.Create(matrix, dominant.Value);
 
-        // A deterministic basis vector that is not parallel to the removed vector is
-        // safer than reusing the all-ones default: the removed eigenvector is now the
-        // zero-eigenvalue direction of the deflated matrix.
+        // Do not start the second power iteration in a single coordinate direction:
+        // that direction can itself be another exact eigenvector and would make the
+        // iteration converge to whichever eigenvalue happens to own that coordinate.
+        // Instead use a deterministic broad vector and remove its component along the
+        // deflated zero-eigenvalue direction. A basis-vector fallback handles the case
+        // where the removed eigenvector itself is proportional to the all-ones vector.
         var deflatedInitial = CreateDeflatedInitialVector(dominant.Value.Eigenvector);
         var deflated = PowerMethod(deflation.DeflatedMatrix, deflatedInitial, tolerance, maximumIterations);
         var totalIterations = dominant.Iterations + deflated.Iterations;
@@ -318,21 +321,45 @@ public static class EigenSolvers
 
     private static double[] CreateDeflatedInitialVector(IReadOnlyList<double> removedEigenvector)
     {
-        var index = 0;
-        var smallestMagnitude = System.Math.Abs(removedEigenvector[0]);
-        for (var i = 1; i < removedEigenvector.Count; i++)
+        var denominator = Dot(removedEigenvector, removedEigenvector);
+        if (denominator <= NumericConstants.NearlyZero)
         {
-            var magnitude = System.Math.Abs(removedEigenvector[i]);
-            if (magnitude < smallestMagnitude)
+            throw new ArgumentException("Removed eigenvector must not be the zero vector.", nameof(removedEigenvector));
+        }
+
+        // Start with a broad deterministic vector so all remaining eigendirections
+        // normally have a non-zero component, then project out the direction that was
+        // deliberately replaced by the zero eigenvalue.
+        var vector = Enumerable.Repeat(1.0, removedEigenvector.Count).ToArray();
+        RemoveProjection(vector, removedEigenvector, denominator);
+        if (EuclideanNorm(vector) > NumericConstants.NearlyZero)
+        {
+            return vector;
+        }
+
+        // If the removed eigenvector is itself proportional to the all-ones vector,
+        // project individual basis vectors until a non-parallel direction is found.
+        for (var candidate = 0; candidate < removedEigenvector.Count; candidate++)
+        {
+            Array.Clear(vector);
+            vector[candidate] = 1.0;
+            RemoveProjection(vector, removedEigenvector, denominator);
+            if (EuclideanNorm(vector) > NumericConstants.NearlyZero)
             {
-                index = i;
-                smallestMagnitude = magnitude;
+                return vector;
             }
         }
 
-        var vector = new double[removedEigenvector.Count];
-        vector[index] = 1.0;
-        return vector;
+        throw new ArithmeticException("Unable to construct an initial vector for the deflated power iteration.");
+    }
+
+    private static void RemoveProjection(double[] vector, IReadOnlyList<double> direction, double directionNormSquared)
+    {
+        var coefficient = Dot(vector, direction) / directionNormSquared;
+        for (var i = 0; i < vector.Length; i++)
+        {
+            vector[i] -= coefficient * direction[i];
+        }
     }
 
     private static void EnsureSquare(DenseMatrix matrix)
