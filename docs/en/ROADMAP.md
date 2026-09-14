@@ -10,17 +10,17 @@
 
 ## M1 — Broad numerical foundation (in progress; vertical slice expanded)
 
-Implemented across the major domains: scalar and complex roots, reusable polynomial/Horner/deflation support, polynomial/spline interpolation, the complete historical V1 differentiation catalog, integration, dense linear algebra with reusable pivoted LU factorization, the complete historical V1 eigenvalue catalog, RK4 ODE integration, least squares and radix-2 FFT.
+Implemented across the major domains: scalar and complex roots, reusable polynomial/Horner/deflation support, polynomial/spline interpolation, the complete historical V1 differentiation catalog, integration, dense linear algebra with reusable pivoted LU factorization, the complete historical V1 eigenvalue catalog, fixed-step RK4 plus adaptive RKF45 ODE integration, least squares and radix-2 FFT.
 
-The root-finding slice includes the complete historical V1 root catalog. Direct LU factorization is complete through `LuFactorization`. The eigenvalue slice is complete through power iteration, inverse power iteration, Wielandt deflation and cyclic Jacobi. Differentiation is now also complete for V1 through function, tabular two/three/five-point and spline-based derivative APIs.
+The root-finding, differentiation and eigenvalue slices include their complete historical V1 catalogs. Direct LU factorization is complete through `LuFactorization`. The ODE slice now includes both classical RK4 and adaptive Runge-Kutta-Fehlberg 4(5), with explicit tolerances, rejected-step diagnostics and bounded adaptive step sizes.
 
-A C#/.NET user handbook has started under `docs/user-guide/` and is intended to grow alongside stable implementation milestones rather than reuse the historical Pascal documentation.
+A C#/.NET user handbook lives under `docs/user-guide/` and grows alongside stable implementation milestones rather than reusing the historical Pascal documentation. The ODE chapter now documents both RK4 and RKF45 usage and numerical interpretation.
 
 The intent remains to validate architecture across the whole product before filling every historical routine.
 
 ## M2 — Complete V1 compatibility catalog
 
-Close every item marked `planned` in `BORLAND-V1-COMPATIBILITY.md`, including RKF/Adams methods, shooting methods and the remaining FFT variants. Several convenience APIs currently marked `partial` must also be completed or explicitly documented as superseded by a more general equivalent.
+Close every item marked `planned` in `BORLAND-V1-COMPATIBILITY.md`, including Adams predictor-corrector methods, shooting methods and the remaining FFT variants. Several convenience APIs currently marked `partial` must also be completed or explicitly documented as superseded by a more general equivalent.
 
 Quality gate for V1:
 

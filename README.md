@@ -54,7 +54,7 @@ Implemented now:
 - Numerical integration: composite trapezoid, composite Simpson, adaptive Simpson, Romberg, 5-point Gauss-Legendre and adaptive Gauss-Legendre
 - Linear algebra: determinant, Gaussian elimination, partial pivoting, reusable LU factorization/solve, inverse and Gauss-Seidel iteration
 - Eigenvalues: power method, LU-backed inverse power method, Wielandt deflation/second eigenpair and cyclic Jacobi complete symmetric eigensystems
-- Differential equations: fourth-order Runge-Kutta for scalar equations and systems
+- Differential equations: fixed-step fourth-order Runge-Kutta for scalar equations/systems and adaptive Runge-Kutta-Fehlberg 4(5) for scalar first-order equations
 - Least squares: polynomial and arbitrary linear-basis fitting
 - FFT: radix-2 complex/real FFT, inverse FFT, real convolution and real cross-correlation
 - Geometry seed: immutable `Vector2D`
@@ -75,7 +75,7 @@ Target framework: **.NET 10**.
 
 - Numerical algorithms are deterministic and independent from UI, files and console I/O.
 - Input validation is explicit.
-- Iterative algorithms return termination status, iteration count and residual information where useful.
+- Iterative/adaptive algorithms return termination status, work counts and diagnostic information where useful.
 - Public APIs use ordinary .NET data types and `System.Numerics.Complex` where appropriate.
 - Algorithms stay understandable and well documented before micro-optimization begins.
 - Large-scale/high-performance workloads may later use optional BLAS/LAPACK or other mature backends behind SASD abstractions.
@@ -85,8 +85,8 @@ Target framework: **.NET 10**.
 
 Technical documentation:
 
-- English: [`docs/en/ARCHITECTURE.md`](docs/en/ARCHITECTURE.md), [`docs/en/ROADMAP.md`](docs/en/ROADMAP.md), [`docs/en/DIFFERENTIATION.md`](docs/en/DIFFERENTIATION.md), [`docs/en/POLYNOMIAL-ROOTS.md`](docs/en/POLYNOMIAL-ROOTS.md), [`docs/en/LU-FACTORIZATION.md`](docs/en/LU-FACTORIZATION.md), [`docs/en/EIGENVALUES.md`](docs/en/EIGENVALUES.md)
-- Deutsch: [`docs/de/ARCHITECTURE.md`](docs/de/ARCHITECTURE.md), [`docs/de/ROADMAP.md`](docs/de/ROADMAP.md), [`docs/de/DIFFERENTIATION.md`](docs/de/DIFFERENTIATION.md), [`docs/de/POLYNOM-NULLSTELLEN.md`](docs/de/POLYNOM-NULLSTELLEN.md), [`docs/de/LU-FAKTORISIERUNG.md`](docs/de/LU-FAKTORISIERUNG.md), [`docs/de/EIGENWERTE.md`](docs/de/EIGENWERTE.md)
+- English: [`docs/en/ARCHITECTURE.md`](docs/en/ARCHITECTURE.md), [`docs/en/ROADMAP.md`](docs/en/ROADMAP.md), [`docs/en/DIFFERENTIATION.md`](docs/en/DIFFERENTIATION.md), [`docs/en/RUNGE-KUTTA-FEHLBERG.md`](docs/en/RUNGE-KUTTA-FEHLBERG.md), [`docs/en/POLYNOMIAL-ROOTS.md`](docs/en/POLYNOMIAL-ROOTS.md), [`docs/en/LU-FACTORIZATION.md`](docs/en/LU-FACTORIZATION.md), [`docs/en/EIGENVALUES.md`](docs/en/EIGENVALUES.md)
+- Deutsch: [`docs/de/ARCHITECTURE.md`](docs/de/ARCHITECTURE.md), [`docs/de/ROADMAP.md`](docs/de/ROADMAP.md), [`docs/de/DIFFERENTIATION.md`](docs/de/DIFFERENTIATION.md), [`docs/de/RUNGE-KUTTA-FEHLBERG.md`](docs/de/RUNGE-KUTTA-FEHLBERG.md), [`docs/de/POLYNOM-NULLSTELLEN.md`](docs/de/POLYNOM-NULLSTELLEN.md), [`docs/de/LU-FAKTORISIERUNG.md`](docs/de/LU-FAKTORISIERUNG.md), [`docs/de/EIGENWERTE.md`](docs/de/EIGENWERTE.md)
 - Clean-room policy: [`docs/en/CLEAN-ROOM.md`](docs/en/CLEAN-ROOM.md)
 
 User handbook:
