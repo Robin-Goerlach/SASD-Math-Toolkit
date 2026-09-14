@@ -15,8 +15,11 @@ public sealed class CalculusTests
     [Fact]
     public void Simpson_IntegratesSin()
     {
-        var integral = NumericalIntegration.CompositeSimpson(System.Math.Sin, 0.0, System.Math.PI, 100);
-        Assert.InRange(integral, 2.0 - 1e-8, 2.0 + 1e-8);
+        // Composite Simpson converges with fourth order for smooth functions.
+        // 200 intervals keep this test strict without demanding more accuracy
+        // than the selected discretization can mathematically provide.
+        var integral = NumericalIntegration.CompositeSimpson(System.Math.Sin, 0.0, System.Math.PI, 200);
+        Assert.InRange(integral, 2.0 - 1e-9, 2.0 + 1e-9);
     }
 
     [Fact]
