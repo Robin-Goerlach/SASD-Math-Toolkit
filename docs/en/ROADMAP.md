@@ -12,7 +12,7 @@
 
 Implemented across the major domains: scalar and complex roots, reusable polynomial/Horner/deflation support, polynomial/spline interpolation, the complete historical V1 differentiation catalog, integration, dense linear algebra with reusable pivoted LU factorization, the complete historical V1 eigenvalue catalog, RK4/RKF45/Adams ODE integration, least squares and radix-2 FFT.
 
-The root-finding slice includes the complete historical V1 root catalog. Direct LU factorization is complete through `LuFactorization`. The eigenvalue slice is complete through power iteration, inverse power iteration, Wielandt deflation and cyclic Jacobi. Differentiation is complete for V1. The RK4 ODE convenience family now covers scalar first-order, scalar second-order, scalar nth-order, coupled first-order and coupled second-order systems on the same shared system RK4 core. Adaptive scalar RKF45 and fourth-order Adams-Bashforth/Adams-Moulton predictor-corrector integration are also available.
+The root-finding slice includes the complete historical V1 root catalog. Direct LU factorization is complete through `LuFactorization`. The eigenvalue slice is complete through power iteration, inverse power iteration, Wielandt deflation and cyclic Jacobi. Differentiation is complete for V1. The RK4 ODE convenience family covers scalar first-order, scalar second-order, scalar nth-order, coupled first-order and coupled second-order systems on the same shared system RK4 core. Adaptive scalar RKF45 and fourth-order Adams-Bashforth/Adams-Moulton predictor-corrector integration are also available. The boundary-value slice has now started with RK4-backed linear shooting for scalar second-order Dirichlet problems.
 
 A C#/.NET user handbook under `docs/user-guide/` grows alongside stable implementation milestones rather than reusing the historical Pascal documentation.
 
@@ -20,7 +20,7 @@ The intent remains to validate architecture across the whole product before fill
 
 ## M2 — Complete V1 compatibility catalog
 
-Close every item marked `planned` in `BORLAND-V1-COMPATIBILITY.md`, especially linear/nonlinear shooting methods and the remaining FFT helpers. Complete or explicitly supersede the remaining items marked `partial`, notably named least-squares helpers.
+Close every item marked `planned` in `BORLAND-V1-COMPATIBILITY.md`, especially nonlinear shooting and the remaining FFT helpers. Complete or explicitly supersede the remaining items marked `partial`, notably named least-squares helpers.
 
 Quality gate for V1:
 

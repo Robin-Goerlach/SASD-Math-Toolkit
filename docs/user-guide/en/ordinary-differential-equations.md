@@ -1,6 +1,6 @@
-# Ordinary differential equations
+# Ordinary differential equations and boundary-value problems
 
-This chapter describes the currently stable C# APIs for initial-value problems. It grows as the remaining V1 ODE and boundary-value routines are implemented.
+This chapter describes the currently stable C# APIs for initial-value and boundary-value problems. It grows as the remaining V1 routines are implemented.
 
 ## First-order initial-value problems
 
@@ -118,6 +118,39 @@ The example represents two coupled oscillators. Both initial vectors must have t
 
 Use this API when your model is naturally a group of second-order equations such as coupled mechanical coordinates. Use `FourthOrderSystem` directly when your model is already expressed as a general first-order state.
 
+## Linear boundary-value problems with shooting
+
+A boundary-value problem can prescribe the solution at **both** ends instead of supplying an initial derivative. The current linear shooting API handles
+
+`y'' = p(x)y' + q(x)y + r(x)`
+
+with `y(x0)=alpha` and `y(xEnd)=beta`.
+
+```csharp
+using Sasd.Numerics.DifferentialEquations;
+
+// y'' = 2, y(0)=1, y(1)=4 -> y = 1 + 2x + x^2.
+var result = LinearShooting.Solve(
+    _ => 0.0, // p(x)
+    _ => 0.0, // q(x)
+    _ => 2.0, // r(x)
+    x0: 0.0,
+    leftValue: 1.0,
+    xEnd: 1.0,
+    rightValue: 4.0,
+    step: 0.05);
+
+Console.WriteLine(result.InitialSlope);          // approximately 2
+Console.WriteLine(result.FinalPoint.Y);          // approximately 4
+Console.WriteLine(result.RightBoundaryResidual); // near zero
+```
+
+Linear shooting integrates two second-order IVPs with RK4: one particular solution and one homogeneous sensitivity solution. Their linear combination is chosen so the right boundary value is met. This is why a linear problem does not need an iterative guess loop.
+
+`AuxiliaryRightValue` reports the sensitivity denominator used by the construction. If its absolute value is smaller than `singularityTolerance`, the boundary map is treated as singular or numerically ill-conditioned rather than dividing by an unstable number.
+
+The returned boundary residual tells you how closely the **constructed endpoint** matches the requested boundary. It is not a global error estimate for every interior point. As with ordinary RK4, repeat with a smaller step if numerical accuracy matters.
+
 ## Adaptive RKF45
 
 Use RKF45 when the solution changes at different rates over the interval or when you prefer to state an error tolerance instead of manually choosing one fixed step size.
@@ -179,7 +212,7 @@ For example, integrating from 0 to 1 with `maximumStep: 0.3` produces four inter
 
 ## Choosing between the methods
 
-Use RK4 when a simple fixed-step reference calculation is desirable. Use RKF45 when automatic local error control and variable steps are more important. Use Adams-Bashforth/Moulton when a regular grid and derivative-history reuse fit the problem well. For scalar second- or higher-order equations and coupled second-order systems, the dedicated RK4 convenience APIs are clearer than manually packing the equivalent first-order state unless you specifically need the generic system interface.
+Use RK4 when a simple fixed-step reference calculation is desirable. Use RKF45 when automatic local error control and variable steps are more important. Use Adams-Bashforth/Moulton when a regular grid and derivative-history reuse fit the problem well. For scalar second- or higher-order equations and coupled second-order systems, the dedicated RK4 convenience APIs are clearer than manually packing the equivalent first-order state unless you specifically need the generic system interface. Use linear shooting when the equation is linear but values are specified at both ends rather than as a complete initial state.
 
 None of these methods is a universal answer for stiff differential equations. If results change strongly when the step or tolerance is tightened, investigate numerical stability rather than assuming more printed digits imply more accuracy.
 
@@ -197,4 +230,4 @@ Rejected steps are not failures by themselves. They are part of normal adaptive 
 
 ## Current limits
 
-The adaptive implementation is for scalar first-order equations and forward integration. RK4 now covers scalar first-order, scalar second-order, scalar nth-order, coupled first-order and coupled second-order systems. The Adams implementation is scalar and fixed-step. Linear and nonlinear shooting methods remain the main V1 ODE/boundary-value work items and will be documented here only after their public APIs exist.
+The adaptive implementation is for scalar first-order equations and forward integration. RK4 covers scalar first-order, scalar second-order, scalar nth-order, coupled first-order and coupled second-order systems. Adams is scalar and fixed-step. Linear shooting currently covers scalar linear second-order Dirichlet boundary-value problems. Nonlinear shooting remains the main V1 boundary-value item; more general Neumann/Robin boundary conditions are outside the current V1 convenience API.

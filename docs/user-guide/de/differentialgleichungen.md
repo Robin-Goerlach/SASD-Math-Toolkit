@@ -1,6 +1,6 @@
-# Gewöhnliche Differentialgleichungen
+# Gewöhnliche Differentialgleichungen und Randwertprobleme
 
-Dieses Kapitel beschreibt die derzeit stabilen C#-APIs für Anfangswertprobleme. Es wächst weiter, sobald die noch fehlenden V1-Verfahren für Differential- und Randwertprobleme implementiert sind.
+Dieses Kapitel beschreibt die derzeit stabilen C#-APIs für Anfangswert- und Randwertprobleme. Es wächst weiter, sobald die noch fehlenden V1-Verfahren implementiert sind.
 
 ## Anfangswertprobleme erster Ordnung
 
@@ -118,6 +118,39 @@ Das Beispiel beschreibt zwei gekoppelte Oszillatoren. Beide Anfangsvektoren müs
 
 Diese API passt besonders zu Modellen, die natürlich als Gruppe von Gleichungen zweiter Ordnung formuliert sind, etwa gekoppelte mechanische Koordinaten. Liegt das Modell bereits als allgemeiner Zustandsvektor erster Ordnung vor, ist `FourthOrderSystem` die direktere Schnittstelle.
 
+## Lineare Randwertprobleme mit Shooting
+
+Bei einem Randwertproblem kann die Lösung an **beiden** Intervallenden vorgegeben sein, statt eine Anfangsableitung zu kennen. Die aktuelle lineare Shooting-API behandelt
+
+`y'' = p(x)y' + q(x)y + r(x)`
+
+mit `y(x0)=alpha` und `y(xEnd)=beta`.
+
+```csharp
+using Sasd.Numerics.DifferentialEquations;
+
+// y'' = 2, y(0)=1, y(1)=4 -> y = 1 + 2x + x^2.
+var result = LinearShooting.Solve(
+    _ => 0.0, // p(x)
+    _ => 0.0, // q(x)
+    _ => 2.0, // r(x)
+    x0: 0.0,
+    leftValue: 1.0,
+    xEnd: 1.0,
+    rightValue: 4.0,
+    step: 0.05);
+
+Console.WriteLine(result.InitialSlope);          // ungefähr 2
+Console.WriteLine(result.FinalPoint.Y);          // ungefähr 4
+Console.WriteLine(result.RightBoundaryResidual); // nahe null
+```
+
+Das lineare Shooting integriert zwei Anfangswertprobleme zweiter Ordnung mit RK4: eine partikuläre Lösung und eine homogene Sensitivitätslösung. Ihre Linearkombination wird so gewählt, dass der rechte Randwert erfüllt wird. Deshalb ist für das lineare Problem noch keine iterative Folge von Steigungsraten notwendig.
+
+`AuxiliaryRightValue` gibt den Sensitivitätsnenner der Konstruktion zurück. Ist sein Betrag kleiner als `singularityTolerance`, wird die Randabbildung als singulär oder numerisch schlecht konditioniert behandelt, statt durch einen instabil kleinen Wert zu teilen.
+
+Das ausgegebene Randresiduum beschreibt, wie gut der **konstruierte Endpunkt** die gewünschte Randbedingung trifft. Es ist keine globale Fehlerschätzung für alle inneren Punkte. Wenn die numerische Genauigkeit wichtig ist, sollte wie bei gewöhnlichem RK4 mit kleinerer Schrittweite gegengeprüft werden.
+
 ## Adaptives RKF45
 
 RKF45 ist besonders nützlich, wenn sich die Lösung innerhalb des Intervalls unterschiedlich schnell ändert oder wenn lieber eine Fehlertoleranz vorgegeben werden soll als eine einzige feste Schrittweite.
@@ -179,7 +212,7 @@ Von 0 bis 1 mit `maximumStep: 0.3` entstehen beispielsweise vier Intervalle mit 
 
 ## Wahl zwischen den Verfahren
 
-RK4 eignet sich als einfache feste Referenzrechnung. RKF45 ist sinnvoll, wenn automatische lokale Fehlerkontrolle und variable Schrittweiten wichtiger sind. Adams-Bashforth/Moulton passt gut, wenn ein regelmäßiges Gitter und die Wiederverwendung der Ableitungshistorie erwünscht sind. Für skalare Gleichungen zweiter oder höherer Ordnung sowie gekoppelte Systeme zweiter Ordnung sind die passenden RK4-Komfort-APIs meist klarer, als den entsprechenden Zustand erster Ordnung selbst zu packen, sofern die allgemeine Systemschnittstelle nicht ausdrücklich benötigt wird.
+RK4 eignet sich als einfache feste Referenzrechnung. RKF45 ist sinnvoll, wenn automatische lokale Fehlerkontrolle und variable Schrittweiten wichtiger sind. Adams-Bashforth/Moulton passt gut, wenn ein regelmäßiges Gitter und die Wiederverwendung der Ableitungshistorie erwünscht sind. Für skalare Gleichungen zweiter oder höherer Ordnung sowie gekoppelte Systeme zweiter Ordnung sind die passenden RK4-Komfort-APIs meist klarer, als den entsprechenden Zustand erster Ordnung selbst zu packen, sofern die allgemeine Systemschnittstelle nicht ausdrücklich benötigt wird. Lineares Shooting passt, wenn die Gleichung linear ist, aber an beiden Enden Werte statt eines vollständigen Anfangszustands vorgegeben sind.
 
 Keines dieser Verfahren ist automatisch die richtige Wahl für steife Differentialgleichungen. Ändert sich das Ergebnis stark, wenn Schrittweite oder Toleranz verschärft werden, sollte die numerische Stabilität untersucht werden, statt zusätzliche Nachkommastellen mit zusätzlicher Genauigkeit gleichzusetzen.
 
@@ -197,4 +230,4 @@ Verworfene Schritte sind bei einem adaptiven Verfahren zunächst normal. Einige 
 
 ## Derzeitige Grenzen
 
-Die adaptive Implementierung behandelt skalare Differentialgleichungen erster Ordnung und integriert vorwärts. RK4 deckt nun skalare Gleichungen erster, zweiter und n-ter Ordnung sowie gekoppelte Systeme erster und zweiter Ordnung ab. Die Adams-Implementierung ist skalar und arbeitet mit fester Schrittweite. Als wesentliche V1-Arbeitspunkte im ODE-/Randwertbereich verbleiben jetzt die linearen und nichtlinearen Shooting-Verfahren; dokumentiert werden sie hier erst, wenn ihre öffentlichen APIs tatsächlich vorhanden sind.
+Die adaptive Implementierung behandelt skalare Differentialgleichungen erster Ordnung und integriert vorwärts. RK4 deckt skalare Gleichungen erster, zweiter und n-ter Ordnung sowie gekoppelte Systeme erster und zweiter Ordnung ab. Adams ist skalar und arbeitet mit fester Schrittweite. Das lineare Shooting behandelt derzeit skalare lineare Dirichlet-Randwertprobleme zweiter Ordnung. Als wesentlicher V1-Punkt im Randwertbereich verbleibt das nichtlineare Shooting; allgemeinere Neumann-/Robin-Randbedingungen liegen außerhalb der aktuellen V1-Komfort-API.
