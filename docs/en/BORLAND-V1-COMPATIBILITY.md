@@ -41,7 +41,7 @@ Status legend: **done** = callable implementation exists now; **partial** = doma
 | RK4 nth-order ODE | done | `RungeKutta.FourthOrderNthOrder` + `NthOrderOdePoint` companion-system API |
 | Coupled first-order ODE system | done | `FourthOrderSystem` |
 | Coupled second-order ODE system | done | `RungeKutta.FourthOrderSecondOrderSystem` + `SecondOrderSystemOdePoint` |
-| Nonlinear shooting + RK for second-order BVP | planned | boundary-value module; iterative slope search next |
+| Nonlinear shooting + RK for second-order BVP | done | `NonlinearShooting.Solve` + secant slope search + RK4 trial integration |
 | Linear shooting + RK for second-order BVP | done | `LinearShooting.Solve` + `LinearShootingResult`, RK4-backed Dirichlet BVP |
 | Least-squares approximation | partial | polynomial + arbitrary linear basis done; named historical model helpers planned |
 | Complex FFT | done | radix-2 `Forward` / `Inverse` |

@@ -83,7 +83,7 @@ Console.WriteLine(final.GetDerivative(2)); // approximately -1
 
 Each `NthOrderOdePoint` stores a read-only snapshot `[y, y', ..., y^(n-1)]`. `GetDerivative(0)` is the same value as `Y`. The solver performs the standard companion-system transformation and then reuses the same RK4 system core; there is no separate Runge-Kutta formula for every possible order.
 
-This API is especially useful when the original equation is naturally written in higher-order form. If your model is already a set of interacting first-order variables, use `FourthOrderSystem` directly instead of forcing it into an nth-order scalar representation.
+Use this API when the original equation is naturally written in higher-order form. If your model is already a set of interacting first-order variables, use `FourthOrderSystem` directly.
 
 ## Coupled second-order systems with RK4
 
@@ -114,13 +114,11 @@ Console.WriteLine(final.GetValue(0));
 Console.WriteLine(final.GetFirstDerivative(0));
 ```
 
-The example represents two coupled oscillators. Both initial vectors must have the same dimension, and the callback must return exactly one second derivative per equation. `SecondOrderSystemOdePoint` copies its vectors, so the returned trajectory is not affected by later changes to caller-owned arrays.
-
-Use this API when your model is naturally a group of second-order equations such as coupled mechanical coordinates. Use `FourthOrderSystem` directly when your model is already expressed as a general first-order state.
+Both initial vectors must have the same dimension, and the callback must return exactly one second derivative per equation. `SecondOrderSystemOdePoint` copies its vectors, so later changes to caller-owned arrays cannot alter the computed trajectory.
 
 ## Linear boundary-value problems with shooting
 
-A boundary-value problem can prescribe the solution at **both** ends instead of supplying an initial derivative. The current linear shooting API handles
+A boundary-value problem can prescribe the solution at **both** ends instead of supplying an initial derivative. The linear shooting API handles
 
 `y'' = p(x)y' + q(x)y + r(x)`
 
@@ -131,9 +129,9 @@ using Sasd.Numerics.DifferentialEquations;
 
 // y'' = 2, y(0)=1, y(1)=4 -> y = 1 + 2x + x^2.
 var result = LinearShooting.Solve(
-    _ => 0.0, // p(x)
-    _ => 0.0, // q(x)
-    _ => 2.0, // r(x)
+    _ => 0.0,
+    _ => 0.0,
+    _ => 2.0,
     x0: 0.0,
     leftValue: 1.0,
     xEnd: 1.0,
@@ -145,11 +143,57 @@ Console.WriteLine(result.FinalPoint.Y);          // approximately 4
 Console.WriteLine(result.RightBoundaryResidual); // near zero
 ```
 
-Linear shooting integrates two second-order IVPs with RK4: one particular solution and one homogeneous sensitivity solution. Their linear combination is chosen so the right boundary value is met. This is why a linear problem does not need an iterative guess loop.
+Linear shooting integrates a particular and a homogeneous sensitivity solution with RK4. Because the dependence on the unknown initial slope is linear, the final correction can be computed directly rather than by iteration.
 
-`AuxiliaryRightValue` reports the sensitivity denominator used by the construction. If its absolute value is smaller than `singularityTolerance`, the boundary map is treated as singular or numerically ill-conditioned rather than dividing by an unstable number.
+`AuxiliaryRightValue` reports the sensitivity denominator. If its absolute value falls below `singularityTolerance`, the boundary map is treated as singular or numerically ill-conditioned instead of dividing by an unstable small number.
 
-The returned boundary residual tells you how closely the **constructed endpoint** matches the requested boundary. It is not a global error estimate for every interior point. As with ordinary RK4, repeat with a smaller step if numerical accuracy matters.
+## Nonlinear boundary-value problems with shooting
+
+For a nonlinear problem
+
+`y'' = g(x, y, y')`
+
+with `y(x0)=alpha` and `y(xEnd)=beta`, the right-end value generally depends nonlinearly on the unknown initial slope. `NonlinearShooting.Solve` therefore tries two initial slopes and uses the secant method to drive the boundary residual
+
+`R(s) = y(xEnd; s) - beta`
+
+toward zero.
+
+```csharp
+using Sasd.Numerics.DifferentialEquations;
+
+// Exact solution y = 1/(1-x): y'' = 2y^3,
+// y(0)=1 and y(0.5)=2, with exact initial slope 1.
+var result = NonlinearShooting.Solve(
+    (_, y, _) => 2.0 * y * y * y,
+    x0: 0.0,
+    leftValue: 1.0,
+    xEnd: 0.5,
+    rightValue: 2.0,
+    step: 0.005,
+    firstSlopeGuess: 0.5,
+    secondSlopeGuess: 1.5,
+    options: new NonlinearShootingOptions(
+        BoundaryTolerance: 1e-10,
+        MaximumIterations: 25));
+
+if (result.Converged)
+{
+    Console.WriteLine(result.InitialSlope);          // approximately 1
+    Console.WriteLine(result.FinalPoint.Y);          // approximately 2
+    Console.WriteLine(result.RightBoundaryResidual); // close to zero
+}
+else
+{
+    Console.WriteLine($"{result.Status}: {result.Message}");
+}
+```
+
+A nonlinear shooting failure is not automatically an invalid input. `MaximumIterationsReached` means that the allowed secant corrections were exhausted; `NumericalBreakdown` can occur when the two residuals become too similar for a stable secant update. In both cases the result still exposes the final usable trajectory for diagnosis.
+
+The solver verifies the actual right-boundary residual before reporting `Converged`. This matters because a slope sequence can stagnate even while the requested endpoint is still missed.
+
+The two starting slopes matter. Nonlinear BVPs can have multiple solutions, and different guesses can lead to different roots of the shooting residual. For important calculations, document the guesses and repeat with alternative starting values when multiple solutions are plausible.
 
 ## Adaptive RKF45
 
@@ -202,32 +246,24 @@ var points = AdamsBashforthMoulton.Integrate(
 Console.WriteLine(points[^1].Y); // approximately e
 ```
 
-A multistep formula needs history. SASD Math Toolkit therefore calculates the first three intervals with RK4 and then switches to the AB4/AM4 pair. One Adams-Moulton correction pass is the default. More passes can be requested with `correctorIterations`, although extra passes are not automatically better for every problem.
+A multistep formula needs history. SASD Math Toolkit therefore calculates the first three intervals with RK4 and then switches to the AB4/AM4 pair. One Adams-Moulton correction pass is the default.
 
 ### Why `maximumStep` is not always the actual step
 
 The AB4/AM4 coefficients require equal spacing. If `maximumStep` does not divide the interval exactly, the solver does **not** append a shortened final step. Instead it selects the smallest integer step count that respects the maximum and spreads those steps evenly over the complete interval.
 
-For example, integrating from 0 to 1 with `maximumStep: 0.3` produces four intervals of 0.25. This keeps the multistep history valid and still reaches 1 exactly.
-
 ## Choosing between the methods
 
-Use RK4 when a simple fixed-step reference calculation is desirable. Use RKF45 when automatic local error control and variable steps are more important. Use Adams-Bashforth/Moulton when a regular grid and derivative-history reuse fit the problem well. For scalar second- or higher-order equations and coupled second-order systems, the dedicated RK4 convenience APIs are clearer than manually packing the equivalent first-order state unless you specifically need the generic system interface. Use linear shooting when the equation is linear but values are specified at both ends rather than as a complete initial state.
+Use RK4 when a simple fixed-step reference calculation is desirable. Use RKF45 when automatic local error control and variable steps are more important. Use Adams-Bashforth/Moulton when a regular grid and derivative-history reuse fit the problem well. Use linear shooting for a linear equation with values prescribed at both endpoints. Use nonlinear shooting when the equation itself is nonlinear and the missing initial slope must be found iteratively.
 
 None of these methods is a universal answer for stiff differential equations. If results change strongly when the step or tolerance is tightened, investigate numerical stability rather than assuming more printed digits imply more accuracy.
 
-## Choosing RKF tolerances
+## Boundary residual versus global accuracy
 
-Tighter tolerances generally require more derivative evaluations. Do not request extreme tolerances merely because `double` has many printed digits: truncation error, round-off error and the conditioning of the differential equation still matter.
+For both shooting solvers, a tiny `RightBoundaryResidual` only means that the final discrete trajectory lands close to the requested endpoint. It is not an error bound for the interior solution. Repeat the computation with a smaller RK4 `step` and compare the quantities you care about.
 
-A useful workflow is to solve once with practical tolerances, repeat with stricter tolerances and compare the quantity you actually care about. If the answer changes materially, the first computation was not yet numerically settled.
-
-## Interpreting rejected RKF steps
-
-Rejected steps are not failures by themselves. They are part of normal adaptive integration. A few rejections often mean the controller is learning an appropriate step size. A large rejection count may indicate an aggressive initial step, rapidly changing dynamics or tolerances that are expensive for this method.
-
-`MinimumStepSizeReached` is different: it means RKF45 could not satisfy the requested local tolerance without violating your configured minimum step. Reducing the minimum step may help, but the equation may also need a different numerical method.
+For nonlinear shooting, `BoundaryTolerance` controls the slope search while `step` controls RK4 discretization. Tightening only one of them does not automatically improve the other error source.
 
 ## Current limits
 
-The adaptive implementation is for scalar first-order equations and forward integration. RK4 covers scalar first-order, scalar second-order, scalar nth-order, coupled first-order and coupled second-order systems. Adams is scalar and fixed-step. Linear shooting currently covers scalar linear second-order Dirichlet boundary-value problems. Nonlinear shooting remains the main V1 boundary-value item; more general Neumann/Robin boundary conditions are outside the current V1 convenience API.
+RK4 covers scalar first-order, scalar second-order, scalar nth-order, coupled first-order and coupled second-order systems. RKF45 is currently scalar and forward-only, and Adams is scalar with fixed spacing. The historical V1 linear and nonlinear shooting routines for scalar second-order Dirichlet boundary-value problems are now both implemented. More general Neumann/Robin conditions, multiple shooting, continuation methods and dedicated stiff BVP solvers remain outside the current V1 compatibility target.
