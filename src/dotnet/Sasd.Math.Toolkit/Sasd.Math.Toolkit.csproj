@@ -10,5 +10,7 @@
     <Authors>Robin Goerlach; SASD-GmbH</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- Public XML comments are expanded incrementally as the API stabilizes. -->
+    <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
 </Project>
