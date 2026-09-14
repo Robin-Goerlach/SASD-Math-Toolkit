@@ -69,9 +69,14 @@ public static class EigenSolvers
         Normalize(x);
         var eigenvalue = 0.0;
 
+        // Inverse iteration solves A*y=x repeatedly with the same A. Keeping one LU
+        // factorization makes that repeated-use relationship explicit and exercises the
+        // same reusable factorization abstraction exposed to library callers.
+        var factorization = LinearSystemSolvers.FactorizeLu(matrix);
+
         for (var iteration = 1; iteration <= maximumIterations; iteration++)
         {
-            var y = LinearSystemSolvers.SolveGaussian(matrix, x, partialPivoting: true);
+            var y = factorization.Solve(x);
             Normalize(y);
             AlignSign(y, x);
             var ay = matrix.Multiply(y);

@@ -6,15 +6,15 @@ Repository-Struktur, .NET-10-Projekt, Tests, Sample, CI, englische/deutsche Doku
 
 ## M1 – Breiter numerischer Vertikalschnitt (gestartet und erweitert)
 
-Bereits implementiert sind wichtige Verfahren aus nahezu allen V1-Bereichen: reelle und komplexe Nullstellensuche, wiederverwendbare Polynom-/Horner-/Deflationsfunktionen, Interpolation/Splines, Differentiation, Integration, lineare Algebra, erste Eigenwertverfahren, RK4, Least Squares und FFT.
+Bereits implementiert sind wichtige Verfahren aus nahezu allen V1-Bereichen: reelle und komplexe Nullstellensuche, wiederverwendbare Polynom-/Horner-/Deflationsfunktionen, Interpolation/Splines, Differentiation, Integration, lineare Algebra mit wiederverwendbarer pivotierter LU-Faktorisierung, erste Eigenwertverfahren, RK4, Least Squares und FFT.
 
-Der historische V1-Bereich der Nullstellensuche ist jetzt vollständig abgedeckt: Bisektion, Newton-Raphson, Sekantenverfahren, Newton-Horner, Muller sowie Laguerre mit Deflation.
+Der historische V1-Bereich der Nullstellensuche ist vollständig abgedeckt. Zusätzlich ist die direkte Matrixfaktorisierung über `LuFactorization` abgeschlossen; sie wird bereits von der Inversenbildung und der inversen Potenzmethode wiederverwendet.
 
 Damit wird früh geprüft, ob die Architektur für die ganze Produktfamilie trägt, statt erst ein Kapitel vollständig zu perfektionieren und später grundlegende Entscheidungen wieder ändern zu müssen.
 
 ## M2 – V1 vollständig
 
-Alle noch offenen Punkte der englischen Kompatibilitätsmatrix schließen: insbesondere tabellarische Differentiation, wiederverwendbare LU-Faktorisierung, Jacobi/Wielandt, RKF, Adams-Verfahren, Shooting-Verfahren und die verbleibenden FFT-Hilfsfunktionen.
+Alle noch offenen Punkte der englischen Kompatibilitätsmatrix schließen: insbesondere tabellarische Differentiation, Jacobi/Wielandt, RKF, Adams-Verfahren, Shooting-Verfahren und die verbleibenden FFT-Hilfsfunktionen.
 
 V1 ist erst fertig, wenn jeder öffentliche Algorithmus getestet und dokumentiert ist und keine öffentlichen Platzhalter mit `NotImplementedException` existieren.
 

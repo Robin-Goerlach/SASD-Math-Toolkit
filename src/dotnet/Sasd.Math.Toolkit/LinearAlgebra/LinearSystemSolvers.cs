@@ -93,19 +93,26 @@ public static class LinearSystemSolvers
         return solution;
     }
 
+    /// <summary>
+    /// Creates a reusable LU factorization with partial pivoting.
+    /// </summary>
+    /// <remarks>
+    /// Use this API when several systems share the same coefficient matrix. The
+    /// decomposition is performed once and each subsequent solve only performs
+    /// triangular substitutions.
+    /// </remarks>
+    public static LuFactorization FactorizeLu(
+        DenseMatrix matrix,
+        double pivotTolerance = NumericConstants.NearlyZero) =>
+        LuFactorization.Decompose(matrix, pivotTolerance);
+
     public static DenseMatrix Inverse(DenseMatrix matrix)
     {
         EnsureSquare(matrix);
-        var n = matrix.Rows;
-        var inverse = new DenseMatrix(n, n);
-        for (var column = 0; column < n; column++)
-        {
-            var unit = new double[n];
-            unit[column] = 1.0;
-            var solution = SolveGaussian(matrix, unit, partialPivoting: true);
-            for (var row = 0; row < n; row++) inverse[row, column] = solution[row];
-        }
-        return inverse;
+
+        // Reusing one LU decomposition is both clearer and more appropriate than
+        // repeating Gaussian elimination independently for every identity column.
+        return FactorizeLu(matrix).Inverse();
     }
 
     public static IterativeResult<double[]> GaussSeidel(

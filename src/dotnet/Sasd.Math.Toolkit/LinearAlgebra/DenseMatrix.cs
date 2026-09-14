@@ -66,6 +66,41 @@ public sealed class DenseMatrix
         return result;
     }
 
+    /// <summary>
+    /// Multiplies this matrix by another dense matrix using the straightforward
+    /// reference algorithm.
+    /// </summary>
+    /// <remarks>
+    /// Clarity is preferred over cache blocking or SIMD-specific code at this stage.
+    /// A future high-performance backend can optimize this operation without changing
+    /// the numerical APIs built on top of <see cref="DenseMatrix"/>.
+    /// </remarks>
+    public DenseMatrix Multiply(DenseMatrix other)
+    {
+        ArgumentNullException.ThrowIfNull(other);
+        if (Columns != other.Rows)
+        {
+            throw new ArgumentException("Left matrix column count must match right matrix row count.", nameof(other));
+        }
+
+        var result = new DenseMatrix(Rows, other.Columns);
+        for (var row = 0; row < Rows; row++)
+        {
+            for (var column = 0; column < other.Columns; column++)
+            {
+                var sum = 0.0;
+                for (var inner = 0; inner < Columns; inner++)
+                {
+                    sum += this[row, inner] * other[inner, column];
+                }
+
+                result[row, column] = sum;
+            }
+        }
+
+        return result;
+    }
+
     public static DenseMatrix Identity(int size)
     {
         var result = new DenseMatrix(size, size);

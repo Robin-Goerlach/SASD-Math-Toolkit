@@ -25,13 +25,13 @@ Status legend: **done** = callable implementation exists now; **partial** = doma
 | Adaptive Gaussian quadrature | done | `AdaptiveGaussLegendre5` |
 | Romberg integration | done | `Romberg` |
 | Determinant | done | `LinearSystemSolvers.Determinant` |
-| Matrix inverse | done | `LinearSystemSolvers.Inverse` |
+| Matrix inverse | done | `LinearSystemSolvers.Inverse` (LU-backed) |
 | Gaussian elimination | done | `SolveGaussian(... partialPivoting:false)` |
 | Gaussian elimination + partial pivoting | done | `SolveGaussian(... partialPivoting:true)` |
-| Direct factoring / LU decompose + solve | planned | explicit reusable LU factorization object |
+| Direct factoring / LU decompose + solve | done | `LuFactorization` / `LinearSystemSolvers.FactorizeLu` |
 | Gauss-Seidel iterative solve | done | `GaussSeidel` |
 | Dominant eigenpair / power method | done | `EigenSolvers.PowerMethod` |
-| Inverse power method | done | `EigenSolvers.InversePowerMethod` |
+| Inverse power method | done | `EigenSolvers.InversePowerMethod` (reuses LU factorization) |
 | Power method + Wielandt deflation | planned | eigen module |
 | Cyclic Jacobi symmetric eigensystem | planned | eigen module |
 | RK4 first-order ODE | done | `RungeKutta.FourthOrder` |

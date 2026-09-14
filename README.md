@@ -51,8 +51,8 @@ Implemented now:
 - Interpolation: Lagrange, Newton divided differences, natural cubic spline and clamped cubic spline
 - Numerical differentiation: central finite differences, Richardson refinement and five-point formulas
 - Numerical integration: composite trapezoid, composite Simpson, adaptive Simpson, Romberg, 5-point Gauss-Legendre and adaptive Gauss-Legendre
-- Linear algebra: determinant, Gaussian elimination, partial pivoting, inverse and Gauss-Seidel iteration
-- Eigenvalues: power method and inverse power method
+- Linear algebra: determinant, Gaussian elimination, partial pivoting, reusable LU factorization/solve, inverse and Gauss-Seidel iteration
+- Eigenvalues: power method and inverse power method; inverse iteration reuses LU factorization
 - Differential equations: fourth-order Runge-Kutta for scalar equations and systems
 - Least squares: polynomial and arbitrary linear-basis fitting
 - FFT: radix-2 complex/real FFT, inverse FFT, real convolution and real cross-correlation
@@ -84,8 +84,8 @@ Target framework: **.NET 10**.
 
 Start with:
 
-- English: [`docs/en/ARCHITECTURE.md`](docs/en/ARCHITECTURE.md), [`docs/en/ROADMAP.md`](docs/en/ROADMAP.md), [`docs/en/POLYNOMIAL-ROOTS.md`](docs/en/POLYNOMIAL-ROOTS.md)
-- Deutsch: [`docs/de/ARCHITECTURE.md`](docs/de/ARCHITECTURE.md), [`docs/de/ROADMAP.md`](docs/de/ROADMAP.md), [`docs/de/POLYNOM-NULLSTELLEN.md`](docs/de/POLYNOM-NULLSTELLEN.md)
+- English: [`docs/en/ARCHITECTURE.md`](docs/en/ARCHITECTURE.md), [`docs/en/ROADMAP.md`](docs/en/ROADMAP.md), [`docs/en/POLYNOMIAL-ROOTS.md`](docs/en/POLYNOMIAL-ROOTS.md), [`docs/en/LU-FACTORIZATION.md`](docs/en/LU-FACTORIZATION.md)
+- Deutsch: [`docs/de/ARCHITECTURE.md`](docs/de/ARCHITECTURE.md), [`docs/de/ROADMAP.md`](docs/de/ROADMAP.md), [`docs/de/POLYNOM-NULLSTELLEN.md`](docs/de/POLYNOM-NULLSTELLEN.md), [`docs/de/LU-FAKTORISIERUNG.md`](docs/de/LU-FAKTORISIERUNG.md)
 - Clean-room policy: [`docs/en/CLEAN-ROOM.md`](docs/en/CLEAN-ROOM.md)
 
 ## License
