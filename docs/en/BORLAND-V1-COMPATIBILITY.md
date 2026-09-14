@@ -32,8 +32,8 @@ Status legend: **done** = callable implementation exists now; **partial** = doma
 | Gauss-Seidel iterative solve | done | `GaussSeidel` |
 | Dominant eigenpair / power method | done | `EigenSolvers.PowerMethod` |
 | Inverse power method | done | `EigenSolvers.InversePowerMethod` (reuses LU factorization) |
-| Power method + Wielandt deflation | planned | eigen module |
-| Cyclic Jacobi symmetric eigensystem | planned | eigen module |
+| Power method + Wielandt deflation | done | `WielandtDeflation` / `EigenSolvers.WielandtSecondEigenpair` |
+| Cyclic Jacobi symmetric eigensystem | done | `EigenSolvers.CyclicJacobi` / `SymmetricEigendecomposition` |
 | RK4 first-order ODE | done | `RungeKutta.FourthOrder` |
 | Runge-Kutta-Fehlberg first-order ODE | planned | adaptive ODE module |
 | Adams-Bashforth/Adams-Moulton predictor-corrector | planned | multistep ODE module |

@@ -10,15 +10,15 @@
 
 ## M1 — Broad numerical foundation (in progress; vertical slice expanded)
 
-Implemented across the major domains: scalar and complex roots, reusable polynomial/Horner/deflation support, polynomial/spline interpolation, differentiation, integration, dense linear algebra with reusable pivoted LU factorization, basic eigen solvers, RK4 ODE integration, least squares and radix-2 FFT.
+Implemented across the major domains: scalar and complex roots, reusable polynomial/Horner/deflation support, polynomial/spline interpolation, differentiation, integration, dense linear algebra with reusable pivoted LU factorization, the complete historical V1 eigenvalue catalog, RK4 ODE integration, least squares and radix-2 FFT.
 
-The root-finding slice includes the complete historical V1 root catalog: bisection, Newton-Raphson, secant, Newton-Horner, Muller and Laguerre with deflation. The direct-factorization matrix item is also complete through `LuFactorization`, which is already reused by matrix inversion and inverse eigenvalue iteration.
+The root-finding slice includes the complete historical V1 root catalog: bisection, Newton-Raphson, secant, Newton-Horner, Muller and Laguerre with deflation. The direct-factorization matrix item is complete through `LuFactorization`. The eigenvalue slice is now also complete for V1 through power iteration, inverse power iteration, Wielandt deflation and cyclic Jacobi diagonalization for symmetric matrices.
 
 The intent remains to validate architecture across the whole product before filling every historical routine.
 
 ## M2 — Complete V1 compatibility catalog
 
-Close every item marked `planned` in `BORLAND-V1-COMPATIBILITY.md`, including tabular differentiation, Jacobi/Wielandt eigensystems, RKF/Adams methods, shooting methods and the remaining FFT variants.
+Close every item marked `planned` in `BORLAND-V1-COMPATIBILITY.md`, including tabular differentiation, RKF/Adams methods, shooting methods and the remaining FFT variants. Several convenience APIs currently marked `partial` must also be completed or explicitly documented as superseded by a more general equivalent.
 
 Quality gate for V1:
 

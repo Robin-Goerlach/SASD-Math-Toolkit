@@ -105,6 +105,126 @@ public sealed class LinearAlgebraTests
         Assert.InRange(result.Residual, 0.0, 1e-8);
     }
 
+    [Fact]
+    public void WielandtDeflation_ReplacesKnownEigenvalueByZero()
+    {
+        var matrix = new DenseMatrix(new double[,]
+        {
+            { 4.0, 1.0, 0.0 },
+            { 1.0, 3.0, 0.0 },
+            { 0.0, 0.0, 1.0 }
+        });
+
+        var dominant = EigenSolvers.PowerMethod(matrix, tolerance: 1e-12);
+        Assert.True(dominant.Converged);
+
+        var deflation = WielandtDeflation.Create(matrix, dominant.Value);
+        var mapped = deflation.DeflatedMatrix.Multiply(deflation.RemovedEigenpair.Eigenvector);
+
+        Assert.InRange(EuclideanNorm(mapped), 0.0, 1e-9);
+    }
+
+    [Fact]
+    public void WielandtSecondEigenpair_FindsSecondEigenvalueAndOriginalEigenvector()
+    {
+        var matrix = new DenseMatrix(new double[,]
+        {
+            { 4.0, 1.0, 0.0 },
+            { 1.0, 3.0, 0.0 },
+            { 0.0, 0.0, 1.0 }
+        });
+
+        var result = EigenSolvers.WielandtSecondEigenpair(matrix, tolerance: 1e-11);
+        var expected = (7.0 - System.Math.Sqrt(5.0)) / 2.0;
+
+        Assert.True(result.Converged);
+        Assert.InRange(result.Value.Eigenvalue, expected - 1e-8, expected + 1e-8);
+        Assert.InRange(result.Residual, 0.0, 1e-8);
+    }
+
+    [Fact]
+    public void CyclicJacobi_FindsCompleteSymmetricEigensystem()
+    {
+        var matrix = new DenseMatrix(new double[,]
+        {
+            { 4.0, 1.0, 0.0 },
+            { 1.0, 3.0, 0.0 },
+            { 0.0, 0.0, 1.0 }
+        });
+
+        var result = EigenSolvers.CyclicJacobi(matrix);
+        Assert.True(result.Converged);
+
+        var expectedLargest = (7.0 + System.Math.Sqrt(5.0)) / 2.0;
+        var expectedMiddle = (7.0 - System.Math.Sqrt(5.0)) / 2.0;
+        var values = result.Value.Eigenvalues;
+
+        Assert.InRange(values[0], expectedLargest - 1e-10, expectedLargest + 1e-10);
+        Assert.InRange(values[1], expectedMiddle - 1e-10, expectedMiddle + 1e-10);
+        Assert.InRange(values[2], 1.0 - 1e-10, 1.0 + 1e-10);
+
+        for (var index = 0; index < result.Value.Size; index++)
+        {
+            var pair = result.Value.GetEigenpair(index);
+            Assert.InRange(EigenResidual(matrix, pair), 0.0, 1e-9);
+        }
+
+        AssertOrthonormalColumns(result.Value.Eigenvectors, 1e-10);
+    }
+
+    [Fact]
+    public void CyclicJacobi_RejectsNonSymmetricMatrix()
+    {
+        var matrix = new DenseMatrix(new double[,]
+        {
+            { 1.0, 2.0 },
+            { 0.0, 1.0 }
+        });
+
+        Assert.Throws<ArgumentException>(() => EigenSolvers.CyclicJacobi(matrix));
+    }
+
+    private static double EigenResidual(DenseMatrix matrix, Eigenpair eigenpair)
+    {
+        var multiplied = matrix.Multiply(eigenpair.Eigenvector);
+        var residual = new double[multiplied.Length];
+        for (var i = 0; i < residual.Length; i++)
+        {
+            residual[i] = multiplied[i] - (eigenpair.Eigenvalue * eigenpair.Eigenvector[i]);
+        }
+
+        return EuclideanNorm(residual);
+    }
+
+    private static double EuclideanNorm(IReadOnlyList<double> vector)
+    {
+        var sum = 0.0;
+        for (var i = 0; i < vector.Count; i++)
+        {
+            sum += vector[i] * vector[i];
+        }
+
+        return System.Math.Sqrt(sum);
+    }
+
+    private static void AssertOrthonormalColumns(DenseMatrix matrix, double tolerance)
+    {
+        for (var left = 0; left < matrix.Columns; left++)
+        {
+            for (var right = 0; right < matrix.Columns; right++)
+            {
+                var dot = 0.0;
+                for (var row = 0; row < matrix.Rows; row++)
+                {
+                    dot += matrix[row, left] * matrix[row, right];
+                }
+
+                var expected = left == right ? 1.0 : 0.0;
+                Assert.InRange(dot, expected - tolerance, expected + tolerance);
+            }
+        }
+    }
+
     private static void AssertIdentity(DenseMatrix matrix, double tolerance)
     {
         Assert.Equal(matrix.Rows, matrix.Columns);
