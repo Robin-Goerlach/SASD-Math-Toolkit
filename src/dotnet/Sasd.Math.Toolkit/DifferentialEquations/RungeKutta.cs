@@ -103,6 +103,84 @@ public static class RungeKutta
     }
 
     /// <summary>
+    /// Solves a scalar equation of arbitrary order with classical RK4 by converting it
+    /// to the standard companion first-order system.
+    /// </summary>
+    /// <param name="highestDerivative">
+    /// Function returning <c>y^(n)</c>. The supplied state is ordered as
+    /// <c>[y, y', y'', ..., y^(n-1)]</c>.
+    /// </param>
+    /// <param name="x0">Initial independent-variable value.</param>
+    /// <param name="initialState">
+    /// Initial derivative state <c>[y(x0), y'(x0), ..., y^(n-1)(x0)]</c>.
+    /// Its element count defines the ODE order.
+    /// </param>
+    /// <param name="xEnd">Requested end point; it must be greater than <paramref name="x0"/>.</param>
+    /// <param name="step">Nominal positive RK4 step size. The last step is shortened when required.</param>
+    /// <returns>Read-only snapshots containing <c>x</c> and all derivatives through order <c>n-1</c>.</returns>
+    /// <remarks>
+    /// For an nth-order equation the solver introduces the state
+    /// <c>z0=y, z1=y', ..., z(n-1)=y^(n-1)</c>. Its first-order system is
+    /// <c>z0'=z1, z1'=z2, ..., z(n-2)'=z(n-1), z(n-1)'=y^(n)</c>.
+    /// This method therefore reuses the same system RK4 implementation as the first-
+    /// and second-order APIs instead of duplicating Runge-Kutta stage calculations.
+    /// </remarks>
+    public static IReadOnlyList<NthOrderOdePoint> FourthOrderNthOrder(
+        Func<double, IReadOnlyList<double>, double> highestDerivative,
+        double x0,
+        IReadOnlyList<double> initialState,
+        double xEnd,
+        double step)
+    {
+        ArgumentNullException.ThrowIfNull(highestDerivative);
+        ArgumentNullException.ThrowIfNull(initialState);
+        NumericGuard.Finite(x0, nameof(x0));
+        NumericGuard.Finite(xEnd, nameof(xEnd));
+        NumericGuard.Positive(step, nameof(step));
+
+        if (initialState.Count == 0)
+        {
+            throw new ArgumentException(
+                "Initial state must contain y and any lower derivatives required by the equation.",
+                nameof(initialState));
+        }
+
+        ValidateFiniteInitialState(initialState, nameof(initialState));
+        if (xEnd <= x0)
+        {
+            throw new ArgumentException("xEnd must be greater than x0.", nameof(xEnd));
+        }
+
+        var systemPoints = FourthOrderSystem(
+            (x, state) =>
+            {
+                var derivativeState = new double[state.Count];
+
+                // Companion-system shift: d/dx(y^(k)) = y^(k+1) for every stored
+                // derivative below the highest one. The caller provides only y^(n).
+                for (var i = 0; i < derivativeState.Length - 1; i++)
+                {
+                    derivativeState[i] = state[i + 1];
+                }
+
+                derivativeState[^1] = highestDerivative(x, state);
+                return derivativeState;
+            },
+            x0,
+            initialState,
+            xEnd,
+            step);
+
+        var result = new List<NthOrderOdePoint>(systemPoints.Count);
+        foreach (var point in systemPoints)
+        {
+            result.Add(new NthOrderOdePoint(point.X, point.Y));
+        }
+
+        return result;
+    }
+
+    /// <summary>
     /// Solves a coupled first-order system <c>Y' = F(x, Y)</c> with classical RK4.
     /// </summary>
     public static IReadOnlyList<(double X, double[] Y)> FourthOrderSystem(

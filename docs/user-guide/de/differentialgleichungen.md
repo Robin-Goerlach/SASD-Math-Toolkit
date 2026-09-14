@@ -56,6 +56,35 @@ Console.WriteLine(final.FirstDerivative); // ungefähr 0
 
 Das ist eine Komfort-API und keine zweite unabhängige RK4-Implementierung. Intern wird die Gleichung zu `y'=v`, `v'=g(x,y,v)` umgeformt und über denselben getesteten System-RK4-Kern integriert.
 
+## Gleichungen n-ter Ordnung mit RK4
+
+Für ein skalares Problem der Ordnung `n` wird die Gleichung so geschrieben, dass die höchste Ableitung isoliert ist:
+
+`y^(n) = g(x, y, y', ..., y^(n-1))`.
+
+`FourthOrderNthOrder` erhält die niedrigeren Ableitungen als geordneten Anfangszustand. Element null ist `y`, Element eins ist `y'` und so weiter. Die Anzahl der Elemente bestimmt die Ordnung der Gleichung.
+
+```csharp
+using Sasd.Numerics.DifferentialEquations;
+
+// y''' = -y', mit y(0)=0, y'(0)=1, y''(0)=0.
+var points = RungeKutta.FourthOrderNthOrder(
+    (_, state) => -state[1],
+    x0: 0.0,
+    initialState: [0.0, 1.0, 0.0],
+    xEnd: Math.PI / 2.0,
+    step: 0.01);
+
+var final = points[^1];
+Console.WriteLine(final.Y);                // ungefähr 1
+Console.WriteLine(final.GetDerivative(1)); // ungefähr 0
+Console.WriteLine(final.GetDerivative(2)); // ungefähr -1
+```
+
+Jeder `NthOrderOdePoint` speichert einen schreibgeschützten Snapshot `[y, y', ..., y^(n-1)]`. `GetDerivative(0)` liefert denselben Wert wie `Y`. Der Solver bildet intern das mathematische Begleitsystem erster Ordnung und verwendet danach denselben RK4-Systemkern; für jede mögliche Ordnung wird also keine eigene Runge-Kutta-Formel dupliziert.
+
+Diese API ist besonders praktisch, wenn die ursprüngliche Gleichung natürlich in höherer Ordnung formuliert ist. Besteht das Modell bereits aus mehreren wechselwirkenden Variablen erster Ordnung, ist `FourthOrderSystem` die passendere direkte Schnittstelle.
+
 ## Adaptives RKF45
 
 RKF45 ist besonders nützlich, wenn sich die Lösung innerhalb des Intervalls unterschiedlich schnell ändert oder wenn lieber eine Fehlertoleranz vorgegeben werden soll als eine einzige feste Schrittweite.
@@ -117,7 +146,7 @@ Von 0 bis 1 mit `maximumStep: 0.3` entstehen beispielsweise vier Intervalle mit 
 
 ## Wahl zwischen den Verfahren
 
-RK4 eignet sich als einfache feste Referenzrechnung. RKF45 ist sinnvoll, wenn automatische lokale Fehlerkontrolle und variable Schrittweiten wichtiger sind. Adams-Bashforth/Moulton passt gut, wenn ein regelmäßiges Gitter und die Wiederverwendung der Ableitungshistorie erwünscht sind. Für eine skalare Gleichung zweiter Ordnung ist die neue RK4-Komfort-API in der Regel klarer, als `y` und `y'` selbst in einen Zustandsvektor zu verpacken, sofern die allgemeine Systemschnittstelle nicht ausdrücklich benötigt wird.
+RK4 eignet sich als einfache feste Referenzrechnung. RKF45 ist sinnvoll, wenn automatische lokale Fehlerkontrolle und variable Schrittweiten wichtiger sind. Adams-Bashforth/Moulton passt gut, wenn ein regelmäßiges Gitter und die Wiederverwendung der Ableitungshistorie erwünscht sind. Für skalare Gleichungen zweiter oder höherer Ordnung sind die passenden RK4-Komfort-APIs meist klarer, als Ableitungen manuell in einen generischen Zustandsvektor zu verpacken, sofern die allgemeine Systemschnittstelle nicht ausdrücklich benötigt wird.
 
 Keines dieser Verfahren ist automatisch die richtige Wahl für steife Differentialgleichungen. Ändert sich das Ergebnis stark, wenn Schrittweite oder Toleranz verschärft werden, sollte die numerische Stabilität untersucht werden, statt zusätzliche Nachkommastellen mit zusätzlicher Genauigkeit gleichzusetzen.
 
@@ -135,4 +164,4 @@ Verworfene Schritte sind bei einem adaptiven Verfahren zunächst normal. Einige 
 
 ## Derzeitige Grenzen
 
-Die adaptive Implementierung behandelt skalare Differentialgleichungen erster Ordnung und integriert vorwärts. RK4 unterstützt skalare Gleichungen erster und zweiter Ordnung sowie gekoppelte Systeme erster Ordnung. Die Adams-Implementierung ist skalar und arbeitet mit fester Schrittweite. Eine allgemeine Komfort-API für n-te Ordnung, eine eigene Komfort-API für gekoppelte Systeme zweiter Ordnung sowie lineare und nichtlineare Shooting-Verfahren sind noch V1-Arbeitspunkte und werden erst dokumentiert, wenn die APIs tatsächlich vorhanden sind.
+Die adaptive Implementierung behandelt skalare Differentialgleichungen erster Ordnung und integriert vorwärts. RK4 unterstützt skalare Gleichungen erster, zweiter und n-ter Ordnung sowie gekoppelte Systeme erster Ordnung. Die Adams-Implementierung ist skalar und arbeitet mit fester Schrittweite. Eine eigene Komfort-API für gekoppelte Systeme zweiter Ordnung sowie lineare und nichtlineare Shooting-Verfahren sind noch V1-Arbeitspunkte und werden erst dokumentiert, wenn die APIs tatsächlich vorhanden sind.

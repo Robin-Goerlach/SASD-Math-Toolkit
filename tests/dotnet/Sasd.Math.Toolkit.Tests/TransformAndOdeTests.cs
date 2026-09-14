@@ -76,6 +76,65 @@ public sealed class TransformAndOdeTests
     }
 
     [Fact]
+    public void RungeKuttaNthOrder_SolvesThirdOrderSinusoid()
+    {
+        // y''' = -y', y(0)=0, y'(0)=1, y''(0)=0 has y=sin(x).
+        // The test verifies the complete companion state, not only y.
+        var points = RungeKutta.FourthOrderNthOrder(
+            (_, state) => -state[1],
+            x0: 0.0,
+            initialState: [0.0, 1.0, 0.0],
+            xEnd: System.Math.PI / 2.0,
+            step: 0.01);
+
+        var final = points[^1];
+        Assert.Equal(3, final.Order);
+        Assert.Equal(System.Math.PI / 2.0, final.X, 12);
+        Assert.InRange(final.Y, 1.0 - 2e-9, 1.0 + 2e-9);
+        Assert.InRange(final.GetDerivative(1), -2e-9, 2e-9);
+        Assert.InRange(final.GetDerivative(2), -1.0 - 2e-9, -1.0 + 2e-9);
+        Assert.Equal(final.Y, final.GetDerivative(0), 12);
+    }
+
+    [Fact]
+    public void RungeKuttaNthOrder_IntegratesFourthOrderPolynomialAndShortFinalStep()
+    {
+        // y'''' = 24 with all lower initial derivatives zero has y=x^4.
+        // A nominal 0.3 step also exercises the shortened final interval.
+        var points = RungeKutta.FourthOrderNthOrder(
+            (_, _) => 24.0,
+            x0: 0.0,
+            initialState: [0.0, 0.0, 0.0, 0.0],
+            xEnd: 1.0,
+            step: 0.3);
+
+        var final = points[^1];
+        Assert.Equal(1.0, final.X, 12);
+        Assert.InRange(final.Y, 1.0 - 1e-11, 1.0 + 1e-11);
+        Assert.InRange(final.GetDerivative(1), 4.0 - 1e-11, 4.0 + 1e-11);
+        Assert.InRange(final.GetDerivative(2), 12.0 - 1e-11, 12.0 + 1e-11);
+        Assert.InRange(final.GetDerivative(3), 24.0 - 1e-11, 24.0 + 1e-11);
+    }
+
+    [Fact]
+    public void RungeKuttaNthOrder_RejectsInvalidStateAndNonFiniteHighestDerivative()
+    {
+        Assert.Throws<ArgumentException>(() => RungeKutta.FourthOrderNthOrder(
+            (_, _) => 0.0,
+            x0: 0.0,
+            initialState: Array.Empty<double>(),
+            xEnd: 1.0,
+            step: 0.1));
+
+        Assert.Throws<ArithmeticException>(() => RungeKutta.FourthOrderNthOrder(
+            (_, _) => double.NaN,
+            x0: 0.0,
+            initialState: [0.0, 0.0, 0.0],
+            xEnd: 1.0,
+            step: 0.1));
+    }
+
+    [Fact]
     public void RungeKuttaFehlberg_AdaptivelySolvesExponentialGrowth()
     {
         var result = RungeKuttaFehlberg.Integrate(

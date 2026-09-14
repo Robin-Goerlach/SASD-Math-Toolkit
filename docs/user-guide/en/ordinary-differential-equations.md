@@ -56,6 +56,35 @@ Console.WriteLine(final.FirstDerivative); // approximately 0
 
 This is a convenience API, not a second independent RK4 implementation. Internally the equation is transformed to `y'=v`, `v'=g(x,y,v)` and passed through the same tested system RK4 core.
 
+## Nth-order equations with RK4
+
+For a scalar problem of order `n`, write the equation so the highest derivative is isolated:
+
+`y^(n) = g(x, y, y', ..., y^(n-1))`.
+
+`FourthOrderNthOrder` accepts the lower derivatives as one ordered initial state. Element zero is `y`, element one is `y'`, and so on. The number of elements defines the equation order.
+
+```csharp
+using Sasd.Numerics.DifferentialEquations;
+
+// y''' = -y', with y(0)=0, y'(0)=1, y''(0)=0.
+var points = RungeKutta.FourthOrderNthOrder(
+    (_, state) => -state[1],
+    x0: 0.0,
+    initialState: [0.0, 1.0, 0.0],
+    xEnd: Math.PI / 2.0,
+    step: 0.01);
+
+var final = points[^1];
+Console.WriteLine(final.Y);                // approximately 1
+Console.WriteLine(final.GetDerivative(1)); // approximately 0
+Console.WriteLine(final.GetDerivative(2)); // approximately -1
+```
+
+Each `NthOrderOdePoint` stores a read-only snapshot `[y, y', ..., y^(n-1)]`. `GetDerivative(0)` is the same value as `Y`. The solver performs the standard companion-system transformation and then reuses the same RK4 system core; there is no separate Runge-Kutta formula for every possible order.
+
+This API is especially useful when the original equation is naturally written in higher-order form. If your model is already a set of interacting first-order variables, use `FourthOrderSystem` directly instead of forcing it into an nth-order scalar representation.
+
 ## Adaptive RKF45
 
 Use RKF45 when the solution changes at different rates over the interval or when you prefer to state an error tolerance instead of manually choosing one fixed step size.
@@ -117,7 +146,7 @@ For example, integrating from 0 to 1 with `maximumStep: 0.3` produces four inter
 
 ## Choosing between the methods
 
-Use RK4 when a simple fixed-step reference calculation is desirable. Use RKF45 when automatic local error control and variable steps are more important. Use Adams-Bashforth/Moulton when a regular grid and derivative-history reuse fit the problem well. For a scalar second-order equation, the second-order RK4 convenience API is preferable to manually packing `y` and `y'` into an array unless you specifically need the generic system interface.
+Use RK4 when a simple fixed-step reference calculation is desirable. Use RKF45 when automatic local error control and variable steps are more important. Use Adams-Bashforth/Moulton when a regular grid and derivative-history reuse fit the problem well. For scalar second- or higher-order equations, the typed RK4 convenience APIs are clearer than manually packing derivatives into a generic state array unless you specifically need the general system interface.
 
 None of these methods is a universal answer for stiff differential equations. If results change strongly when the step or tolerance is tightened, investigate numerical stability rather than assuming more printed digits imply more accuracy.
 
@@ -135,4 +164,4 @@ Rejected steps are not failures by themselves. They are part of normal adaptive 
 
 ## Current limits
 
-The adaptive implementation is for scalar first-order equations and forward integration. RK4 supports scalar first-order, scalar second-order and coupled first-order systems. The Adams implementation is scalar and fixed-step. A general nth-order convenience API, a dedicated convenience API for coupled second-order systems, and linear/nonlinear shooting methods are still V1 work items and will be documented here only after their public APIs exist.
+The adaptive implementation is for scalar first-order equations and forward integration. RK4 supports scalar first-order, scalar second-order, scalar nth-order and coupled first-order systems. The Adams implementation is scalar and fixed-step. A dedicated convenience API for coupled second-order systems and linear/nonlinear shooting methods are still V1 work items and will be documented here only after their public APIs exist.
