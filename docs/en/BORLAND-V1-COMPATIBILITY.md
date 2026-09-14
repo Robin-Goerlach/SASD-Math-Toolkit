@@ -14,9 +14,9 @@ Status legend: **done** = callable implementation exists now; **partial** = doma
 | Newton divided differences | done | `NewtonDividedDifference` |
 | Free/natural cubic spline | done | `NaturalCubicSpline` |
 | Clamped cubic spline | done | `ClampedCubicSpline` |
-| First derivative from tabular data (2/3/5 point) | planned | data finite-difference module |
-| Second derivative from tabular data (3/5 point) | planned | data finite-difference module |
-| Differentiation via cubic spline interpolant | partial | `CubicSpline.FirstDerivative` exists; convenience API planned |
+| First derivative from tabular data (2/3/5 point) | done | `TabularDifferentiation.FirstDerivativeTwoPoint/ThreePoint/FivePoint` |
+| Second derivative from tabular data (3/5 point) | done | `TabularDifferentiation.SecondDerivativeThreePoint/FivePoint` |
+| Differentiation via cubic spline interpolant | done | `CubicSpline.FirstDerivative/SecondDerivative` + `SplineDifferentiation` helpers |
 | First derivative of a function | done | Richardson-refined central formula |
 | Second derivative of a function | done | Richardson-refined central formula |
 | Composite Simpson integration | done | `CompositeSimpson` |

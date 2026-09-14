@@ -1,7 +1,7 @@
 namespace Sasd.Numerics.Interpolation;
 
 /// <summary>
-/// Piecewise cubic spline represented as S_i(x)=A+B*dx+C*dx^2+D*dx^3.
+/// Piecewise cubic spline represented as <c>S_i(x)=A+B*dx+C*dx^2+D*dx^3</c>.
 /// </summary>
 public sealed class CubicSpline
 {
@@ -22,28 +22,47 @@ public sealed class CubicSpline
 
     public IReadOnlyList<double> Knots => _x;
 
+    /// <summary>
+    /// Evaluates the spline inside its interpolation interval.
+    /// </summary>
     public double Evaluate(double x)
     {
-        if (x < _x[0] || x > _x[^1])
-        {
-            throw new ArgumentOutOfRangeException(nameof(x), "Spline evaluation is restricted to the interpolation interval.");
-        }
-
+        EnsureInsideInterval(x);
         var i = FindSegment(x);
         var dx = x - _x[i];
         return _a[i] + (_b[i] * dx) + (_c[i] * dx * dx) + (_d[i] * dx * dx * dx);
     }
 
+    /// <summary>
+    /// Evaluates the first derivative of the piecewise cubic spline.
+    /// </summary>
     public double FirstDerivative(double x)
     {
-        if (x < _x[0] || x > _x[^1])
-        {
-            throw new ArgumentOutOfRangeException(nameof(x), "Spline evaluation is restricted to the interpolation interval.");
-        }
-
+        EnsureInsideInterval(x);
         var i = FindSegment(x);
         var dx = x - _x[i];
         return _b[i] + (2.0 * _c[i] * dx) + (3.0 * _d[i] * dx * dx);
+    }
+
+    /// <summary>
+    /// Evaluates the second derivative of the piecewise cubic spline.
+    /// </summary>
+    public double SecondDerivative(double x)
+    {
+        EnsureInsideInterval(x);
+        var i = FindSegment(x);
+        var dx = x - _x[i];
+        return (2.0 * _c[i]) + (6.0 * _d[i] * dx);
+    }
+
+    private void EnsureInsideInterval(double x)
+    {
+        if (!double.IsFinite(x) || x < _x[0] || x > _x[^1])
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(x),
+                "Spline evaluation requires a finite point inside the interpolation interval.");
+        }
     }
 
     private int FindSegment(double x)

@@ -118,6 +118,8 @@ public static class InterpolationAlgorithms
     {
         ValidatePoints(x, y, 2);
         EnsureStrictlyIncreasing(x);
+        NumericGuard.Finite(leftDerivative, nameof(leftDerivative));
+        NumericGuard.Finite(rightDerivative, nameof(rightDerivative));
 
         var n = x.Count - 1;
         var a = y.ToArray();
@@ -173,6 +175,14 @@ public static class InterpolationAlgorithms
         if (x.Count < minimumCount)
         {
             throw new ArgumentException($"At least {minimumCount} data points are required.");
+        }
+
+        for (var i = 0; i < x.Count; i++)
+        {
+            if (!double.IsFinite(x[i]) || !double.IsFinite(y[i]))
+            {
+                throw new ArgumentException("Interpolation coordinates must be finite.");
+            }
         }
     }
 

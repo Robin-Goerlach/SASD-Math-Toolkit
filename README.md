@@ -35,8 +35,9 @@ SASD-Math-Toolkit/
 │   └── dotnet/                 # small executable examples
 ├── spec/                       # language-neutral contracts and algorithm catalog
 ├── docs/
-│   ├── en/                     # primary documentation
-│   └── de/                     # German documentation
+│   ├── en/                     # primary technical documentation
+│   ├── de/                     # German technical documentation
+│   └── user-guide/             # C#/.NET user handbook (English and German)
 └── .github/workflows/          # build and test automation
 ```
 
@@ -49,7 +50,7 @@ Implemented now:
 - Root finding: bisection, Newton-Raphson, secant, Newton-Horner, complex Muller and Laguerre with polynomial deflation/all-roots support
 - Polynomial foundation: immutable complex-capable coefficients, Horner evaluation, first/second derivative evaluation, formal derivative and synthetic deflation
 - Interpolation: Lagrange, Newton divided differences, natural cubic spline and clamped cubic spline
-- Numerical differentiation: central finite differences, Richardson refinement and five-point formulas
+- Numerical differentiation: function derivatives with Richardson/five-point formulas, tabular two/three/five-point methods on uniform or non-uniform grids, and first/second derivatives of cubic splines
 - Numerical integration: composite trapezoid, composite Simpson, adaptive Simpson, Romberg, 5-point Gauss-Legendre and adaptive Gauss-Legendre
 - Linear algebra: determinant, Gaussian elimination, partial pivoting, reusable LU factorization/solve, inverse and Gauss-Seidel iteration
 - Eigenvalues: power method, LU-backed inverse power method, Wielandt deflation/second eigenpair and cyclic Jacobi complete symmetric eigensystems
@@ -82,11 +83,18 @@ Target framework: **.NET 10**.
 
 ## Documentation
 
-Start with:
+Technical documentation:
 
-- English: [`docs/en/ARCHITECTURE.md`](docs/en/ARCHITECTURE.md), [`docs/en/ROADMAP.md`](docs/en/ROADMAP.md), [`docs/en/POLYNOMIAL-ROOTS.md`](docs/en/POLYNOMIAL-ROOTS.md), [`docs/en/LU-FACTORIZATION.md`](docs/en/LU-FACTORIZATION.md), [`docs/en/EIGENVALUES.md`](docs/en/EIGENVALUES.md)
-- Deutsch: [`docs/de/ARCHITECTURE.md`](docs/de/ARCHITECTURE.md), [`docs/de/ROADMAP.md`](docs/de/ROADMAP.md), [`docs/de/POLYNOM-NULLSTELLEN.md`](docs/de/POLYNOM-NULLSTELLEN.md), [`docs/de/LU-FAKTORISIERUNG.md`](docs/de/LU-FAKTORISIERUNG.md), [`docs/de/EIGENWERTE.md`](docs/de/EIGENWERTE.md)
+- English: [`docs/en/ARCHITECTURE.md`](docs/en/ARCHITECTURE.md), [`docs/en/ROADMAP.md`](docs/en/ROADMAP.md), [`docs/en/DIFFERENTIATION.md`](docs/en/DIFFERENTIATION.md), [`docs/en/POLYNOMIAL-ROOTS.md`](docs/en/POLYNOMIAL-ROOTS.md), [`docs/en/LU-FACTORIZATION.md`](docs/en/LU-FACTORIZATION.md), [`docs/en/EIGENVALUES.md`](docs/en/EIGENVALUES.md)
+- Deutsch: [`docs/de/ARCHITECTURE.md`](docs/de/ARCHITECTURE.md), [`docs/de/ROADMAP.md`](docs/de/ROADMAP.md), [`docs/de/DIFFERENTIATION.md`](docs/de/DIFFERENTIATION.md), [`docs/de/POLYNOM-NULLSTELLEN.md`](docs/de/POLYNOM-NULLSTELLEN.md), [`docs/de/LU-FAKTORISIERUNG.md`](docs/de/LU-FAKTORISIERUNG.md), [`docs/de/EIGENWERTE.md`](docs/de/EIGENWERTE.md)
 - Clean-room policy: [`docs/en/CLEAN-ROOM.md`](docs/en/CLEAN-ROOM.md)
+
+User handbook:
+
+- English: [`docs/user-guide/en/README.md`](docs/user-guide/en/README.md)
+- Deutsch: [`docs/user-guide/de/README.md`](docs/user-guide/de/README.md)
+
+The handbook is written for the SASD C#/.NET API and grows with stable milestones; it is not a redistribution of the historical Pascal handbook.
 
 ## License
 
