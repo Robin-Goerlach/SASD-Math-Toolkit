@@ -22,7 +22,7 @@ Die dichte Referenzbasis ist breit genug, um in die nächste Modernisierungsschi
 
 ## M3.2 — Dünnbesetzte lineare Algebra — in Arbeit
 
-Das Speicher-/Arithmetikfundament ist jetzt implementiert:
+Das Speicher-/Arithmetikfundament und der erste SPD-Solver sind jetzt implementiert:
 
 - **kanonische unveränderliche CSR-Speicherung — implementiert**;
 - **Koordinatenaufbau mit expliziter Aggregation doppelter Einträge — implementiert**;
@@ -30,12 +30,15 @@ Das Speicher-/Arithmetikfundament ist jetzt implementiert:
 - **Sparse-Matrix-Vektor-Multiplikation mit wiederverwendbaren Span-Puffern — implementiert**;
 - **Transponieren ohne Dense-Materialisierung — implementiert**;
 - **Sparse-Maximalwert-, 1-, Unendlich- und Frobenius-Norm — implementiert**;
-- Conjugate Gradient für symmetrisch positiv definite dünnbesetzte Systeme — **als Nächstes**;
-- CSC-Unterstützung, sobald dauerhaft spaltenorientierte Verbraucher eine eigene Darstellung rechtfertigen;
-- später GMRES und BiCGSTAB für allgemeinere Systeme;
-- Preconditioner-Abstraktionen erst dann, wenn der erste Solver sie tatsächlich benötigt.
+- **gemeinsame absolute/relative Residual-Konvergenzoptionen — implementiert**;
+- **gemeinsames statusbasiertes Sparse-Linear-Solve-Ergebnismodell — implementiert**;
+- **Conjugate Gradient für symmetrisch positiv definite Sparse-Systeme — implementiert**;
+- **Symmetrie-/Positivdiagonal-Diagnostik und Verifikation des echten Residuums — implementiert**;
+- Jacobi-/Diagonal-Preconditioning für CG — **als Nächstes**;
+- GMRES und BiCGSTAB für allgemeinere Systeme — folgende Schritte;
+- CSC erst dann, wenn dauerhaft spaltenorientierte Verbraucher eine eigene Darstellung rechtfertigen.
 
-Sparse-Solver werden die vorhandenen `IterationStatus`-, Residual- und Toleranzkonventionen wiederverwenden und kein zweites Konvergenzmodell einführen. Die CSR-API bietet bereits eine allokationsfreie Matrix-Vektor-Zielüberladung, damit iterative Solver ihre Arbeitsvektoren wiederverwenden können.
+Sparse-Solver verwenden das toolkitweite `IterationStatus`-Vokabular und die Abbruchregel `||b-A*x||2 <= max(absTol, relTol*||b||2)`. CG verifiziert behauptete Konvergenz gegen das explizit neu berechnete echte Residuum und meldet `NumericalBreakdown` bei ungültiger/nichtendlicher Suchrichtungskrümmung statt Konvergenz vorzutäuschen.
 
 ## M3.3 — Optimierung und nichtlineare Systeme
 
