@@ -1,4 +1,4 @@
-# Sparse linear algebra — CSR and Conjugate Gradient
+# Sparse linear algebra — CSR, CG and preconditioning
 
 Dense matrices reserve storage for every matrix position. That is the right representation for many small and medium problems, but it becomes wasteful when a large matrix contains only a small number of non-zero coefficients per row. `CsrMatrix` is the first SASD sparse representation for such workloads.
 
@@ -89,11 +89,6 @@ var result = ConjugateGradientSolver.Solve(
         RelativeTolerance = 1e-10,
         MaximumIterations = 1000
     });
-
-if (result.Converged)
-{
-    var solution = result.Solution;
-}
 ```
 
 The shared sparse stopping rule is
@@ -102,7 +97,7 @@ The shared sparse stopping rule is
 ||b - A*x||2 <= max(AbsoluteTolerance, RelativeTolerance * ||b||2)
 ```
 
-so the same semantics can later be reused by GMRES and BiCGSTAB.
+so the same semantics can be reused by later Krylov solvers.
 
 Symmetry is checked by default. A strictly positive diagonal is also required because it is necessary for positive definiteness. These inexpensive checks cannot prove that an arbitrary sparse matrix is SPD; CG therefore additionally reports `NumericalBreakdown` if the search-direction curvature `p^T*A*p` becomes non-positive or non-finite.
 
@@ -110,12 +105,44 @@ Symmetry is checked by default. A strictly positive diagonal is also required be
 
 CG updates its residual recursively for efficiency. Floating-point roundoff can make that recursive residual differ from the real `b-A*x`. Before returning `Converged`, the SASD implementation therefore recomputes the true residual. If it is still above the requested threshold, CG restarts from the refreshed residual instead of reporting a false convergence.
 
+## Preconditioned Conjugate Gradient
+
+Poor scaling or an unfavorable spectrum can make CG require many iterations even when the matrix is SPD. A preconditioner applies an approximate inverse operation
+
+```text
+z = M^-1 * r
+```
+
+so the Krylov iteration sees a numerically easier problem.
+
+The public `ISparsePreconditioner` interface is solver-neutral. The first implementation is `JacobiPreconditioner`, which uses the inverse matrix diagonal:
+
+```csharp
+var jacobi = JacobiPreconditioner.Create(a);
+var result = ConjugateGradientSolver.SolvePreconditioned(
+    a,
+    rightHandSide,
+    jacobi,
+    options: new SparseIterativeSolverOptions
+    {
+        AbsoluteTolerance = 1e-12,
+        RelativeTolerance = 1e-10,
+        MaximumIterations = 1000
+    });
+```
+
+Jacobi is cheap to build and apply, creates no per-application arrays, and is especially useful as a scaling baseline. It is not guaranteed to reduce the iteration count for every problem; preconditioning quality is problem dependent.
+
+For PCG, the preconditioner must itself be SPD. `JacobiPreconditioner` has that property when built from an SPD matrix. A custom preconditioner that makes `r^T*M^-1*r` non-positive or non-finite causes `NumericalBreakdown` rather than silent continuation with an invalid recurrence.
+
+`JacobiPreconditioner.Create` rejects missing or unusable diagonal entries. Its optional `absoluteDiagonalTolerance` is deliberately explicit and absolute. A positive threshold is a modelling choice, not a hidden universal epsilon.
+
 ### Solver diagnostics
 
 `SparseLinearSolveResult` exposes the best available solution, `IterationStatus`, completed iteration count, initial/final residual norms, the right-hand-side norm, the effective convergence threshold and the relative residual norm. A result with `MaximumIterationsReached` can therefore still be inspected quantitatively instead of being reduced to a success/failure Boolean.
 
 ## What sparse linear algebra does not yet provide
 
-CSR and unpreconditioned Conjugate Gradient are now implemented. The next layers are preconditioning and general nonsymmetric Krylov methods such as GMRES and BiCGSTAB. A dedicated CSC type remains deferred until sustained column-oriented workloads justify maintaining a second sparse storage representation.
+CSR, CG, the common preconditioner abstraction, Jacobi preconditioning and PCG are now implemented. The next major solver is restarted **GMRES** for general nonsymmetric systems, followed by **BiCGSTAB** and an architecture consolidation round. More powerful preconditioners such as incomplete Cholesky/ILU and a dedicated CSC type remain deferred until concrete workloads justify them.
 
-The distinction matters: sparse storage is a data-layout decision, while solver choice depends on mathematical structure. An SPD system is a good CG problem; a general nonsymmetric matrix is not.
+The distinction matters: sparse storage is a data-layout decision, solver choice depends on mathematical structure, and preconditioner choice depends on both the solver contract and the matrix. An SPD system is a good CG/PCG problem; a general nonsymmetric matrix is not.
