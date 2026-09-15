@@ -7,12 +7,15 @@ The historical Numerical Methods compatibility catalog is now a completed founda
 - **Householder QR factorization — implemented**
 - **Least-squares default path migrated from normal equations to QR — implemented**
 - **Cholesky factorization for symmetric positive-definite matrices — implemented**
-- reusable vector/multi-RHS Cholesky solves and determinant/log-determinant diagnostics — implemented
-- SVD with singular values, rank diagnostics, pseudoinverse, and robust least squares — **next major milestone**
-- condition-number estimates and explicit rank diagnostics
-- matrix norms and additional decomposition utilities
+- **reusable vector/multi-RHS Cholesky solves and determinant/log-determinant diagnostics — implemented**
+- **one-sided Jacobi SVD for tall, square and wide dense matrices — implemented**
+- **singular values, numerical rank, pseudoinverse, 2-norm condition diagnostics and minimum-norm least squares — implemented**
+- matrix norms and additional decomposition utilities — next cleanup slice
+- later: optional LAPACK-class backend behind stable SASD decomposition concepts
 
-QR is now the baseline robust dense least-squares solver. Cholesky provides the structured path for SPD systems. SVD will handle rank-deficient and underdetermined cases and later support PCA.
+QR remains the preferred full-column-rank dense least-squares path because it is cheaper than a complete SVD. Cholesky provides the structured path for SPD systems. SVD is now the rank-aware fallback for rank-deficient and underdetermined problems and establishes the mathematical base required by later PCA and advanced regression diagnostics.
+
+The current managed SVD is intentionally a readable one-sided Jacobi reference implementation. It avoids `A^T*A`, uses scale-aware column orthogonalization, and keeps rank truncation explicit. High-throughput production workloads can later select an optional mature native backend without changing the higher-level SASD contracts.
 
 ## M3.2 — Sparse linear algebra
 
@@ -28,7 +31,7 @@ Dormand-Prince, dense output, event detection, reusable vector-state APIs and la
 
 ## M3.5 — Statistics, random, and special functions
 
-Stable descriptive statistics, distributions/quantiles, regression diagnostics, hypothesis-test building blocks, reproducible random streams, special functions and PCA after SVD.
+Stable descriptive statistics, distributions/quantiles, regression diagnostics, hypothesis-test building blocks, reproducible random streams, special functions and **PCA on the new SVD foundation**.
 
 ## M3.6 — Geometry, transforms, and simulation
 
