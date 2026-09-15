@@ -1,4 +1,4 @@
-# Dünnbesetzte lineare Algebra — CSR, CG und Preconditioning
+# Dünnbesetzte lineare Algebra — CSR, CG/PCG und GMRES
 
 Dichte Matrizen reservieren Speicher für jede Matrixposition. Das ist für viele kleine und mittlere Probleme sinnvoll, wird aber verschwenderisch, wenn eine große Matrix pro Zeile nur wenige von null verschiedene Koeffizienten enthält. `CsrMatrix` ist die erste SASD-Sparse-Repräsentation für solche Workloads.
 
@@ -137,12 +137,54 @@ Für PCG muss der Preconditioner selbst SPD sein. `JacobiPreconditioner` besitzt
 
 `JacobiPreconditioner.Create` weist fehlende oder unbrauchbare Diagonaleinträge zurück. Die optionale `absoluteDiagonalTolerance` ist bewusst explizit und absolut. Eine positive Schwelle ist eine Modellierungsentscheidung und kein verborgenes universelles Epsilon.
 
+## Restarted GMRES für allgemeine quadratische Systeme
+
+`GmresSolver` ist das allgemeine nichtsymmetrische Gegenstück zu CG/PCG. Der Solver setzt weder Symmetrie noch positive Definitheit voraus und minimiert das Residuum über einen Krylov-Unterraum, der mit dem Arnoldi-Prozess aufgebaut wird.
+
+```csharp
+var result = GmresSolver.Solve(
+    matrix,
+    rightHandSide,
+    restartLength: 30,
+    options: new SparseIterativeSolverOptions
+    {
+        AbsoluteTolerance = 1e-12,
+        RelativeTolerance = 1e-10,
+        MaximumIterations = 1000
+    });
+```
+
+Vollständiges GMRES speichert pro Iteration einen zusätzlichen Basisvektor. `restartLength` begrenzt dieses Speicherwachstum. An einer Restart-Grenze wird die aktuelle Least-Squares-Korrektur angewendet, das echte Residuum neu berechnet und der nächste Krylov-Zyklus von diesem Residuum aus gestartet. Eine kleine Restart-Länge spart Speicher, kann aber die Konvergenz verlangsamen oder stagnieren lassen; ein größerer Wert bewahrt mehr Krylov-Information.
+
+Die Arnoldi-Basis verwendet zwei Modified-Gram-Schmidt-Pässe, um vermeidbaren Orthogonalitätsverlust zu reduzieren. Givens-Rotationen aktualisieren das kleine obere Hessenberg-Least-Squares-System inkrementell. Das projizierte Residuum dient als günstiger Auslöser, aber `Converged` wird erst nach expliziter Neuberechnung des echten Residuums `b-A*x` gemeldet.
+
+### Right-preconditioned GMRES
+
+Dieselbe solverneutrale Preconditioner-Abstraktion wird über `SolvePreconditioned` wiederverwendet. GMRES wendet den Preconditioner auf der rechten Seite an:
+
+```text
+A * M^-1 * y = b
+```
+
+Dadurch bleibt das minimierte und gemeldete Residuum das Residuum des ursprünglichen Systems. Anders als PCG verlangt GMRES keinen SPD-Preconditioner.
+
+```csharp
+var jacobi = JacobiPreconditioner.Create(matrix);
+var result = GmresSolver.SolvePreconditioned(
+    matrix,
+    rightHandSide,
+    jacobi,
+    restartLength: 30);
+```
+
+Ein abgebrochener Arnoldi-Ausbau wird nicht automatisch als Erfolg gewertet. Kann der Krylov-Raum nicht weiter wachsen und liegt das explizit neu berechnete Residuum noch über der Toleranz, liefert der Solver `NumericalBreakdown` mit der besten verfügbaren Lösung.
+
 ### Solver-Diagnostik
 
-`SparseLinearSolveResult` stellt die beste verfügbare Lösung, `IterationStatus`, Anzahl abgeschlossener Iterationen, Anfangs-/Endresiduum, Norm der rechten Seite, effektive Konvergenzschwelle und relative Residualnorm bereit. Auch ein Ergebnis mit `MaximumIterationsReached` kann damit quantitativ beurteilt werden und wird nicht auf ein einfaches Erfolg/Fehlschlag-Boolean reduziert.
+`SparseLinearSolveResult` wird von CG, PCG und GMRES gemeinsam verwendet. Es enthält die beste verfügbare Lösung, `IterationStatus`, Anzahl abgeschlossener Iterationen, Anfangs-/Endresiduum, Norm der rechten Seite, effektive Konvergenzschwelle und relative Residualnorm. `MaximumIterationsReached` bleibt damit quantitativ auswertbar und wird nicht auf ein Boolean reduziert.
 
 ## Was die Sparse-Schicht noch nicht liefert
 
-CSR, CG, die gemeinsame Preconditioner-Abstraktion, Jacobi-Preconditioning und PCG sind jetzt implementiert. Der nächste große Solver ist restarted **GMRES** für allgemeine nichtsymmetrische Systeme, anschließend folgen **BiCGSTAB** und eine Konsolidierungsrunde der Sparse-Architektur. Leistungsfähigere Preconditioner wie Incomplete Cholesky/ILU sowie eine eigene CSC-Struktur bleiben aufgeschoben, bis konkrete Workloads sie rechtfertigen.
+CSR, CG/PCG, die gemeinsame Preconditioner-Abstraktion, Jacobi-Preconditioning und restarted GMRES sind jetzt implementiert. Als nächster Solver-Schritt folgt **BiCGSTAB**, danach eine Konsolidierungs- und Test-Runde der Sparse-Architektur vor dem nächsten Release Candidate. Leistungsfähigere Preconditioner wie Incomplete Cholesky/ILU sowie eine eigene CSC-Struktur bleiben aufgeschoben, bis konkrete Workloads sie rechtfertigen.
 
-Die Trennung bleibt wichtig: Sparse-Speicherung ist eine Datenlayout-Entscheidung, die Solverwahl hängt von der mathematischen Struktur ab, und die Wahl des Preconditioners hängt sowohl vom Solver-Vertrag als auch von der Matrix ab. Ein SPD-System passt gut zu CG/PCG; eine allgemeine nichtsymmetrische Matrix nicht.
+Die Trennung bleibt wichtig: Sparse-Speicherung ist eine Datenlayout-Entscheidung, die Solverwahl hängt von der mathematischen Struktur ab, und die Wahl des Preconditioners hängt sowohl vom Solver-Vertrag als auch von der Matrix ab. Ein SPD-System passt gut zu CG/PCG; eine allgemeine nichtsymmetrische quadratische Matrix ist ein GMRES-Problem.
