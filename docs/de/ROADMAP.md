@@ -39,9 +39,11 @@ Weitere dichte Hilfen bleiben möglich, aber das Managed-Referenzfundament ist v
 - Koordinaten-/Dense-/Raw-CSR-Aufbau mit expliziter Duplikatregel: **implementiert**
 - Sparse-Matvec mit wiederverwendbaren Ausgabepuffern: **implementiert**
 - Transponieren, Dense-Konvertierung und preiswerte Sparse-Normen: **implementiert**
-- Conjugate Gradient für SPD-Sparse-Systeme: **als Nächstes**
+- Gemeinsame Sparse-Iterationsoptionen und Ergebnismodell: **implementiert**
+- Conjugate Gradient für SPD-Sparse-Systeme mit Verifikation des echten Residuums: **implementiert**
+- Diagonal-/Jacobi-Preconditioning für CG: **als Nächstes**
 - eigenes CSC: später bei dauerhaft spaltenorientierten Workloads
-- GMRES, BiCGSTAB und Preconditioning: spätere Schritte
+- GMRES und BiCGSTAB: folgende Solver-Schritte
 
 ### M3.3 – Optimierung und nichtlineare Systeme
 
