@@ -3,89 +3,41 @@ using System.Numerics;
 
 namespace Sasd.Numerics.Transforms;
 
-/// <summary>
-/// Immutable compact spectrum produced from a real-valued radix-2 FFT input sequence.
-/// </summary>
-/// <remarks>
-/// For a real input sequence of length <c>N</c>, the negative-frequency half of the
-/// discrete Fourier spectrum is the complex conjugate of the positive-frequency half.
-/// Therefore only bins <c>0..N/2</c> need to be stored. The original input length is
-/// retained explicitly so the full Hermitian spectrum can be reconstructed without
-/// asking callers to manage packing conventions themselves.
-/// </remarks>
+/// <summary>Immutable compact spectrum produced from a real-valued radix-2 FFT input sequence.</summary>
 public sealed class RealFftSpectrum
 {
     private readonly Complex[] _bins;
     private readonly ReadOnlyCollection<Complex> _readOnlyBins;
 
     internal RealFftSpectrum(int originalLength, IReadOnlyList<Complex> bins)
+        : this(originalLength, CopyBins(bins))
     {
-        ArgumentNullException.ThrowIfNull(bins);
+    }
 
-        if (originalLength < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(originalLength));
-        }
-
-        if (originalLength == 0)
-        {
-            if (bins.Count != 0)
-            {
-                throw new ArgumentException("An empty input must have an empty compact spectrum.", nameof(bins));
-            }
-
-            OriginalLength = 0;
-            _bins = [];
-            _readOnlyBins = Array.AsReadOnly(_bins);
-            return;
-        }
-
-        if (!IsPowerOfTwo(originalLength))
-        {
-            throw new ArgumentException(
-                "A compact real FFT spectrum must describe a radix-2 input length.",
-                nameof(originalLength));
-        }
-
-        var expectedBinCount = (originalLength / 2) + 1;
-        if (bins.Count != expectedBinCount)
-        {
-            throw new ArgumentException(
-                $"A real FFT of length {originalLength} requires exactly {expectedBinCount} compact bins.",
-                nameof(bins));
-        }
-
-        _bins = bins.ToArray();
-        for (var index = 0; index < _bins.Length; index++)
-        {
-            if (!double.IsFinite(_bins[index].Real) || !double.IsFinite(_bins[index].Imaginary))
-            {
-                throw new ArgumentOutOfRangeException(nameof(bins), "Spectrum bins must be finite complex values.");
-            }
-        }
+    private RealFftSpectrum(int originalLength, Complex[] ownedBins)
+    {
+        ArgumentNullException.ThrowIfNull(ownedBins);
+        ValidateShape(originalLength, ownedBins.Length);
+        ValidateFiniteBins(ownedBins);
 
         OriginalLength = originalLength;
+        _bins = ownedBins;
         _readOnlyBins = Array.AsReadOnly(_bins);
     }
 
-    /// <summary>Gets the number of real samples from which the spectrum was produced.</summary>
-    public int OriginalLength { get; }
-
-    /// <summary>Gets the number of stored non-negative-frequency bins.</summary>
-    public int BinCount => _bins.Length;
-
     /// <summary>
-    /// Gets an immutable view of the stored bins from DC through the Nyquist bin.
+    /// Creates a spectrum by taking ownership of a freshly allocated internal array. This avoids
+    /// a redundant full-bin copy on the FFT hot path while preserving public immutability.
     /// </summary>
-    public IReadOnlyList<Complex> Bins => _readOnlyBins;
+    internal static RealFftSpectrum FromOwnedBins(int originalLength, Complex[] bins) =>
+        new(originalLength, bins);
 
-    /// <summary>Gets a stored spectrum bin by index.</summary>
+    public int OriginalLength { get; }
+    public int BinCount => _bins.Length;
+    public IReadOnlyList<Complex> Bins => _readOnlyBins;
     public Complex this[int binIndex] => _bins[binIndex];
 
-    /// <summary>
-    /// Gets the bin frequency in cycles per sample. Multiply this value by the sample rate
-    /// to obtain the physical frequency in cycles per second (Hz).
-    /// </summary>
+    /// <summary>Gets the bin frequency in cycles per sample.</summary>
     public double GetNormalizedFrequency(int binIndex)
     {
         if (OriginalLength == 0)
@@ -93,7 +45,7 @@ public sealed class RealFftSpectrum
             throw new InvalidOperationException("An empty spectrum has no frequency bins.");
         }
 
-        if (binIndex < 0 || binIndex >= _bins.Length)
+        if ((uint)binIndex >= (uint)_bins.Length)
         {
             throw new ArgumentOutOfRangeException(nameof(binIndex));
         }
@@ -101,10 +53,54 @@ public sealed class RealFftSpectrum
         return binIndex / (double)OriginalLength;
     }
 
-    /// <summary>
-    /// Returns a defensive copy of the compact bins for callers that need an array.
-    /// </summary>
-    public Complex[] ToArray() => _bins.ToArray();
+    /// <summary>Returns a defensive copy of the compact bins.</summary>
+    public Complex[] ToArray() => (Complex[])_bins.Clone();
+
+    private static Complex[] CopyBins(IReadOnlyList<Complex> bins)
+    {
+        ArgumentNullException.ThrowIfNull(bins);
+        return bins.ToArray();
+    }
+
+    private static void ValidateShape(int originalLength, int binCount)
+    {
+        if (originalLength < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(originalLength));
+        }
+
+        if (originalLength == 0)
+        {
+            if (binCount != 0)
+            {
+                throw new ArgumentException("An empty input must have an empty compact spectrum.", nameof(binCount));
+            }
+
+            return;
+        }
+
+        if (!IsPowerOfTwo(originalLength))
+        {
+            throw new ArgumentException("A compact real FFT spectrum must describe a radix-2 input length.", nameof(originalLength));
+        }
+
+        var expectedBinCount = (originalLength / 2) + 1;
+        if (binCount != expectedBinCount)
+        {
+            throw new ArgumentException($"A real FFT of length {originalLength} requires exactly {expectedBinCount} compact bins.", nameof(binCount));
+        }
+    }
+
+    private static void ValidateFiniteBins(IReadOnlyList<Complex> bins)
+    {
+        for (var index = 0; index < bins.Count; index++)
+        {
+            if (!double.IsFinite(bins[index].Real) || !double.IsFinite(bins[index].Imaginary))
+            {
+                throw new ArgumentOutOfRangeException(nameof(bins), "Spectrum bins must be finite complex values.");
+            }
+        }
+    }
 
     private static bool IsPowerOfTwo(int value) => value > 0 && (value & (value - 1)) == 0;
 }

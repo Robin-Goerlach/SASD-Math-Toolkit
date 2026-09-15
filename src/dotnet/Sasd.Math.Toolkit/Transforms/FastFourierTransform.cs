@@ -6,9 +6,10 @@ namespace Sasd.Numerics.Transforms;
 /// Dependency-free radix-2 Cooley-Tukey FFT plus convolution and cross-correlation helpers.
 /// </summary>
 /// <remarks>
-/// The forward transform is unscaled. The inverse transform divides every result by the
-/// sequence length, so <c>Inverse(Forward(x))</c> reconstructs <c>x</c> within floating-point
-/// round-off. The implementation intentionally favors clarity over micro-optimization.
+/// The public APIs retain defensive-copy semantics: caller-owned arrays are never transformed in
+/// place. Internally, however, arrays that the toolkit has just allocated are transformed in place
+/// so real FFT, inverse-real reconstruction, convolution and correlation do not create redundant
+/// full-length spectrum copies.
 /// </remarks>
 public static partial class FastFourierTransform
 {
@@ -17,7 +18,11 @@ public static partial class FastFourierTransform
     {
         ArgumentNullException.ThrowIfNull(input);
         ValidateFiniteComplexInput(input, nameof(input));
-        return Transform(input, inverse: false);
+        ValidateTransformLength(input.Count, nameof(input));
+
+        var data = input.ToArray();
+        TransformInPlace(data, inverse: false);
+        return data;
     }
 
     /// <summary>Computes the normalized inverse complex radix-2 transform.</summary>
@@ -25,62 +30,60 @@ public static partial class FastFourierTransform
     {
         ArgumentNullException.ThrowIfNull(input);
         ValidateFiniteComplexInput(input, nameof(input));
-        return Transform(input, inverse: true);
+        ValidateTransformLength(input.Count, nameof(input));
+
+        var data = input.ToArray();
+        TransformInPlace(data, inverse: true);
+        return data;
     }
 
-    /// <summary>
-    /// Computes the full complex spectrum of a real-valued input sequence.
-    /// </summary>
-    /// <remarks>
-    /// This compatibility API returns all <c>N</c> complex bins even though the negative-
-    /// frequency half is redundant for real input. Use <see cref="ForwardRealCompact"/>
-    /// when that redundancy should be hidden from application code.
-    /// </remarks>
+    /// <summary>Computes the full complex spectrum of a real-valued input sequence.</summary>
     public static Complex[] ForwardReal(IReadOnlyList<double> input)
     {
         ArgumentNullException.ThrowIfNull(input);
         ValidateFiniteRealInput(input, nameof(input));
-        return Forward(input.Select(value => new Complex(value, 0.0)).ToArray());
+        ValidateTransformLength(input.Count, nameof(input));
+
+        if (input.Count == 0)
+        {
+            return [];
+        }
+
+        // Build the complex working array directly. The old path created this array through LINQ,
+        // validated it again as complex input and then copied it a second time in Transform().
+        var data = new Complex[input.Count];
+        for (var index = 0; index < input.Count; index++)
+        {
+            data[index] = new Complex(input[index], 0.0);
+        }
+
+        TransformInPlace(data, inverse: false);
+        return data;
     }
 
-    /// <summary>
-    /// Computes only the non-redundant half-spectrum for a real-valued input sequence.
-    /// </summary>
-    /// <remarks>
-    /// For a non-empty real input of length <c>N</c>, the result stores exactly
-    /// <c>N/2 + 1</c> bins: DC, the positive-frequency bins, and the Nyquist bin.
-    /// The original length travels with the result so <see cref="InverseReal"/> can
-    /// reconstruct the omitted conjugate half without a separate packing convention.
-    /// </remarks>
+    /// <summary>Computes only the non-redundant half-spectrum for a real-valued input sequence.</summary>
     public static RealFftSpectrum ForwardRealCompact(IReadOnlyList<double> input)
     {
         ArgumentNullException.ThrowIfNull(input);
-
         var fullSpectrum = ForwardReal(input);
         if (input.Count == 0)
         {
-            return new RealFftSpectrum(0, Array.Empty<Complex>());
+            return RealFftSpectrum.FromOwnedBins(0, []);
         }
 
         var compactBinCount = (input.Count / 2) + 1;
         var compactBins = new Complex[compactBinCount];
         Array.Copy(fullSpectrum, compactBins, compactBinCount);
-        return new RealFftSpectrum(input.Count, compactBins);
+
+        // compactBins is newly allocated and cannot be observed elsewhere. Transferring ownership
+        // avoids another defensive copy while RealFftSpectrum remains immutable to public callers.
+        return RealFftSpectrum.FromOwnedBins(input.Count, compactBins);
     }
 
-    /// <summary>
-    /// Reconstructs a real-valued sequence from a compact real FFT spectrum.
-    /// </summary>
-    /// <remarks>
-    /// The omitted negative-frequency bins are restored using Hermitian symmetry before
-    /// the ordinary complex inverse FFT is evaluated. The DC and Nyquist bins are forced
-    /// to their mathematically real values to discard harmless round-off-sized imaginary
-    /// components introduced by the forward transform.
-    /// </remarks>
+    /// <summary>Reconstructs a real-valued sequence from a compact real FFT spectrum.</summary>
     public static double[] InverseReal(RealFftSpectrum spectrum)
     {
         ArgumentNullException.ThrowIfNull(spectrum);
-
         if (spectrum.OriginalLength == 0)
         {
             return [];
@@ -103,40 +106,39 @@ public static partial class FastFourierTransform
             fullSpectrum[nyquistBin] = new Complex(spectrum[nyquistBin].Real, 0.0);
         }
 
-        var restored = Inverse(fullSpectrum);
+        // fullSpectrum is an internal working array, so an additional public-Inverse copy would
+        // provide no safety. Transform it directly and project the real part once.
+        TransformInPlace(fullSpectrum, inverse: true);
         var result = new double[length];
         for (var index = 0; index < length; index++)
         {
-            if (!double.IsFinite(restored[index].Real))
-            {
-                throw new ArithmeticException("Inverse real FFT produced a non-finite sample.");
-            }
-
-            result[index] = restored[index].Real;
+            result[index] = fullSpectrum[index].Real;
         }
 
         return result;
     }
 
-    private static Complex[] Transform(IReadOnlyList<Complex> input, bool inverse)
+    /// <summary>
+    /// Transforms an owned working array in place. Public APIs must validate/copy caller-owned data
+    /// before reaching this method; internal algorithms may pass arrays they created themselves.
+    /// </summary>
+    private static void TransformInPlace(Complex[] data, bool inverse)
     {
-        if (input.Count == 0) return [];
-        if (!IsPowerOfTwo(input.Count))
+        if (data.Length == 0)
         {
-            throw new ArgumentException("Radix-2 FFT requires a power-of-two input length.", nameof(input));
+            return;
         }
 
-        var data = input.ToArray();
         BitReversePermutation(data);
-
         for (var length = 2; length <= data.Length; length <<= 1)
         {
             var angle = (inverse ? 2.0 : -2.0) * System.Math.PI / length;
             var wLength = Complex.FromPolarCoordinates(1.0, angle);
+            var half = length / 2;
+
             for (var start = 0; start < data.Length; start += length)
             {
                 var w = Complex.One;
-                var half = length / 2;
                 for (var offset = 0; offset < half; offset++)
                 {
                     var even = data[start + offset];
@@ -147,9 +149,6 @@ public static partial class FastFourierTransform
                 }
             }
 
-            // Avoid an integer overflow in the loop increment for the largest representable
-            // power-of-two array length. Real-world allocations will normally be far smaller,
-            // but the guard keeps the control flow correct independently of machine memory.
             if (length == data.Length)
             {
                 break;
@@ -158,10 +157,24 @@ public static partial class FastFourierTransform
 
         if (inverse)
         {
-            for (var i = 0; i < data.Length; i++) data[i] /= data.Length;
+            var scale = 1.0 / data.Length;
+            for (var i = 0; i < data.Length; i++)
+            {
+                data[i] *= scale;
+            }
         }
 
-        return data;
+        // One O(N) validation pass is cheap relative to O(N log N) transformation and gives all
+        // internal optimized paths the same protection against arithmetic overflow.
+        EnsureFiniteTransformOutput(data);
+    }
+
+    private static void ValidateTransformLength(int length, string parameterName)
+    {
+        if (length != 0 && !IsPowerOfTwo(length))
+        {
+            throw new ArgumentException("Radix-2 FFT requires a power-of-two input length.", parameterName);
+        }
     }
 
     private static void ValidateFiniteRealInput(IReadOnlyList<double> input, string parameterName)
@@ -170,9 +183,7 @@ public static partial class FastFourierTransform
         {
             if (!double.IsFinite(input[index]))
             {
-                throw new ArgumentOutOfRangeException(
-                    parameterName,
-                    $"Real-valued input sample at index {index} must be finite.");
+                throw new ArgumentOutOfRangeException(parameterName, $"Real-valued input sample at index {index} must be finite.");
             }
         }
     }
@@ -184,9 +195,19 @@ public static partial class FastFourierTransform
             var value = input[index];
             if (!double.IsFinite(value.Real) || !double.IsFinite(value.Imaginary))
             {
-                throw new ArgumentOutOfRangeException(
-                    parameterName,
-                    $"Complex input sample at index {index} must have finite real and imaginary parts.");
+                throw new ArgumentOutOfRangeException(parameterName, $"Complex input sample at index {index} must have finite real and imaginary parts.");
+            }
+        }
+    }
+
+    private static void EnsureFiniteTransformOutput(IReadOnlyList<Complex> data)
+    {
+        for (var index = 0; index < data.Count; index++)
+        {
+            var value = data[index];
+            if (!double.IsFinite(value.Real) || !double.IsFinite(value.Imaginary))
+            {
+                throw new ArithmeticException("FFT arithmetic produced a non-finite value.");
             }
         }
     }
@@ -202,8 +223,12 @@ public static partial class FastFourierTransform
                 j ^= bit;
                 bit >>= 1;
             }
+
             j ^= bit;
-            if (i < j) (data[i], data[j]) = (data[j], data[i]);
+            if (i < j)
+            {
+                (data[i], data[j]) = (data[j], data[i]);
+            }
         }
     }
 
@@ -221,9 +246,7 @@ public static partial class FastFourierTransform
         {
             if (result >= (1 << 30))
             {
-                throw new ArgumentOutOfRangeException(
-                    nameof(value),
-                    "The required radix-2 transform length exceeds the supported Int32 array range.");
+                throw new ArgumentOutOfRangeException(nameof(value), "The required radix-2 transform length exceeds the supported Int32 array range.");
             }
 
             result <<= 1;

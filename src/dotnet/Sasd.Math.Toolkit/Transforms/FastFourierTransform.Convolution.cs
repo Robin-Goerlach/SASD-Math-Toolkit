@@ -2,197 +2,173 @@ using System.Numerics;
 
 namespace Sasd.Numerics.Transforms;
 
-/// <summary>
-/// Convolution and cross-correlation operations built on the shared FFT implementation.
-/// </summary>
+/// <summary>Convolution and cross-correlation operations built on the shared FFT implementation.</summary>
 public static partial class FastFourierTransform
 {
-    /// <summary>
-    /// Computes the full linear convolution of two complex sequences.
-    /// </summary>
-    /// <remarks>
-    /// The output length is <c>left.Count + right.Count - 1</c>. Both inputs are zero-padded
-    /// to the next radix-2 length, transformed with the shared FFT, multiplied pointwise and
-    /// transformed back. An empty input produces an empty result.
-    /// </remarks>
-    public static Complex[] ConvolveComplex(
-        IReadOnlyList<Complex> left,
-        IReadOnlyList<Complex> right)
+    public static Complex[] ConvolveComplex(IReadOnlyList<Complex> left, IReadOnlyList<Complex> right)
     {
         ArgumentNullException.ThrowIfNull(left);
         ArgumentNullException.ThrowIfNull(right);
         ValidateFiniteComplexInput(left, nameof(left));
         ValidateFiniteComplexInput(right, nameof(right));
-
-        return ConvolveComplexCore(left, right);
+        return ConvolveComplexCore(left, right, correlate: false);
     }
 
-    /// <summary>
-    /// Computes the full linear convolution of two real-valued sequences.
-    /// </summary>
-    /// <remarks>
-    /// This convenience overload deliberately delegates to the same complex FFT convolution
-    /// core as <see cref="ConvolveComplex"/>. The small imaginary round-off component of the
-    /// inverse transform is discarded after the result has been checked for finiteness.
-    /// </remarks>
-    public static double[] ConvolveReal(
-        IReadOnlyList<double> left,
-        IReadOnlyList<double> right)
+    public static double[] ConvolveReal(IReadOnlyList<double> left, IReadOnlyList<double> right)
     {
         ArgumentNullException.ThrowIfNull(left);
         ArgumentNullException.ThrowIfNull(right);
         ValidateFiniteRealInput(left, nameof(left));
         ValidateFiniteRealInput(right, nameof(right));
-
-        var complexLeft = ToComplex(left);
-        var complexRight = ToComplex(right);
-        return ExtractRealPart(ConvolveComplexCore(complexLeft, complexRight));
+        return ConvolveRealCore(left, right, correlate: false);
     }
 
     /// <summary>
-    /// Computes the full complex cross-correlation of two sequences.
+    /// Computes <c>r[l] = sum_k left[k] * conjugate(right[k-l])</c>. Result index <c>i</c>
+    /// corresponds to lag <c>i - (right.Count - 1)</c>.
     /// </summary>
-    /// <remarks>
-    /// The implemented convention is
-    /// <c>r[l] = sum_k left[k] * conjugate(right[k-l])</c> over the valid overlap.
-    /// The returned array contains lags from <c>-(right.Count-1)</c> through
-    /// <c>left.Count-1</c>; therefore result index <c>i</c> corresponds to
-    /// <c>lag = i - (right.Count - 1)</c>. At zero lag this becomes the ordinary complex
-    /// inner product of the overlapping sequences.
-    /// </remarks>
-    public static Complex[] CrossCorrelateComplex(
-        IReadOnlyList<Complex> left,
-        IReadOnlyList<Complex> right)
+    public static Complex[] CrossCorrelateComplex(IReadOnlyList<Complex> left, IReadOnlyList<Complex> right)
     {
         ArgumentNullException.ThrowIfNull(left);
         ArgumentNullException.ThrowIfNull(right);
         ValidateFiniteComplexInput(left, nameof(left));
         ValidateFiniteComplexInput(right, nameof(right));
-
-        return CrossCorrelateComplexCore(left, right);
+        return ConvolveComplexCore(left, right, correlate: true);
     }
 
-    /// <summary>
-    /// Computes the full real-valued cross-correlation of two sequences.
-    /// </summary>
-    /// <remarks>
-    /// The lag ordering is identical to <see cref="CrossCorrelateComplex"/>. Because real
-    /// values are unchanged by complex conjugation, this preserves the behavior of the
-    /// historical real helper while sharing the same correlation core.
-    /// </remarks>
-    public static double[] CrossCorrelateReal(
-        IReadOnlyList<double> left,
-        IReadOnlyList<double> right)
+    public static double[] CrossCorrelateReal(IReadOnlyList<double> left, IReadOnlyList<double> right)
     {
         ArgumentNullException.ThrowIfNull(left);
         ArgumentNullException.ThrowIfNull(right);
         ValidateFiniteRealInput(left, nameof(left));
         ValidateFiniteRealInput(right, nameof(right));
-
-        var complexLeft = ToComplex(left);
-        var complexRight = ToComplex(right);
-        return ExtractRealPart(CrossCorrelateComplexCore(complexLeft, complexRight));
+        return ConvolveRealCore(left, right, correlate: true);
     }
 
-    /// <summary>
-    /// Shared FFT convolution kernel. Inputs must already have been validated by the public
-    /// boundary or constructed internally from validated values.
-    /// </summary>
     private static Complex[] ConvolveComplexCore(
         IReadOnlyList<Complex> left,
-        IReadOnlyList<Complex> right)
+        IReadOnlyList<Complex> right,
+        bool correlate)
     {
         if (left.Count == 0 || right.Count == 0)
         {
             return [];
         }
 
-        int outputLength;
-        try
-        {
-            outputLength = checked(left.Count + right.Count - 1);
-        }
-        catch (OverflowException)
-        {
-            throw new ArgumentOutOfRangeException(
-                nameof(left),
-                "The requested convolution result is too large for an Int32-indexed array.");
-        }
-
+        var outputLength = GetConvolutionOutputLength(left.Count, right.Count);
         var transformLength = NextPowerOfTwo(outputLength);
-        var paddedLeft = new Complex[transformLength];
-        var paddedRight = new Complex[transformLength];
+        var leftWork = new Complex[transformLength];
+        var rightWork = new Complex[transformLength];
 
         for (var index = 0; index < left.Count; index++)
         {
-            paddedLeft[index] = left[index];
+            leftWork[index] = left[index];
         }
 
-        for (var index = 0; index < right.Count; index++)
+        if (correlate)
         {
-            paddedRight[index] = right[index];
+            // Correlation is convolution with a reversed, conjugated right sequence. Build that
+            // sequence directly in the zero-padded transform buffer instead of allocating an
+            // intermediate reversed array.
+            for (var index = 0; index < right.Count; index++)
+            {
+                rightWork[index] = Complex.Conjugate(right[right.Count - 1 - index]);
+            }
         }
-
-        var leftSpectrum = Forward(paddedLeft);
-        var rightSpectrum = Forward(paddedRight);
-        for (var bin = 0; bin < transformLength; bin++)
+        else
         {
-            leftSpectrum[bin] *= rightSpectrum[bin];
+            for (var index = 0; index < right.Count; index++)
+            {
+                rightWork[index] = right[index];
+            }
         }
 
-        var paddedResult = Inverse(leftSpectrum);
+        ExecuteConvolutionInPlace(leftWork, rightWork);
         var result = new Complex[outputLength];
-        Array.Copy(paddedResult, result, outputLength);
+        Array.Copy(leftWork, result, outputLength);
         return result;
     }
 
-    /// <summary>
-    /// Expresses correlation as convolution with a reversed, conjugated right sequence.
-    /// Keeping this identity in one place ensures that real and complex overloads use the
-    /// same lag convention.
-    /// </summary>
-    private static Complex[] CrossCorrelateComplexCore(
-        IReadOnlyList<Complex> left,
-        IReadOnlyList<Complex> right)
+    private static double[] ConvolveRealCore(
+        IReadOnlyList<double> left,
+        IReadOnlyList<double> right,
+        bool correlate)
     {
         if (left.Count == 0 || right.Count == 0)
         {
             return [];
         }
 
-        var reversedConjugatedRight = new Complex[right.Count];
-        for (var index = 0; index < right.Count; index++)
+        var outputLength = GetConvolutionOutputLength(left.Count, right.Count);
+        var transformLength = NextPowerOfTwo(outputLength);
+        var leftWork = new Complex[transformLength];
+        var rightWork = new Complex[transformLength];
+
+        // Real overloads now populate the padded complex buffers directly. The previous path first
+        // allocated two exact-size complex arrays and then copied them into two padded arrays.
+        for (var index = 0; index < left.Count; index++)
         {
-            reversedConjugatedRight[index] = Complex.Conjugate(right[right.Count - 1 - index]);
+            leftWork[index] = new Complex(left[index], 0.0);
         }
 
-        return ConvolveComplexCore(left, reversedConjugatedRight);
-    }
-
-    private static Complex[] ToComplex(IReadOnlyList<double> input)
-    {
-        var result = new Complex[input.Count];
-        for (var index = 0; index < input.Count; index++)
+        if (correlate)
         {
-            result[index] = new Complex(input[index], 0.0);
+            for (var index = 0; index < right.Count; index++)
+            {
+                rightWork[index] = new Complex(right[right.Count - 1 - index], 0.0);
+            }
+        }
+        else
+        {
+            for (var index = 0; index < right.Count; index++)
+            {
+                rightWork[index] = new Complex(right[index], 0.0);
+            }
+        }
+
+        ExecuteConvolutionInPlace(leftWork, rightWork);
+        var result = new double[outputLength];
+        for (var index = 0; index < outputLength; index++)
+        {
+            result[index] = leftWork[index].Real;
         }
 
         return result;
     }
 
-    private static double[] ExtractRealPart(IReadOnlyList<Complex> input)
+    /// <summary>
+    /// Transforms the two owned padded arrays in place, stores their spectral product in
+    /// <paramref name="leftWork"/>, and inverse-transforms that same array. No full-length
+    /// spectrum/result copies are required.
+    /// </summary>
+    private static void ExecuteConvolutionInPlace(Complex[] leftWork, Complex[] rightWork)
     {
-        var result = new double[input.Count];
-        for (var index = 0; index < input.Count; index++)
+        TransformInPlace(leftWork, inverse: false);
+        TransformInPlace(rightWork, inverse: false);
+
+        for (var bin = 0; bin < leftWork.Length; bin++)
         {
-            if (!double.IsFinite(input[index].Real) || !double.IsFinite(input[index].Imaginary))
+            var product = leftWork[bin] * rightWork[bin];
+            if (!double.IsFinite(product.Real) || !double.IsFinite(product.Imaginary))
             {
-                throw new ArithmeticException("FFT convolution produced a non-finite output sample.");
+                throw new ArithmeticException("FFT convolution spectrum multiplication produced a non-finite value.");
             }
 
-            result[index] = input[index].Real;
+            leftWork[bin] = product;
         }
 
-        return result;
+        TransformInPlace(leftWork, inverse: true);
+    }
+
+    private static int GetConvolutionOutputLength(int leftCount, int rightCount)
+    {
+        try
+        {
+            return checked(leftCount + rightCount - 1);
+        }
+        catch (OverflowException)
+        {
+            throw new ArgumentOutOfRangeException(nameof(leftCount), "The requested convolution result is too large for an Int32-indexed array.");
+        }
     }
 }
