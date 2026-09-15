@@ -45,9 +45,12 @@ Additional dense utilities remain possible, but the managed reference foundation
 - Transpose, dense conversion and inexpensive sparse norms: **implemented**
 - Shared sparse iterative options/result diagnostics: **implemented**
 - Conjugate Gradient for SPD sparse systems with true-residual verification: **implemented**
-- Diagonal/Jacobi preconditioning for CG: **next**
-- Dedicated CSC: later when sustained column-oriented workloads justify it
-- GMRES and BiCGSTAB: subsequent solver slices
+- Solver-neutral `ISparsePreconditioner` abstraction: **implemented**
+- Diagonal/Jacobi preconditioning: **implemented**
+- Preconditioned Conjugate Gradient with SPD recurrence validation: **implemented**
+- Restarted GMRES for general nonsymmetric systems: **next**
+- BiCGSTAB: subsequent solver slice
+- Dedicated CSC and stronger incomplete-factorization preconditioners: later when concrete workloads justify them
 
 ### M3.3 — Optimization and nonlinear systems
 
