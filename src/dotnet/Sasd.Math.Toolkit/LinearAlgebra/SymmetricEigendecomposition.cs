@@ -4,10 +4,9 @@ namespace Sasd.Numerics.LinearAlgebra;
 /// Immutable public view of the complete eigensystem of a real symmetric matrix.
 /// </summary>
 /// <remarks>
-/// Eigenvectors are stored as columns and correspond to the eigenvalues at the
-/// same index. The decomposition is returned in descending eigenvalue order.
-/// Copies are exposed deliberately so callers cannot accidentally mutate a
-/// completed numerical result.
+/// Eigenvectors are stored as columns and correspond to the eigenvalues at the same index.
+/// The decomposition is returned in descending numerical eigenvalue order. Public arrays and
+/// matrices are defensive copies so callers cannot accidentally mutate a completed result.
 /// </remarks>
 public sealed class SymmetricEigendecomposition
 {
@@ -19,9 +18,17 @@ public sealed class SymmetricEigendecomposition
         ArgumentNullException.ThrowIfNull(eigenvalues);
         ArgumentNullException.ThrowIfNull(eigenvectors);
 
-        if (eigenvectors.Rows != eigenvectors.Columns || eigenvectors.Columns != eigenvalues.Length)
+        if (!eigenvectors.IsSquare || eigenvectors.Columns != eigenvalues.Length)
         {
             throw new ArgumentException("Eigenvalue and eigenvector dimensions must describe a square eigensystem.");
+        }
+
+        for (var i = 0; i < eigenvalues.Length; i++)
+        {
+            if (!double.IsFinite(eigenvalues[i]))
+            {
+                throw new ArgumentOutOfRangeException(nameof(eigenvalues), "Eigenvalues must be finite.");
+            }
         }
 
         _eigenvalues = (double[])eigenvalues.Clone();
@@ -34,25 +41,31 @@ public sealed class SymmetricEigendecomposition
     public int Size => _eigenvalues.Length;
 
     /// <summary>
-    /// Gets the eigenvalues in descending order.
+    /// Gets the eigenvalues in descending numerical order as a defensive copy.
     /// </summary>
     public double[] Eigenvalues => (double[])_eigenvalues.Clone();
 
     /// <summary>
-    /// Gets a copy of the orthonormal eigenvector matrix.
+    /// Gets a defensive copy of the orthonormal eigenvector matrix.
     /// </summary>
     /// <remarks>Column <c>i</c> belongs to eigenvalue <c>Eigenvalues[i]</c>.</remarks>
     public DenseMatrix Eigenvectors => _eigenvectors.Clone();
 
     /// <summary>
-    /// Returns one eigenpair from the decomposition.
+    /// Gets one eigenvalue without allocating an array copy.
     /// </summary>
-    public Eigenpair GetEigenpair(int index)
+    public double GetEigenvalue(int index)
     {
-        if ((uint)index >= (uint)Size)
-        {
-            throw new ArgumentOutOfRangeException(nameof(index));
-        }
+        ValidateIndex(index);
+        return _eigenvalues[index];
+    }
+
+    /// <summary>
+    /// Gets one eigenvector as an independent array copy.
+    /// </summary>
+    public double[] GetEigenvector(int index)
+    {
+        ValidateIndex(index);
 
         var vector = new double[Size];
         for (var row = 0; row < Size; row++)
@@ -60,6 +73,23 @@ public sealed class SymmetricEigendecomposition
             vector[row] = _eigenvectors[row, index];
         }
 
-        return new Eigenpair(_eigenvalues[index], vector);
+        return vector;
+    }
+
+    /// <summary>
+    /// Returns one immutable eigenpair from the decomposition.
+    /// </summary>
+    public Eigenpair GetEigenpair(int index)
+    {
+        ValidateIndex(index);
+        return new Eigenpair(_eigenvalues[index], GetEigenvector(index));
+    }
+
+    private void ValidateIndex(int index)
+    {
+        if ((uint)index >= (uint)Size)
+        {
+            throw new ArgumentOutOfRangeException(nameof(index));
+        }
     }
 }
