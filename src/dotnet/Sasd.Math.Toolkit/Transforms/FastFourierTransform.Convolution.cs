@@ -112,12 +112,11 @@ public static partial class FastFourierTransform
         {
             outputLength = checked(left.Count + right.Count - 1);
         }
-        catch (OverflowException exception)
+        catch (OverflowException)
         {
             throw new ArgumentOutOfRangeException(
                 nameof(left),
-                "The requested convolution result is too large for an Int32-indexed array.",
-                exception);
+                "The requested convolution result is too large for an Int32-indexed array.");
         }
 
         var transformLength = NextPowerOfTwo(outputLength);
