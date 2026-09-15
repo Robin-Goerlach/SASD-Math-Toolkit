@@ -48,8 +48,10 @@ Additional dense utilities remain possible, but the managed reference foundation
 - Solver-neutral `ISparsePreconditioner` abstraction: **implemented**
 - Diagonal/Jacobi preconditioning: **implemented**
 - Preconditioned Conjugate Gradient with SPD recurrence validation: **implemented**
-- Restarted GMRES for general nonsymmetric systems: **next**
-- BiCGSTAB: subsequent solver slice
+- Restarted GMRES for general nonsymmetric systems: **implemented**
+- Right-preconditioned GMRES with modified Gram-Schmidt/Arnoldi and Givens updates: **implemented**
+- BiCGSTAB: **next**
+- Sparse architecture/reference-case consolidation: after BiCGSTAB
 - Dedicated CSC and stronger incomplete-factorization preconditioners: later when concrete workloads justify them
 
 ### M3.3 — Optimization and nonlinear systems
