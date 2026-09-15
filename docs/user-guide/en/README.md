@@ -15,7 +15,7 @@ The handbook is for application developers, students and technically oriented us
 3. [Interpolation](interpolation.md)
 4. [Numerical differentiation](differentiation.md)
 5. [Numerical integration](integration.md)
-6. Matrices and linear systems
+6. [Matrices and linear systems](matrices-linear-systems.md)
 7. Eigenvalues and eigenvectors
 8. [Ordinary differential equations and boundary-value problems](ordinary-differential-equations.md)
 9. [Least-squares approximation](least-squares.md)

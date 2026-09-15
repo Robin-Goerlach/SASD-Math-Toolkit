@@ -15,7 +15,7 @@ Das Benutzerhandbuch richtet sich an Anwendungsentwickler, Lernende und technisc
 3. [Interpolation](interpolation.md)
 4. [Numerische Differentiation](differentiation.md)
 5. [Numerische Integration](integration.md)
-6. Matrizen und lineare Gleichungssysteme
+6. [Matrizen und lineare Gleichungssysteme](matrizen-lineare-gleichungssysteme.md)
 7. Eigenwerte und Eigenvektoren
 8. [Gewöhnliche Differentialgleichungen und Randwertprobleme](differentialgleichungen.md)
 9. [Least-Squares-Approximation](least-squares.md)
