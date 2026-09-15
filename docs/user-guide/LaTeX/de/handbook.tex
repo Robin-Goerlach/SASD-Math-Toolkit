@@ -1,0 +1,94 @@
+\documentclass[11pt,a4paper,twoside,openright]{book}
+\usepackage[ngerman]{babel}
+\newcommand{\HandbookPdfTitle}{SASD Math Toolkit - CSharp/.NET Handbuch Version 1.0}
+\newcommand{\HandbookFooter}{Handbuch Version 1.0 - Deutsch}
+\newcommand{\HandbookSubtitle}{Numerical Methods - C\# / .NET}
+\newcommand{\HandbookVersionText}{Benutzer- und Entwicklerhandbuch - Version 1.0}
+\newcommand{\HandbookTagline}{Numerische Verfahren für robuste, nachvollziehbare und wiederverwendbare C\#-Anwendungen.}
+\newcommand{\HandbookRepositoryRef}{Repository: \repo\quad |\quad C\#/.NET 10}
+
+\usepackage{sasd-handbook}
+
+\begin{document}
+\frontmatter
+\SASDTitlePage
+
+\chapter*{Dokumentstatus}
+\addcontentsline{toc}{chapter}{Dokumentstatus}
+\begin{sasdnote}{Version 1.0 dieses Handbuchs}
+Dieses Dokument ist die deutschsprachige Handbuchausgabe 1.0 für die C\#/.NET-Implementierung des SASD Math Toolkit. Die Kapitelinhalte werden beim Build aus dem gepflegten Markdown-Handbuch unter \texttt{docs/user-guide/de/} erzeugt. Dadurch bleibt Markdown die redaktionelle Quelle, während LaTeX Satz, Navigation und PDF-Ausgabe übernimmt.
+\end{sasdnote}
+
+\begin{tabularx}{\textwidth}{@{}>{\bfseries}p{0.31\textwidth}X@{}}
+Dokument & SASD Math Toolkit - C\#/.NET Benutzer- und Entwicklerhandbuch\\
+Handbuchversion & 1.0\\
+Repository & \repo\\
+Zielplattform & .NET 10\\
+Assembly & \texttt{Sasd.Math.Toolkit}\\
+Root Namespace & \texttt{Sasd.Numerics}\\
+Lizenz & MIT\\
+Autor / Projekt & Robin Goerlach; SASD-GmbH\\
+\end{tabularx}
+
+\chapter*{Vorwort}
+\addcontentsline{toc}{chapter}{Vorwort}
+Das SASD Math Toolkit überträgt den funktionalen Kern einer klassischen Numerical-Methods-Toolbox in eine moderne, unabhängig entwickelte C\#/.NET-Bibliothek. Das historische Handbuch dient dabei als Orientierung für Problemklassen und Handbuchdramaturgie - nicht als Text- oder Quellcodevorlage.
+
+Die historische Ausgabe strukturierte numerische Verfahren konsequent nach Problem, Beschreibung, Eingaben, Ausgaben, Aufrufsyntax, Kommentaren und Beispiel. Die vorliegende Ausgabe übernimmt diesen anwenderorientierten Gedanken, formuliert ihn aber für moderne C\#-APIs mit Exceptions, Statusobjekten, Residuen und Tests neu.
+
+\begin{sasdtip}{Leitgedanke}
+Eine Zahl ist noch kein belastbares numerisches Ergebnis. Für wichtige Rechnungen gehören Methode, Toleranz, Terminierungsstatus und eine problemspezifische Qualitätsprüfung zusammen.
+\end{sasdtip}
+
+\tableofcontents
+\clearpage
+\mainmatter
+
+\input{build/de/erste-schritte.tex}
+\input{build/de/nullstellen.tex}
+\input{build/de/interpolation.tex}
+\input{build/de/differentiation.tex}
+\input{build/de/integration.tex}
+\input{build/de/matrizen-lineare-gleichungssysteme.tex}
+\input{build/de/eigenwerte-eigenvektoren.tex}
+\input{build/de/differentialgleichungen.tex}
+\input{build/de/least-squares.tex}
+\input{build/de/fft-faltung-korrelation.tex}
+\input{build/de/diagnostik-fehlerfaelle.tex}
+
+\appendix
+\chapter{Historischer Kontext und V1-Abdeckung}
+Die Kapitelreihenfolge der C\#-Ausgabe folgt bewusst den großen numerischen Problemklassen der historischen Numerical Methods Toolbox. Die Umsetzung ist jedoch keine Quellcode-Portierung. Die öffentlichen APIs, Datentypen, Fehlerbehandlung, Beispiele und Diagnosen gehören zum SASD Math Toolkit.
+
+\begin{longtable}{@{}p{0.28\textwidth}p{0.62\textwidth}@{}}
+\toprule
+\textbf{Historischer Themenblock} & \textbf{C\#/.NET-Ausgabe}\\
+\midrule
+Nullstellen & Bisektion, Newton-Raphson, Sekante, Newton-Horner, Muller, Laguerre und Polynomdeflation\\
+Interpolation & Lagrange, dividierte Differenzen, natürliche und geklemmte kubische Splines\\
+Differentiation / Integration & Funktions-, Tabellen- und Spline-Differentiation; Newton-Cotes, adaptiv, Romberg, Gauß-Legendre\\
+Matrixverfahren & \texttt{DenseMatrix}, Gauß, pivotierte LU, Householder-QR, Inverse, Residuen und Gauss-Seidel\\
+Eigenwertprobleme & Potenz-/inverse Potenzmethode, Wielandt-Deflation und zyklisches Jacobi-Verfahren\\
+Differentialgleichungen & RK4-Familie, RKF45, Adams-Prädiktor-Korrektor sowie lineares und nichtlineares Shooting\\
+Least Squares & Polynom- und Basisfits, benannte Modelle; modernisiert auf Householder-QR\\
+FFT / Anwendungen & Komplexe und reelle FFT, kompaktes Realspektrum, Faltung und Kreuzkorrelation\\
+Grafische Demonstrationen & Plattformunabhängiges, deterministisches HTML/SVG-Sample statt Kopplung der Numerik an eine GUI-Technologie\\
+\bottomrule
+\end{longtable}
+
+\chapter{Build und Pflege der LaTeX-Ausgabe}
+Die LaTeX-Ausgabe wird absichtlich aus den bestehenden Markdown-Kapiteln generiert. Änderungen an fachlichen Erläuterungen sollen daher zuerst in \texttt{docs/user-guide/de/} bzw. \texttt{docs/user-guide/en/} erfolgen. Das Verzeichnis \texttt{LaTeX/} enthält Layout, Buildlogik und sprachspezifische Front-/Back-Matter.
+
+\begin{lstlisting}
+cd docs/user-guide/LaTeX
+make de      # deutsches PDF
+make en      # English PDF
+make all     # beide Ausgaben
+\end{lstlisting}
+
+\backmatter
+\chapter*{Lizenz und Herkunft}
+\addcontentsline{toc}{chapter}{Lizenz und Herkunft}
+Das SASD Math Toolkit steht unter der MIT-Lizenz. Das historische Borland-Handbuch und die historischen Produktnamen bleiben Eigentum ihrer jeweiligen Rechteinhaber. Dieses Handbuch dokumentiert die unabhängig entwickelte SASD-C\#/.NET-Implementierung und reproduziert nicht den historischen Handbuchtext.
+
+\end{document}
