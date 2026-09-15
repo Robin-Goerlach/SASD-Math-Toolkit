@@ -22,7 +22,7 @@ Die dichte Referenzbasis ist breit genug, um in die nächste Modernisierungsschi
 
 ## M3.2 — Dünnbesetzte lineare Algebra — in Arbeit
 
-Das Speicher-/Arithmetikfundament, der erste SPD-Krylov-Solver und die erste wiederverwendbare Preconditioning-Schicht sind jetzt implementiert:
+Das Speicher-/Arithmetikfundament, der SPD-Krylov-Pfad, die wiederverwendbare Preconditioning-Schicht und der erste allgemeine nichtsymmetrische Krylov-Solver sind jetzt implementiert:
 
 - **kanonische unveränderliche CSR-Speicherung — implementiert**;
 - **Koordinatenaufbau mit expliziter Aggregation doppelter Einträge — implementiert**;
@@ -37,13 +37,16 @@ Das Speicher-/Arithmetikfundament, der erste SPD-Krylov-Solver und die erste wie
 - **solverneutraler `ISparsePreconditioner`-Apply-Vertrag — implementiert**;
 - **Jacobi-/Diagonal-Preconditioner mit expliziter Diagonalschwelle — implementiert**;
 - **Preconditioned Conjugate Gradient mit Prüfung von `r^T M^-1 r` und Suchrichtungskrümmung — implementiert**;
-- Restarted GMRES für allgemeine nichtsymmetrische Systeme — **als Nächstes**;
-- BiCGSTAB — folgender Solver-Schritt;
+- **restarted GMRES für allgemeine quadratische/nichtsymmetrische Sparse-Systeme — implementiert**;
+- **Right-preconditioned GMRES, sodass Konvergenz weiterhin über das ursprüngliche Residuum `b-A*x` definiert bleibt — implementiert**;
+- **zweifacher Modified-Gram-Schmidt-Arnoldi-Prozess und inkrementelle Givens-Least-Squares-Aktualisierung — implementiert**;
+- BiCGSTAB — **als Nächstes**;
+- Konsolidierung von Sparse-Architektur und Referenzfällen — nach BiCGSTAB;
 - CSC und stärkere Incomplete-Factorization-Preconditioner erst bei dauerhaft begründetem Bedarf.
 
-Sparse-Solver verwenden das toolkitweite `IterationStatus`-Vokabular und die Abbruchregel `||b-A*x||2 <= max(absTol, relTol*||b||2)`. CG/PCG verifiziert behauptete Konvergenz gegen das explizit neu berechnete echte Residuum. PCG behandelt zusätzlich ein nichtpositives oder nichtendliches `r^T M^-1 r` als Vertragsverletzung, statt mit einem ungeeigneten Preconditioner weiterzurechnen.
+Sparse-Solver verwenden das toolkitweite `IterationStatus`-Vokabular und die Abbruchregel `||b-A*x||2 <= max(absTol, relTol*||b||2)`. CG/PCG verifiziert behauptete Konvergenz gegen das explizit neu berechnete echte Residuum. GMRES verwendet sein projiziertes Residuum nur als günstigen Auslöser und verlangt ebenfalls das explizit neu berechnete echte Residuum, bevor `Converged` gemeldet wird.
 
-Die Preconditioner-Abstraktion ist bewusst solverneutral. Jacobi bildet die erste preiswerte Baseline; spätere GMRES-/BiCGSTAB-Solver und Incomplete-Factorization-Verfahren können denselben Operationsvertrag verwenden, soweit ihre mathematischen Anforderungen passen.
+Die Preconditioner-Abstraktion bleibt bewusst solverneutral. PCG stellt den stärkeren SPD-Vertrag an den Preconditioner. Right-preconditioned GMRES kann eine breitere Klasse fester linearer angenäherter Inversoperationen verwenden und behält trotzdem die Residualsemantik des ursprünglichen Systems bei.
 
 ## M3.3 — Optimierung und nichtlineare Systeme
 
