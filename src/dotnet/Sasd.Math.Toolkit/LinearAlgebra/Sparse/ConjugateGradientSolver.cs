@@ -3,7 +3,7 @@ using Sasd.Numerics.Common;
 namespace Sasd.Numerics.LinearAlgebra.Sparse;
 
 /// <summary>
-/// Conjugate Gradient solver for real symmetric positive-definite sparse systems.
+/// Conjugate Gradient and Preconditioned Conjugate Gradient solvers for real SPD sparse systems.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -12,22 +12,22 @@ namespace Sasd.Numerics.LinearAlgebra.Sparse;
 /// reuses fixed work vectors for all matrix-vector products.
 /// </para>
 /// <para>
-/// Symmetry can be validated before iteration. Positive definiteness is a mathematical contract
-/// that cannot be proven cheaply for an arbitrary large sparse matrix; CG therefore also treats a
-/// non-positive search-direction curvature <c>p^T*A*p</c> as a numerical breakdown rather than
-/// silently continuing with an invalid recurrence.
+/// <see cref="SolvePreconditioned"/> implements left-preconditioned CG with an abstract operation
+/// <c>z = M^-1*r</c>. The supplied preconditioner must itself be SPD for the PCG recurrence to be
+/// mathematically valid. The solver detects a non-positive <c>r^T*z</c> or <c>p^T*A*p</c> and reports
+/// numerical breakdown instead of silently continuing with an invalid recurrence.
 /// </para>
 /// <para>
 /// Recursive residuals are inexpensive but can drift from the true residual through floating-point
 /// roundoff. Whenever the recursive residual first claims convergence, this implementation recomputes
-/// <c>b-A*x</c> explicitly. If that verification fails the tolerance, CG restarts from the refreshed
-/// residual instead of reporting a false convergence.
+/// <c>b-A*x</c> explicitly. If that verification fails the tolerance, CG/PCG restarts from the
+/// refreshed residual instead of reporting a false convergence.
 /// </para>
 /// </remarks>
 public static class ConjugateGradientSolver
 {
     /// <summary>
-    /// Solves <c>A*x=b</c> for a square SPD CSR matrix.
+    /// Solves <c>A*x=b</c> for a square SPD CSR matrix without preconditioning.
     /// </summary>
     /// <param name="matrix">Canonical sparse system matrix.</param>
     /// <param name="rightHandSide">Finite right-hand-side vector.</param>
@@ -38,7 +38,41 @@ public static class ConjugateGradientSolver
         CsrMatrix matrix,
         IReadOnlyList<double> rightHandSide,
         IReadOnlyList<double>? initialGuess = null,
+        SparseIterativeSolverOptions? options = null) =>
+        SolveCore(matrix, rightHandSide, initialGuess, preconditioner: null, options);
+
+    /// <summary>
+    /// Solves <c>A*x=b</c> for a square SPD CSR matrix using Preconditioned Conjugate Gradient.
+    /// </summary>
+    /// <param name="matrix">Canonical sparse SPD system matrix.</param>
+    /// <param name="rightHandSide">Finite right-hand-side vector.</param>
+    /// <param name="preconditioner">
+    /// SPD approximate-inverse operation with the same vector dimension as the matrix.
+    /// </param>
+    /// <param name="initialGuess">Optional finite starting vector; zero is used by default.</param>
+    /// <param name="options">Shared sparse iterative-solver options.</param>
+    /// <remarks>
+    /// The matrix must be SPD and the preconditioner must preserve the SPD PCG inner-product
+    /// contract. <see cref="JacobiPreconditioner"/> created from an SPD matrix satisfies this
+    /// requirement because every SPD matrix has a strictly positive diagonal.
+    /// </remarks>
+    public static SparseLinearSolveResult SolvePreconditioned(
+        CsrMatrix matrix,
+        IReadOnlyList<double> rightHandSide,
+        ISparsePreconditioner preconditioner,
+        IReadOnlyList<double>? initialGuess = null,
         SparseIterativeSolverOptions? options = null)
+    {
+        ArgumentNullException.ThrowIfNull(preconditioner);
+        return SolveCore(matrix, rightHandSide, initialGuess, preconditioner, options);
+    }
+
+    private static SparseLinearSolveResult SolveCore(
+        CsrMatrix matrix,
+        IReadOnlyList<double> rightHandSide,
+        IReadOnlyList<double>? initialGuess,
+        ISparsePreconditioner? preconditioner,
+        SparseIterativeSolverOptions? options)
     {
         ArgumentNullException.ThrowIfNull(matrix);
         ArgumentNullException.ThrowIfNull(rightHandSide);
@@ -63,6 +97,13 @@ public static class ConjugateGradientSolver
             throw new ArgumentException(
                 "Initial-guess length must match the sparse matrix size.",
                 nameof(initialGuess));
+        }
+
+        if (preconditioner is not null && preconditioner.Size != n)
+        {
+            throw new ArgumentException(
+                "Preconditioner size must match the sparse matrix size.",
+                nameof(preconditioner));
         }
 
         var rhs = CopyAndValidateVector(rightHandSide, nameof(rightHandSide));
@@ -114,7 +155,14 @@ public static class ConjugateGradientSolver
         var residual = new double[n];
         var matrixVector = new double[n];
 
-        if (!TryComputeTrueResidual(matrix, solution, rhs, residual, matrixVector, out var residualNorm, out var residualError))
+        if (!TryComputeTrueResidual(
+                matrix,
+                solution,
+                rhs,
+                residual,
+                matrixVector,
+                out var residualNorm,
+                out var residualError))
         {
             return Breakdown(
                 solution,
@@ -139,8 +187,8 @@ public static class ConjugateGradientSolver
                 convergenceThreshold);
         }
 
-        var direction = (double[])residual.Clone();
-        if (!TryDot(residual, residual, out var residualEnergy) || !(residualEnergy > 0.0))
+        var preconditionedResidual = new double[n];
+        if (!TryApplyPreconditioner(preconditioner, residual, preconditionedResidual, out var preconditionerError))
         {
             return Breakdown(
                 solution,
@@ -149,8 +197,23 @@ public static class ConjugateGradientSolver
                 initialResidualNorm,
                 rhsNorm,
                 convergenceThreshold,
-                "Initial residual inner product underflowed, overflowed, or became non-positive.");
+                preconditionerError);
         }
+
+        if (!TryDot(residual, preconditionedResidual, out var residualInnerProduct)
+            || !(residualInnerProduct > 0.0))
+        {
+            return Breakdown(
+                solution,
+                0,
+                residualNorm,
+                initialResidualNorm,
+                rhsNorm,
+                convergenceThreshold,
+                "Initial r^T*M^-1*r underflowed, overflowed, or became non-positive. The preconditioner may violate the SPD contract.");
+        }
+
+        var direction = (double[])preconditionedResidual.Clone();
 
         for (var iteration = 1; iteration <= settings.MaximumIterations; iteration++)
         {
@@ -167,7 +230,7 @@ public static class ConjugateGradientSolver
                     initialResidualNorm,
                     rhsNorm,
                     convergenceThreshold,
-                    $"Sparse matrix-vector multiplication failed during CG: {exception.Message}");
+                    $"Sparse matrix-vector multiplication failed during CG/PCG: {exception.Message}");
             }
 
             if (!TryDot(direction, matrixVector, out var curvature))
@@ -179,7 +242,7 @@ public static class ConjugateGradientSolver
                     initialResidualNorm,
                     rhsNorm,
                     convergenceThreshold,
-                    "CG search-direction curvature became non-finite.");
+                    "CG/PCG search-direction curvature became non-finite.");
             }
 
             if (!(curvature > 0.0))
@@ -191,10 +254,10 @@ public static class ConjugateGradientSolver
                     initialResidualNorm,
                     rhsNorm,
                     convergenceThreshold,
-                    "CG encountered non-positive p^T*A*p. The matrix may not be positive definite or roundoff has destroyed the SPD recurrence.");
+                    "CG/PCG encountered non-positive p^T*A*p. The matrix may not be positive definite or roundoff has destroyed the SPD recurrence.");
             }
 
-            var alpha = residualEnergy / curvature;
+            var alpha = residualInnerProduct / curvature;
             if (!double.IsFinite(alpha))
             {
                 return Breakdown(
@@ -204,7 +267,7 @@ public static class ConjugateGradientSolver
                     initialResidualNorm,
                     rhsNorm,
                     convergenceThreshold,
-                    "CG step length became non-finite.");
+                    "CG/PCG step length became non-finite.");
             }
 
             for (var index = 0; index < n; index++)
@@ -220,7 +283,7 @@ public static class ConjugateGradientSolver
                         initialResidualNorm,
                         rhsNorm,
                         convergenceThreshold,
-                        "CG produced a non-finite solution or residual component.");
+                        "CG/PCG produced a non-finite solution or residual component.");
                 }
 
                 solution[index] = nextSolution;
@@ -236,13 +299,13 @@ public static class ConjugateGradientSolver
                     initialResidualNorm,
                     rhsNorm,
                     convergenceThreshold,
-                    "CG recursive residual norm is outside the finite double range.");
+                    "CG/PCG recursive residual norm is outside the finite double range.");
             }
 
             if (residualNorm <= convergenceThreshold)
             {
                 // Verify against the true residual before announcing convergence. If roundoff has
-                // accumulated enough drift to fail the check, restart CG from the refreshed residual.
+                // accumulated enough drift to fail the check, restart from the refreshed residual.
                 if (!TryComputeTrueResidual(
                         matrix,
                         solution,
@@ -274,8 +337,11 @@ public static class ConjugateGradientSolver
                         convergenceThreshold);
                 }
 
-                Array.Copy(residual, direction, n);
-                if (!TryDot(residual, residual, out residualEnergy) || !(residualEnergy > 0.0))
+                if (!TryApplyPreconditioner(
+                        preconditioner,
+                        residual,
+                        preconditionedResidual,
+                        out preconditionerError))
                 {
                     return Breakdown(
                         solution,
@@ -284,13 +350,31 @@ public static class ConjugateGradientSolver
                         initialResidualNorm,
                         rhsNorm,
                         convergenceThreshold,
-                        "CG could not restart from the refreshed true residual.");
+                        preconditionerError);
                 }
 
+                if (!TryDot(residual, preconditionedResidual, out residualInnerProduct)
+                    || !(residualInnerProduct > 0.0))
+                {
+                    return Breakdown(
+                        solution,
+                        iteration,
+                        residualNorm,
+                        initialResidualNorm,
+                        rhsNorm,
+                        convergenceThreshold,
+                        "CG/PCG could not restart because r^T*M^-1*r became non-positive or non-finite.");
+                }
+
+                Array.Copy(preconditionedResidual, direction, n);
                 continue;
             }
 
-            if (!TryDot(residual, residual, out var nextResidualEnergy) || !(nextResidualEnergy > 0.0))
+            if (!TryApplyPreconditioner(
+                    preconditioner,
+                    residual,
+                    preconditionedResidual,
+                    out preconditionerError))
             {
                 return Breakdown(
                     solution,
@@ -299,10 +383,23 @@ public static class ConjugateGradientSolver
                     initialResidualNorm,
                     rhsNorm,
                     convergenceThreshold,
-                    "CG residual inner product underflowed, overflowed, or became non-positive.");
+                    preconditionerError);
             }
 
-            var beta = nextResidualEnergy / residualEnergy;
+            if (!TryDot(residual, preconditionedResidual, out var nextResidualInnerProduct)
+                || !(nextResidualInnerProduct > 0.0))
+            {
+                return Breakdown(
+                    solution,
+                    iteration,
+                    residualNorm,
+                    initialResidualNorm,
+                    rhsNorm,
+                    convergenceThreshold,
+                    "CG/PCG r^T*M^-1*r underflowed, overflowed, or became non-positive. The preconditioner may violate the SPD contract.");
+            }
+
+            var beta = nextResidualInnerProduct / residualInnerProduct;
             if (!double.IsFinite(beta))
             {
                 return Breakdown(
@@ -312,12 +409,12 @@ public static class ConjugateGradientSolver
                     initialResidualNorm,
                     rhsNorm,
                     convergenceThreshold,
-                    "CG direction-update coefficient became non-finite.");
+                    "CG/PCG direction-update coefficient became non-finite.");
             }
 
             for (var index = 0; index < n; index++)
             {
-                var nextDirection = residual[index] + (beta * direction[index]);
+                var nextDirection = preconditionedResidual[index] + (beta * direction[index]);
                 if (!double.IsFinite(nextDirection))
                 {
                     return Breakdown(
@@ -327,13 +424,13 @@ public static class ConjugateGradientSolver
                         initialResidualNorm,
                         rhsNorm,
                         convergenceThreshold,
-                        "CG produced a non-finite search direction.");
+                        "CG/PCG produced a non-finite search direction.");
                 }
 
                 direction[index] = nextDirection;
             }
 
-            residualEnergy = nextResidualEnergy;
+            residualInnerProduct = nextResidualInnerProduct;
         }
 
         if (!TryComputeTrueResidual(
@@ -364,6 +461,42 @@ public static class ConjugateGradientSolver
             rhsNorm,
             convergenceThreshold,
             "Maximum number of Conjugate Gradient iterations reached.");
+    }
+
+    private static bool TryApplyPreconditioner(
+        ISparsePreconditioner? preconditioner,
+        ReadOnlySpan<double> residual,
+        Span<double> destination,
+        out string? error)
+    {
+        if (preconditioner is null)
+        {
+            residual.CopyTo(destination);
+            error = null;
+            return true;
+        }
+
+        try
+        {
+            preconditioner.Apply(residual, destination);
+        }
+        catch (ArithmeticException exception)
+        {
+            error = $"Preconditioner application failed numerically: {exception.Message}";
+            return false;
+        }
+
+        for (var index = 0; index < destination.Length; index++)
+        {
+            if (!double.IsFinite(destination[index]))
+            {
+                error = "Preconditioner produced a non-finite output component.";
+                return false;
+            }
+        }
+
+        error = null;
+        return true;
     }
 
     private static bool TryComputeTrueResidual(
