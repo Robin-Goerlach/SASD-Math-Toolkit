@@ -18,9 +18,11 @@ The RK4 ODE convenience family covers scalar first-order, scalar second-order, s
 
 The historical compatibility catalog, including the graphical demonstration layer, is implemented. Work therefore focuses on release quality rather than on adding more historical algorithms.
 
-The independent C#/.NET user handbook under `docs/user-guide/` is being completed domain by domain. Root finding, interpolation, numerical integration, and matrices/linear systems have now received publication-quality handbook chapters plus API/test audits. The linear-system audit strengthens finite-value invariants, direct-solver validation, LU diagnostic state, residual checks, and Gauss-Seidel breakdown reporting while keeping the reference implementation intentionally simple.
+The independent C#/.NET user handbook under `docs/user-guide/` is being completed domain by domain. Root finding, interpolation, numerical integration, matrices/linear systems, and eigenvalues/eigenvectors have now received publication-quality handbook chapters plus API/test audits.
 
-The next handbook/audit area is eigenvalues. After that come the cross-cutting diagnostics chapter and the final V1 audit.
+The eigenvalue audit adds immutable eigenpair results, stable scaled normalization/norm calculations, explicit inverse-iteration pivot tolerance, an independent public eigenpair residual diagnostic, validation of source eigenpairs before Wielandt deflation, and clearer Jacobi convergence semantics while keeping the reference implementation intentionally understandable.
+
+The next handbook milestone is the cross-cutting numerical recipes/diagnostics/common-failure-modes chapter. After that, perform the final V1 audit across public APIs, examples, documentation, compatibility claims and release metadata.
 
 Quality gate for V1:
 

@@ -14,9 +14,11 @@ Die RK4-Komfortfamilie deckt skalare Gleichungen erster, zweiter und n-ter Ordnu
 
 Der historische Kompatibilitätskatalog einschließlich grafischer Demo-Ebene ist implementiert. Die Arbeit konzentriert sich deshalb jetzt auf die Qualität einer veröffentlichbaren V1 statt auf weitere historische Algorithmen.
 
-Das eigenständige C#/.NET-Benutzerhandbuch unter `docs/user-guide/` wird Fachbereich für Fachbereich vervollständigt. Nullstellensuche, Interpolation, numerische Integration sowie Matrizen/lineare Gleichungssysteme besitzen jetzt ausführliche Handbuchkapitel und API-/Test-Audits. Beim linearen Algebra-Audit wurden insbesondere die Endlichkeitsinvariante von Matrizen, direkte Solver-Validierung, LU-Diagnosezustand, Residualprüfung und Gauss-Seidel-Breakdown-Erkennung gehärtet, ohne die Referenzimplementierung unnötig zu verkomplizieren.
+Das eigenständige C#/.NET-Benutzerhandbuch unter `docs/user-guide/` wird Fachbereich für Fachbereich vervollständigt. Nullstellensuche, Interpolation, numerische Integration, Matrizen/lineare Gleichungssysteme sowie Eigenwerte/Eigenvektoren besitzen jetzt ausführliche Handbuchkapitel und API-/Test-Audits.
 
-Als Nächstes folgen die Eigenwerte. Anschließend kommen das fachübergreifende Diagnosekapitel und das abschließende V1-Audit.
+Beim Eigenwert-Audit wurden insbesondere unveränderliche Eigenpaar-Ergebnisse, skalierte robuste Normalisierung/Normberechnung, eine explizite Pivot-Toleranz der inversen Iteration, eine öffentliche unabhängige Eigenpaar-Residuumdiagnose, die Validierung eines Quell-Eigenpaars vor der Wielandt-Deflation und klarere Jacobi-Konvergenzsemantik ergänzt. Die Referenzimplementierung bleibt dabei bewusst nachvollziehbar.
+
+Als nächstes folgt das fachübergreifende Handbuchkapitel zu numerischen Rezepten, Diagnostik und typischen Fehlerfällen. Danach kommt das abschließende V1-Audit über öffentliche APIs, Beispiele, Dokumentation, Kompatibilitätsaussagen und Release-Metadaten.
 
 V1 ist erst fertig, wenn jeder öffentliche Algorithmus getestet und dokumentiert ist, wichtige Fehler-/Abbruchzustände regressionstestet sind, die stabilen V1-Bereiche im Benutzerhandbuch beschrieben sind und keine öffentlichen Platzhalter mit `NotImplementedException` existieren.
 
