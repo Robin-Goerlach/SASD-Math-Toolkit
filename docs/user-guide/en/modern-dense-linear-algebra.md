@@ -94,6 +94,38 @@ For a numerically full-rank matrix, `ConditionNumber` reports the ratio of large
 
 A large condition number means that small input perturbations can cause much larger changes in the solution. It is not a statement about whether the implementation is “good” or “bad”; it is a property of the numerical problem.
 
+## Matrix norms and a combined diagnostic report
+
+Modern numerical work frequently needs to answer more than “did the solver return a vector?”. Matrix scale, rank and null-space dimension often determine whether a result is scientifically meaningful.
+
+The `MatrixNorms` helper provides the most commonly useful norms:
+
+```csharp
+var one = MatrixNorms.OneNorm(a);
+var infinity = MatrixNorms.InfinityNorm(a);
+var frobenius = MatrixNorms.FrobeniusNorm(a);
+var spectral = MatrixNorms.SpectralNorm(a);
+```
+
+`OneNorm` is the maximum absolute column sum, `InfinityNorm` the maximum absolute row sum, `FrobeniusNorm` the Euclidean norm of all entries, and `SpectralNorm` the largest singular value. The Frobenius and absolute-sum implementations use scaled accumulation so large finite entries do not cause avoidable intermediate overflow.
+
+When several diagnostics are needed together, prefer a single combined analysis:
+
+```csharp
+var diagnostics = MatrixConditionDiagnostics.Analyze(a);
+
+Console.WriteLine(diagnostics.EstimatedRank);
+Console.WriteLine(diagnostics.LeftNullity);
+Console.WriteLine(diagnostics.RightNullity);
+Console.WriteLine(diagnostics.ConditionNumber2);
+```
+
+The combined report computes the inexpensive entry-based norms directly and reuses one SVD for spectral norm, rank and 2-norm conditioning. This avoids accidentally paying for several identical decompositions.
+
+Left and right nullity are deliberately separate. A wide 2x3 matrix can have full rectangular rank 2 and still have right nullity 1. In an underdetermined system that right null space is the family of directions that can be added to one solution without changing the right-hand side.
+
+A small residual and a large condition number can coexist. The residual says that the computed vector satisfies the represented equations closely; the condition number says that the represented equations themselves may be sensitive to tiny perturbations.
+
 ## Least-squares routing in the toolkit
 
 The general `LeastSquares.FitBasis` API now chooses its dense solver deliberately:
@@ -112,7 +144,8 @@ Named models can retain stricter identifiability rules. For example, the five-te
 | Square/tall full-rank least squares | Householder QR |
 | Rank-deficient least squares | SVD |
 | Underdetermined minimum-norm system | SVD |
-| Numerical rank / 2-norm conditioning | SVD |
+| Matrix scale / 1-, infinity-, Frobenius norm | `MatrixNorms` |
+| Numerical rank / 2-norm conditioning | SVD or `MatrixConditionDiagnostics` |
 | Explicit pseudoinverse required | SVD |
 | Very large dense production workload | Later optional BLAS/LAPACK-class backend |
 
