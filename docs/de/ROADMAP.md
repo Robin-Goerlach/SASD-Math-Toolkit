@@ -4,24 +4,58 @@
 
 Repository-Struktur, .NET-10-Projekt, Tests, Sample, CI, englische/deutsche Dokumentation und Clean-Room-Regeln.
 
-## M1 – Breite numerische Grundlage (historischer Algorithmuskatalog erledigt)
+## M1 – Breite numerische Grundlage (historischer Katalog vollständig)
 
 Implementiert sind Nullstellensuche, Polynom-/Horner-/Deflationsfunktionen, Interpolation/Splines, Differentiation, Integration, lineare Algebra/Eigenwerte, RK4/RKF45/Adams, Least Squares, FFT, Faltung/Korrelation und die Demo-Ebene.
 
-## M2 – Veröffentlichungsqualität für V1 (nur Abschlussaudit offen)
+Die Borland-inspirierte Übertragungsphase ist damit funktional abgeschlossen. Sie bleibt als Kompatibilitäts-/Referenzbaseline erhalten, bestimmt aber nicht mehr die zukünftige Produktgrenze.
 
-Der historische Kompatibilitätskatalog und alle elf geplanten Kapitel des Benutzerhandbuchs sind vollständig. Die fachbezogenen API-/Test-Audits und die gemeinsame Diagnostikdokumentation sind ebenfalls abgeschlossen.
+## M2 – Veröffentlichungsqualität und Release-Audit
 
-Vor dem Abschlussaudit wurde eine pragmatische Performance-Runde durchgeführt. Sie entfernt wiederholte geprüfte Matrixzugriffe aus dichten Hot Loops, löst mehrere LU-Rechte-Seiten gemeinsam, cached Least-Squares-Designwerte, spezialisiert die Polynom-Basiserzeugung und vermeidet redundante FFT-/Faltungs-Kopien, ohne die öffentlichen Defensive-Copy- und Validierungsverträge aufzugeben. Details stehen in [`PERFORMANCE.md`](PERFORMANCE.md). Bewusst nicht enthalten sind unsafe/SIMD/Parallel-/Native-Optimierungen ohne repräsentative Benchmarks.
+Der historische Kompatibilitätskatalog und alle elf geplanten Kapitel des Benutzerhandbuchs sind vollständig. Die fachbezogenen API-/Test-Audits, die gemeinsame Diagnostikdokumentation und eine pragmatische Performance-Runde sind für das klassische Fundament ebenfalls abgeschlossen.
 
-Als verbleibender V1-Meilenstein folgt das **abschließende repositoryweite Release-Audit**. Dabei sollen öffentliche API-Konsistenz, XML-Kommentare, Beispiele, Handbuchlinks, technische Dokumente, Kompatibilitätsaussagen, das Fehlen öffentlicher Platzhalter, Package-/Release-Metadaten, deterministisches Sample-Verhalten und CI-Abdeckung geprüft werden, bevor ein V1-Tag vergeben wird.
+Vor einem öffentlichen 1.0-Tag bleibt das abschließende repositoryweite Release-Audit erforderlich. Da die Modernisierung jetzt begonnen hat, soll dieses Audit gegen den tatsächlichen Release Candidate laufen, statt die Weiterentwicklung nur für ein Audit eines Zwischenstands einzufrieren.
 
-V1 ist erst fertig, wenn jeder öffentliche Algorithmus getestet und dokumentiert ist, wichtige Fehler-/Abbruchzustände regressionstestet sind, keine öffentlichen Platzhalter existieren, die Diagnosekonventionen konsistent sind, die pragmatische Performance-Runde abgeschlossen ist und das Abschlussaudit erledigt wurde.
+## M3 – Modernisierung 2026 (in Arbeit)
 
-## M3 – SASD-eigene Erweiterungen
+Das Projekt entwickelt sich jetzt bewusst über den Funktionskatalog der 1980er-Jahre hinaus. Der detaillierte Plan steht in [`MODERNISIERUNG-2026.md`](MODERNISIERUNG-2026.md).
 
-Danach folgen moderne Anforderungen aus der Produktfamilie: Vektoren/Matrizen/Transformationen für Game und Grafik, Geometrie, Kurven, Statistik-Grundlagen, Simulation/Random, robuste Toleranzwerkzeuge sowie unterstützende Mathematik für Sicherheitssoftware.
+### M3.1 – Moderne dichte lineare Algebra und Regression (in Arbeit)
 
-## M4 – Weitere Sprachen
+- Householder-QR-Faktorisierung: **implementiert**
+- Allgemeines/Polynom-Least-Squares von Normalgleichungen auf QR umgestellt: **implementiert**
+- Cholesky / symmetrische Faktorisierungen: als Nächstes
+- SVD, Rangdiagnostik, Pseudoinverse, robustes Least Squares
+- Konditionsschätzer und Matrixnormen
 
-Geplante Reihenfolge, sofern kein konkretes Projekt andere Prioritäten erzwingt: C++, Java, JavaScript/TypeScript, Fortran. Ab der zweiten Sprache werden sprachübergreifende Golden-Tests und maschinenlesbare Spezifikationen wichtig.
+### M3.2 – Dünnbesetzte lineare Algebra
+
+CSR/CSC, Sparse-Matvec, CG, GMRES, BiCGSTAB und Preconditioning.
+
+### M3.3 – Optimierung und nichtlineare Systeme
+
+Mehrdimensionale Nullstellen, Nelder-Mead, BFGS/L-BFGS, Line Search und explizite Diagnostik.
+
+### M3.4 – Moderne ODE-Fähigkeiten
+
+Dormand-Prince, Dense Output, Event Detection, allokationsärmere Vektor-State-APIs und später steife Solver bei echtem Bedarf.
+
+### M3.5 – Statistik, Random und Spezialfunktionen
+
+Stabile deskriptive Statistik, Verteilungen, Quantile, Regressionsdiagnostik, reproduzierbare Random-Streams, Spezialfunktionen und PCA nach SVD.
+
+### M3.6 – Geometrie, Transformationen und Simulation
+
+Vector3/4, Transformationen, Quaternionen, Kurven/Schnitte, breitere FFT-Unterstützung und Simulationsgrundlagen.
+
+### M3.7 – Performance-Backends und Release Engineering
+
+Benchmarks, optionale BLAS-/LAPACK-Adapter, gemessenes SIMD, Package-/API-Kompatibilitätschecks und Release-Automation.
+
+## M4 – Weitere Sprachimplementierungen
+
+Äquivalente Sprachimplementierungen dürfen bei Bedarf parallel voranschreiten. Gemeinsames Verhalten soll zunehmend in maschinenlesbare `spec/`-Referenzvektoren und Cross-Language-Konformitätstests überführt werden.
+
+## M5 – Optionale High-Performance-Backends
+
+Adapter für etablierte Bibliotheken werden hinter stabilen SASD-Schnittstellen bewertet. Die abhängigkeitfreie Managed-Referenzimplementierung bleibt für Portabilität, Diagnostik und Lehre erhalten.
