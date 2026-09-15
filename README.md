@@ -12,7 +12,7 @@ Modernization is now in progress. The modern dense numerical foundation includes
 
 The current **M3.2 sparse foundation is complete for the next release boundary**: immutable canonical CSR, sparse arithmetic/norms, **Conjugate Gradient**, a solver-neutral preconditioner abstraction, **Jacobi preconditioning**, **Preconditioned Conjugate Gradient (PCG)**, **restarted GMRES** and **BiCGSTAB** with right preconditioning, true-residual verification and explicit numerical-breakdown diagnostics. Structured cross-solver release cases, a public independent residual diagnostic and a release-facing sparse smoke example are also in place.
 
-The repository-wide release-candidate audit is now in progress. Package/release engineering uses the explicit **`1.0.0-rc.1`** candidate identity while the documentation/PDF gate and final Windows acceptance remain open. There is no public final `1.0.0` release yet.
+The repository-wide release-candidate audit is now in progress. Package/release engineering uses the explicit **`1.0.0-rc.1`** candidate identity. The documentation/PDF gate is complete; the final independent Windows acceptance remains open. There is no public final `1.0.0` release yet.
 
 See [`docs/en/BORLAND-V1-COMPATIBILITY.md`](docs/en/BORLAND-V1-COMPATIBILITY.md) for the classical implementation matrix, [`docs/en/MODERNIZATION-2026.md`](docs/en/MODERNIZATION-2026.md) for the modern roadmap and [`docs/en/RELEASE-AUDIT.md`](docs/en/RELEASE-AUDIT.md) for the release gates.
 
@@ -104,7 +104,7 @@ Target framework: **.NET 10**. The normal GitHub Actions gate performs Release r
 - English user handbook: [`docs/user-guide/en/README.md`](docs/user-guide/en/README.md)
 - Deutsches Benutzerhandbuch: [`docs/user-guide/de/README.md`](docs/user-guide/de/README.md)
 
-The **Markdown handbook is the editorial source of truth and is updated continuously with each modernization milestone**. The LaTeX directory is the typesetting/build layer. The committed V1.0 PDFs remain the previous stable classical edition until the release-candidate documentation gate synchronizes chapters 12/13, front/back matter and both generated PDFs.
+The **Markdown handbook is the editorial source of truth and is updated continuously with each modernization milestone**. The LaTeX directory is the typesetting/build layer. The committed V1.0 RC1 PDFs are synchronized with the current Markdown chapters, including the 2026 dense/sparse modernization chapters, and have passed structural and visual release-candidate inspection. Future PDF editions continue to be regenerated at release-candidate/release boundaries.
 
 ## License
 

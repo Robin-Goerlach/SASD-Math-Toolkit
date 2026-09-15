@@ -28,7 +28,8 @@ The project uses semantic versioning for package/release identifiers. The curren
 ### Documentation and release engineering
 
 - Maintained German and English Markdown user-handbook chapters as the editorial source of truth.
-- Added the LaTeX/PDF publication layer; the modernization chapters are synchronized at the release-candidate documentation gate.
+- Synchronized the LaTeX/PDF publication layer with modernization chapters 12 and 13 and updated RC1 front/back matter.
+- Regenerated both language PDFs, added structural `pdfinfo` validation plus retained CI artifacts, and completed page-by-page visual release-candidate inspection.
 - Added NuGet-oriented package metadata, package README, symbols-package generation and CI verification of package contents.
 - Extended CI to run the deterministic sample/sparse smoke path in addition to Release build and tests.
 

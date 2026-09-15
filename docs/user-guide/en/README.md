@@ -1,6 +1,6 @@
 # SASD Math Toolkit User Handbook — C#/.NET
 
-The first eleven chapters form the completed classical V1 handbook. New chapters now document the 2026 modernization layer.
+The first eleven chapters form the completed classical V1 handbook. New chapters document the 2026 modernization layer.
 
 1. [Getting started](getting-started.md)
 2. [Roots of equations](root-finding.md)
@@ -20,4 +20,4 @@ The first eleven chapters form the completed classical V1 handbook. New chapters
 
 **Markdown is the continuously maintained editorial source of truth.** New algorithms, examples and API explanations are written here first during development.
 
-The committed V1.0 PDFs are generated from Markdown through `../LaTeX/`. The LaTeX directory supplies typesetting, front/back matter and chapter ordering; it is not a second independent copy of the technical prose. During active modernization the PDFs may intentionally lag behind Markdown. At the next release-candidate boundary the LaTeX chapter order will be synchronized and both PDF editions will be regenerated and visually checked.
+The committed V1.0 RC1 PDFs are generated from Markdown through `../LaTeX/`. The LaTeX directory supplies typesetting, front/back matter and chapter ordering; it is not a second independent copy of the technical prose. At the current release-candidate boundary the LaTeX order, chapters 12/13 and release metadata have been synchronized, both language editions have been regenerated, structurally validated and visually inspected. Future editorial changes continue to start in Markdown and are synchronized into the PDF editions at release-candidate/release boundaries.

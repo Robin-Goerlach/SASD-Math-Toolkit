@@ -6,7 +6,7 @@ Dieses Dokument hält das repositoryweite Audit für die erste öffentliche 1.0-
 
 Der Kandidat enthält das abgeschlossene klassische Numerical-Methods-Fundament sowie die modernen Grundlagen M3.1 für dichte und M3.2 für dünnbesetzte lineare Algebra. M3.3 und spätere Modernisierungsschritte bleiben nachgelagerter Umfang, sofern das Audit keinen eng begrenzten notwendigen Fix aufdeckt.
 
-Der Paketbezeichner des Audit-Kandidaten lautet `1.0.0-rc.1`. Ein endgültiges `1.0.0`-Tag/Release wird bewusst erst nach Dokumentations-/PDF-Gate und einem unabhängigen Windows-Abnahmelauf erzeugt.
+Der Paketbezeichner des Audit-Kandidaten lautet `1.0.0-rc.1`. Ein endgültiges `1.0.0`-Tag/Release wird bewusst erst nach einem unabhängigen Windows-Abnahmelauf erzeugt.
 
 ## In Audit-Phase 1 adressierte Findings
 
@@ -19,6 +19,15 @@ Der Paketbezeichner des Audit-Kandidaten lautet `1.0.0-rc.1`. Ein endgültiges `
 - **Implementierungs-Platzhalter:** Die Repository-Suche ergab keine offensichtlichen öffentlichen `NotImplementedException`-/TODO-artigen Implementierungsplatzhalter. Das ist ein Audit-Befund und keine Aussage, dass keine zukünftige Arbeit mehr existiert.
 - **Lizenz/Provenienz:** MIT-Lizenzierung und Clean-Room-Regel für historische Referenzen bleiben mit der erklärten Implementierungsstrategie konsistent.
 
+## In Audit-Phase 2 adressierte Findings — Handbuch-/PDF-Gate
+
+- **Handbuch-Synchronisierung:** Der LaTeX-Build enthält jetzt die Markdown-Handbuchkapitel 12 und 13 zu moderner dichter und dünnbesetzter linearer Algebra. Front-/Backmatter kennzeichnen die Ausgabe als Release Candidate `1.0.0-rc.1`.
+- **Deterministischer Publikationspfad:** Änderungen an Markdown-Handbuchkapiteln, LaTeX-Quellen oder dem Handbuch-Workflow bauen auf `main` beide Ausgaben neu.
+- **PDF-Prüfung:** Die CI prüft vor der Veröffentlichung, dass beide erzeugten PDFs nicht leer und mit `pdfinfo` strukturell lesbar sind.
+- **Release-Inspektionsartefakt:** Jeder Handbuch-Build lädt beide erzeugten PDFs zusätzlich als aufbewahrtes GitHub-Actions-Artefakt hoch. Dadurch können exakt die Build-Ausgaben unabhängig von den eingecheckten Kopien geprüft werden.
+- **Visuelle Prüfung:** Das RC1-Artefakt wurde seitenweise gerendert. Die englische Ausgabe besitzt 81 PDF-Seiten, die deutsche Ausgabe 79 PDF-Seiten. Die Kontaktbogenprüfung sämtlicher gerenderter Seiten sowie die Vollbildprüfung releasekritischer Seiten ergaben keine abgeschnittenen Texte, Überlagerungen, schwarzen Kästchen, defekten Glyphen oder fehlenden Kapitelinhalte. Titelseiten, Inhaltsverzeichnisse, Kapitel 12/13, Anhänge und Herkunftsseiten werden korrekt dargestellt.
+- **Eingecheckte Ausgaben:** Die neu erzeugten deutschen und englischen RC1-PDFs sind mit dem aktuellen Markdown-/LaTeX-Stand des Release Candidates synchronisiert.
+
 ## Explizit nicht blockierende technische Schulden
 
 Eine vollständige CS1591-Erzwingung wird für diesen Release Candidate noch nicht aktiviert. Die modernen öffentlichen APIs der Modernisierungsrunde sind dokumentiert; Teile der älteren öffentlichen Oberfläche stützen sich weiterhin auf Handbuch und technische Dokumentation statt auf lückenlose XML-Kommentare. Die Unterdrückung bleibt deshalb sichtbar im Projekt, statt vollständige Abdeckung vorzutäuschen.
@@ -27,11 +36,9 @@ CSC-Speicherung, Incomplete-Cholesky-/ILU-artige Preconditioner, zusätzliche Kr
 
 ## Noch offene Release-Gates
 
-1. LaTeX-Build mit den Markdown-Handbuchkapiteln 12 und 13 synchronisieren und releasebezogenes Front-/Backmatter aktualisieren.
-2. Deutsches und englisches PDF neu erzeugen und beide Ausgaben visuell prüfen.
-3. Den abschließenden Windows-Abnahmelauf gegen den exakten Release-Candidate-Commit nach allen Audit-Fixes durchführen.
-4. Findings aus dieser Abnahme beheben.
-5. Erst nach ausdrücklicher Release-Freigabe: `-rc.1` entfernen, finales Tag/Release erzeugen und entscheiden, ob/wo das NuGet-Paket veröffentlicht wird.
+1. Den abschließenden Windows-Abnahmelauf gegen den exakten Release-Candidate-Commit nach allen Audit-Fixes durchführen.
+2. Findings aus dieser Abnahme beheben.
+3. Erst nach ausdrücklicher Release-Freigabe: `-rc.1` entfernen, finales Tag/Release erzeugen und entscheiden, ob/wo das NuGet-Paket veröffentlicht wird.
 
 ## Release-Prinzip
 

@@ -1,6 +1,6 @@
 # SASD Math Toolkit Benutzerhandbuch — C#/.NET
 
-Die ersten elf Kapitel bilden das abgeschlossene klassische V1-Handbuch. Neue Kapitel dokumentieren jetzt die Modernisierung für 2026.
+Die ersten elf Kapitel bilden das abgeschlossene klassische V1-Handbuch. Neue Kapitel dokumentieren die Modernisierung für 2026.
 
 1. [Erste Schritte](erste-schritte.md)
 2. [Nullstellen von Gleichungen](nullstellen.md)
@@ -20,4 +20,4 @@ Die ersten elf Kapitel bilden das abgeschlossene klassische V1-Handbuch. Neue Ka
 
 **Markdown ist die laufend gepflegte redaktionelle Quelle.** Neue Algorithmen, Beispiele und API-Erklärungen werden während der Entwicklung zuerst hier eingearbeitet.
 
-Die eingecheckten V1.0-PDFs werden über `../LaTeX/` aus Markdown erzeugt. Das LaTeX-Verzeichnis liefert Satz, Front-/Backmatter und Kapitelreihenfolge; es ist keine zweite unabhängige Kopie des technischen Textes. Während der aktiven Modernisierung dürfen die PDFs bewusst hinter dem Markdown-Stand zurückliegen. Am nächsten Release-Candidate-Punkt wird die LaTeX-Kapitelreihenfolge synchronisiert und beide PDF-Ausgaben werden neu erzeugt und visuell geprüft.
+Die eingecheckten V1.0-RC1-PDFs werden über `../LaTeX/` aus Markdown erzeugt. Das LaTeX-Verzeichnis liefert Satz, Front-/Backmatter und Kapitelreihenfolge; es ist keine zweite unabhängige Kopie des technischen Textes. Am aktuellen Release-Candidate-Punkt wurden Kapitelreihenfolge, Kapitel 12/13 und Release-Metadaten synchronisiert, beide Sprachausgaben neu erzeugt, strukturell geprüft und visuell kontrolliert. Künftige redaktionelle Änderungen beginnen weiterhin im Markdown und werden an Release-Candidate-/Release-Grenzen in die PDF-Ausgaben übernommen.
