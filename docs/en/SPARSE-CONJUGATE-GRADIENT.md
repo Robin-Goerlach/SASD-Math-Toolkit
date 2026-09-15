@@ -10,9 +10,11 @@ A * x = b
 
 when `A` is **symmetric positive definite (SPD)**. It never converts the matrix to dense storage and reuses fixed work vectors for all repeated sparse matrix-vector products.
 
+The same implementation now exposes both classical Conjugate Gradient and **Preconditioned Conjugate Gradient (PCG)**. Unpreconditioned callers keep using `Solve`; callers with an `ISparsePreconditioner` use `SolvePreconditioned`.
+
 ## Convergence rule
 
-Sparse iterative solvers share `SparseIterativeSolverOptions`. CG accepts convergence when the Euclidean true residual satisfies
+Sparse iterative solvers share `SparseIterativeSolverOptions`. CG/PCG accepts convergence when the Euclidean true residual satisfies
 
 ```text
 ||b - A*x||2 <= max(absoluteTolerance, relativeTolerance * ||b||2)
@@ -32,11 +34,39 @@ p^T * A * p
 
 and returns `IterationStatus.NumericalBreakdown` if it becomes non-positive or non-finite. Such a breakdown is a strong indication that the SPD contract was violated or that floating-point roundoff destroyed the recurrence.
 
+## Preconditioned CG
+
+PCG applies an approximate inverse operation
+
+```text
+z = M^-1 * r
+```
+
+before forming the search direction. The public `ISparsePreconditioner` abstraction keeps that operation independent from a concrete storage format or factorization.
+
+```csharp
+var jacobi = JacobiPreconditioner.Create(a);
+var result = ConjugateGradientSolver.SolvePreconditioned(
+    a,
+    rightHandSide,
+    jacobi,
+    options: new SparseIterativeSolverOptions
+    {
+        RelativeTolerance = 1e-10,
+        AbsoluteTolerance = 1e-12,
+        MaximumIterations = 500
+    });
+```
+
+For PCG the preconditioner must also be SPD. The built-in `JacobiPreconditioner` satisfies that requirement when created from an SPD matrix. A custom implementation is validated indirectly through the PCG recurrence: `r^T*M^-1*r` must stay positive and finite. A violation is reported as `NumericalBreakdown` instead of corrupting the Krylov recurrence.
+
+Jacobi is intentionally a baseline preconditioner rather than a claim of optimal convergence. It is cheap, allocation-free per application and often useful for scaling disparities. More powerful incomplete-factorization preconditioners can be added later behind the same interface.
+
 ## True residual verification
 
-CG updates the residual recursively because recomputing `A*x` on every iteration would double the dominant sparse matrix-vector cost. Recursive residuals can, however, drift from the mathematically true residual through floating-point roundoff.
+CG/PCG updates the residual recursively because recomputing `A*x` on every iteration would double the dominant sparse matrix-vector cost. Recursive residuals can, however, drift from the mathematically true residual through floating-point roundoff.
 
-The SASD implementation therefore recomputes `b-A*x` whenever the recursive residual first claims convergence. Only the verified true residual can produce `IterationStatus.Converged`. If the verification fails the requested threshold, the algorithm restarts from the refreshed residual instead of reporting false convergence.
+The SASD implementation therefore recomputes `b-A*x` whenever the recursive residual first claims convergence. Only the verified true residual can produce `IterationStatus.Converged`. If the verification fails the requested threshold, the algorithm restarts from the refreshed residual and reapplies the preconditioner before continuing.
 
 ## Result model
 
@@ -52,7 +82,7 @@ The SASD implementation therefore recomputes `b-A*x` whenever the recursive resi
 
 The stored solution is protected from external mutation. `Solution` returns a defensive copy, while `GetSolutionValue` and `CopySolutionTo` avoid unnecessary complete-result copies when callers need finer control.
 
-## Example
+## Unpreconditioned example
 
 ```csharp
 using Sasd.Numerics.LinearAlgebra.Sparse;
@@ -72,22 +102,11 @@ var a = CsrMatrix.FromEntries(
 
 var result = ConjugateGradientSolver.Solve(
     a,
-    [2.0, 4.0, 7.0],
-    options: new SparseIterativeSolverOptions
-    {
-        RelativeTolerance = 1e-10,
-        AbsoluteTolerance = 1e-12,
-        MaximumIterations = 500
-    });
-
-if (result.Converged)
-{
-    var x = result.Solution;
-}
+    [2.0, 4.0, 7.0]);
 ```
 
 ## Performance position
 
 The current implementation prioritizes a transparent managed reference solver. It reuses work buffers and does not materialize dense matrices, but it deliberately avoids speculative SIMD, parallel reductions or native sparse backends. Those optimizations should follow benchmarks and stable solver contracts.
 
-The next natural extensions are preconditioning for CG and general nonsymmetric Krylov solvers such as GMRES and BiCGSTAB, all reusing the same options/result semantics.
+The preconditioner abstraction is already solver-neutral so later GMRES and BiCGSTAB implementations can reuse it where their mathematical contracts permit. Restarted GMRES is the next sparse solver milestone.
