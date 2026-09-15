@@ -31,11 +31,17 @@ Das Projekt entwickelt sich bewusst über den Funktionskatalog der 1980er-Jahre 
 - Gemeinsamer Bericht für Rang, linke/rechte Nullität und Kondition: **implementiert**
 - optionaler etablierter BLAS-/LAPACK-artiger Backend: später und benchmarkgetrieben
 
-Weitere dichte Hilfen bleiben möglich, aber das Managed-Referenzfundament ist jetzt vollständig genug, um Sparse-Arbeit nicht weiter aufzuschieben.
+Weitere dichte Hilfen bleiben möglich, aber das Managed-Referenzfundament ist vollständig genug, um Sparse-Arbeit nicht weiter aufzuschieben.
 
-### M3.2 – Dünnbesetzte lineare Algebra (als Nächstes)
+### M3.2 – Dünnbesetzte lineare Algebra (in Arbeit)
 
-CSR/CSC, Sparse-Matvec, CG, GMRES, BiCGSTAB und Preconditioning. Der erste Schritt legt CSR-Aufbau, Validierung und Matrix-Vektor-Arithmetik fest, bevor iterative Solver ergänzt werden.
+- Kanonische unveränderliche CSR-Speicherung und Validierung: **implementiert**
+- Koordinaten-/Dense-/Raw-CSR-Aufbau mit expliziter Duplikatregel: **implementiert**
+- Sparse-Matvec mit wiederverwendbaren Ausgabepuffern: **implementiert**
+- Transponieren, Dense-Konvertierung und preiswerte Sparse-Normen: **implementiert**
+- Conjugate Gradient für SPD-Sparse-Systeme: **als Nächstes**
+- eigenes CSC: später bei dauerhaft spaltenorientierten Workloads
+- GMRES, BiCGSTAB und Preconditioning: spätere Schritte
 
 ### M3.3 – Optimierung und nichtlineare Systeme
 

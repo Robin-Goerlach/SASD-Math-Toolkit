@@ -35,11 +35,17 @@ The project now evolves beyond the 1980s feature catalog. The detailed plan is i
 - Combined rank, left/right nullity and conditioning report: **implemented**
 - Optional mature BLAS/LAPACK-class backend: later, benchmark driven
 
-Additional dense utilities remain possible, but the managed reference foundation is now complete enough to stop delaying sparse work.
+Additional dense utilities remain possible, but the managed reference foundation is complete enough to stop delaying sparse work.
 
-### M3.2 — Sparse linear algebra (next)
+### M3.2 — Sparse linear algebra (in progress)
 
-CSR/CSC storage, sparse matvec, CG, GMRES, BiCGSTAB and preconditioning. The first slice will establish CSR construction, validation and matrix-vector arithmetic before iterative solvers are added.
+- Canonical immutable CSR storage and validation: **implemented**
+- Coordinate/dense/raw-CSR construction with explicit duplicate policy: **implemented**
+- Sparse matvec with reusable output buffers: **implemented**
+- Transpose, dense conversion and inexpensive sparse norms: **implemented**
+- Conjugate Gradient for SPD sparse systems: **next**
+- Dedicated CSC: later when sustained column-oriented workloads justify it
+- GMRES, BiCGSTAB and preconditioning: later slices
 
 ### M3.3 — Optimization and nonlinear systems
 

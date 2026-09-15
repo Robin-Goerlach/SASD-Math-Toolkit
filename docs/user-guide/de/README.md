@@ -14,7 +14,10 @@ Die ersten elf Kapitel bilden das abgeschlossene klassische V1-Handbuch. Neue Ka
 10. [FFT, Faltung und Korrelation](fft-faltung-korrelation.md)
 11. [Numerische Rezepte, Diagnostik und typische Fehlerfälle](diagnostik-fehlerfaelle.md)
 12. [Moderne dichte lineare Algebra — Erweiterungen 2026](moderne-dichte-lineare-algebra.md)
+13. [Dünnbesetzte lineare Algebra — CSR-Fundament](duennbesetzte-lineare-algebra.md)
 
-## PDF-Ausgabe
+## Dokumentationsquelle und PDF-Ausgabe
 
-Die eingecheckten V1.0-PDFs werden über `../LaTeX/` aus Markdown erzeugt. Markdown bleibt die redaktionelle Quelle. Während der aktiven Modernisierung dürfen die PDFs bewusst hinter dem Markdown-Stand zurückliegen; beide PDF-Ausgaben und die LaTeX-Kapitelreihenfolge werden am nächsten Release-Candidate-Punkt neu erzeugt.
+**Markdown ist die laufend gepflegte redaktionelle Quelle.** Neue Algorithmen, Beispiele und API-Erklärungen werden während der Entwicklung zuerst hier eingearbeitet.
+
+Die eingecheckten V1.0-PDFs werden über `../LaTeX/` aus Markdown erzeugt. Das LaTeX-Verzeichnis liefert Satz, Front-/Backmatter und Kapitelreihenfolge; es ist keine zweite unabhängige Kopie des technischen Textes. Während der aktiven Modernisierung dürfen die PDFs bewusst hinter dem Markdown-Stand zurückliegen. Am nächsten Release-Candidate-Punkt wird die LaTeX-Kapitelreihenfolge synchronisiert und beide PDF-Ausgaben werden neu erzeugt und visuell geprüft.

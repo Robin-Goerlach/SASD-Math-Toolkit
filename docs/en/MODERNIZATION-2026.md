@@ -2,7 +2,7 @@
 
 The historical Numerical Methods compatibility catalog is now a completed foundation, not the future product boundary. The guiding rule is: **keep the classical algorithms where they remain useful, but stop letting a 1980s catalog decide what mathematics the library should contain.**
 
-## M3.1 — Modern dense linear algebra and regression
+## M3.1 — Modern dense linear algebra and regression — foundation complete
 
 - **Householder QR factorization — implemented**
 - **Least-squares default path migrated from normal equations to QR — implemented**
@@ -16,24 +16,26 @@ The historical Numerical Methods compatibility catalog is now a completed founda
 
 QR remains the preferred full-column-rank dense least-squares path because it is cheaper than a complete SVD. Cholesky provides the structured path for SPD systems. SVD is the rank-aware fallback for rank-deficient and underdetermined problems and establishes the mathematical base required by later PCA and advanced regression diagnostics.
 
-The current managed SVD is intentionally a readable one-sided Jacobi reference implementation. It avoids `A^T*A`, uses scale-aware column orthogonalization, and keeps rank truncation explicit. The new matrix-diagnostic layer reuses that SVD for spectral norm, rank, nullity and condition reporting instead of repeating decompositions.
+The current managed SVD is intentionally a readable one-sided Jacobi reference implementation. It avoids `A^T*A`, uses scale-aware column orthogonalization, and keeps rank truncation explicit. The matrix-diagnostic layer reuses that SVD for spectral norm, rank, nullity and condition reporting instead of repeating decompositions.
 
 The dense reference foundation is now broad enough to support the next modernization layer without pretending to be a vendor BLAS/LAPACK replacement. Additional dense utilities can be added when concrete consumers require them.
 
-## M3.2 — Sparse linear algebra — next major milestone
+## M3.2 — Sparse linear algebra — in progress
 
-The first sparse milestone should establish storage and arithmetic semantics before iterative solvers are layered on top:
+The storage/arithmetic foundation is now implemented:
 
-- CSR storage for efficient row-oriented arithmetic;
-- deterministic construction and explicit duplicate-entry policy;
-- sparse matrix-vector multiplication without dense materialization;
-- structural validation and conversion helpers;
-- CSC support when column-oriented consumers justify it;
-- Conjugate Gradient for symmetric positive-definite sparse systems;
+- **canonical immutable CSR storage — implemented**;
+- **coordinate assembly with explicit duplicate aggregation — implemented**;
+- **validated raw-CSR and dense conversion boundaries — implemented**;
+- **sparse matrix-vector multiplication with reusable span buffers — implemented**;
+- **transpose without dense materialization — implemented**;
+- **sparse max-entry, 1-, infinity- and Frobenius norms — implemented**;
+- Conjugate Gradient for symmetric positive-definite sparse systems — **next**;
+- CSC support when sustained column-oriented consumers justify a dedicated representation;
 - later GMRES and BiCGSTAB for more general systems;
 - preconditioner abstractions only when the first solver needs them.
 
-Sparse solver diagnostics should reuse the existing `IterationStatus`, residual and tolerance conventions rather than introducing a second convergence model.
+Sparse solver diagnostics will reuse the existing `IterationStatus`, residual and tolerance conventions rather than introducing a second convergence model. The CSR API already exposes an allocation-free matrix-vector destination overload specifically so iterative solvers can reuse work vectors.
 
 ## M3.3 — Optimization and nonlinear systems
 
@@ -53,4 +55,4 @@ Vector3/Vector4, transforms, quaternions, curves/intersections, geometric predic
 
 ## M3.7 — Performance backends, documentation, and packaging
 
-BenchmarkDotNet, optional BLAS/LAPACK backends, measured SIMD, release automation, and regeneration of the German/English LaTeX PDF handbooks at release-candidate boundaries.
+BenchmarkDotNet, optional BLAS/LAPACK backends, measured SIMD, release automation, and regeneration of the German/English LaTeX PDF handbooks at release-candidate boundaries. Markdown remains the continuously maintained editorial source; LaTeX is synchronized as the publication layer rather than maintained as a second independent copy of the prose.
