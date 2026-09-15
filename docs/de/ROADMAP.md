@@ -12,21 +12,23 @@ Die Borland-inspirierte Übertragungsphase ist damit funktional abgeschlossen. S
 
 ## M2 – Veröffentlichungsqualität und Release-Audit
 
-Der historische Kompatibilitätskatalog und alle elf geplanten Kapitel des Benutzerhandbuchs sind vollständig. Die fachbezogenen API-/Test-Audits, die gemeinsame Diagnostikdokumentation und eine pragmatische Performance-Runde sind für das klassische Fundament ebenfalls abgeschlossen.
+Der historische Kompatibilitätskatalog und alle elf klassischen Kapitel des Benutzerhandbuchs sind vollständig. Die fachbezogenen API-/Test-Audits, die gemeinsame Diagnostikdokumentation und eine pragmatische Performance-Runde sind für das klassische Fundament ebenfalls abgeschlossen.
 
-Vor einem öffentlichen 1.0-Tag bleibt das abschließende repositoryweite Release-Audit erforderlich. Da die Modernisierung jetzt begonnen hat, soll dieses Audit gegen den tatsächlichen Release Candidate laufen, statt die Weiterentwicklung nur für ein Audit eines Zwischenstands einzufrieren.
+Vor einem öffentlichen 1.0-Tag bleibt das abschließende repositoryweite Release-Audit erforderlich. Da die Modernisierung begonnen hat, läuft dieses Audit gegen den tatsächlichen Release Candidate statt gegen einen historischen Zwischenstand.
 
 ## M3 – Modernisierung 2026 (in Arbeit)
 
-Das Projekt entwickelt sich jetzt bewusst über den Funktionskatalog der 1980er-Jahre hinaus. Der detaillierte Plan steht in [`MODERNISIERUNG-2026.md`](MODERNISIERUNG-2026.md).
+Das Projekt entwickelt sich bewusst über den Funktionskatalog der 1980er-Jahre hinaus. Der detaillierte Plan steht in [`MODERNISIERUNG-2026.md`](MODERNISIERUNG-2026.md).
 
-### M3.1 – Moderne dichte lineare Algebra und Regression (in Arbeit)
+### M3.1 – Moderne dichte lineare Algebra und Regression (weit fortgeschritten)
 
 - Householder-QR-Faktorisierung: **implementiert**
-- Allgemeines/Polynom-Least-Squares von Normalgleichungen auf QR umgestellt: **implementiert**
-- Cholesky / symmetrische Faktorisierungen: als Nächstes
-- SVD, Rangdiagnostik, Pseudoinverse, robustes Least Squares
-- Konditionsschätzer und Matrixnormen
+- Allgemeines/Polynom-Least-Squares von Normalgleichungen weggeführt: **implementiert**
+- Cholesky-Faktorisierung, wiederverwendbare Lösungen und Log-Determinante: **implementiert**
+- Einseitige Jacobi-SVD für beliebige dichte Matrixformen: **implementiert**
+- Numerischer Rang, Pseudoinverse, Minimalnorm-Least-Squares und 2-Norm-Konditionsdiagnostik: **implementiert**
+- Matrixnormen und Zerlegungs-Hilfsfunktionen: nächster Aufräumschritt
+- optionaler etablierter BLAS-/LAPACK-artiger Backend: später und benchmarkgetrieben
 
 ### M3.2 – Dünnbesetzte lineare Algebra
 
@@ -42,7 +44,7 @@ Dormand-Prince, Dense Output, Event Detection, allokationsärmere Vektor-State-A
 
 ### M3.5 – Statistik, Random und Spezialfunktionen
 
-Stabile deskriptive Statistik, Verteilungen, Quantile, Regressionsdiagnostik, reproduzierbare Random-Streams, Spezialfunktionen und PCA nach SVD.
+Stabile deskriptive Statistik, Verteilungen, Quantile, Regressionsdiagnostik, reproduzierbare Random-Streams, Spezialfunktionen und PCA auf der SVD-Basis.
 
 ### M3.6 – Geometrie, Transformationen und Simulation
 
@@ -50,7 +52,7 @@ Vector3/4, Transformationen, Quaternionen, Kurven/Schnitte, breitere FFT-Unterst
 
 ### M3.7 – Performance-Backends und Release Engineering
 
-Benchmarks, optionale BLAS-/LAPACK-Adapter, gemessenes SIMD, Package-/API-Kompatibilitätschecks und Release-Automation.
+Benchmarks, optionale BLAS-/LAPACK-Adapter, gemessenes SIMD, Package-/API-Kompatibilitätschecks, Release-Automation und Neugenerierung der deutschen/englischen LaTeX-PDF-Handbücher an Release-Candidate-Punkten.
 
 ## M4 – Weitere Sprachimplementierungen
 
