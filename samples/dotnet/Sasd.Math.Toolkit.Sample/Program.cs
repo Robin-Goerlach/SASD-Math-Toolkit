@@ -25,5 +25,4 @@ var sparse = SparseLinearAlgebraExample.Run();
 Console.WriteLine("SASD Math Toolkit numerical demo report generated successfully.");
 Console.WriteLine($"Open this file in a browser: {outputPath}");
 Console.WriteLine(FormattableString.Invariant(
-    $"Sparse reference solve ({sparse.Size}x{sparse.Size}): GMRES={sparse.GmresIterations} iterations, " +
-    $"BiCGSTAB={sparse.BiCgStabIterations} iterations, residual={sparse.WorstResidualNorm:G6}."));
+    $"Sparse reference solve ({sparse.Size}x{sparse.Size}): GMRES={sparse.GmresIterations} iterations, BiCGSTAB={sparse.BiCgStabIterations} iterations, residual={sparse.WorstResidualNorm:G6}."));
