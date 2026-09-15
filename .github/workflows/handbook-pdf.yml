@@ -1,0 +1,43 @@
+name: Build handbook PDFs
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/handbook-pdf.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build-handbooks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install handbook toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc latexmk texlive-luatex texlive-latex-extra texlive-fonts-recommended fonts-dejavu
+
+      - name: Build German and English handbooks
+        working-directory: docs/user-guide/LaTeX
+        run: make all
+
+      - name: Publish PDFs in user-guide root
+        run: |
+          cp docs/user-guide/LaTeX/SASD-Math-Toolkit-Handbuch-V1.0-DE.pdf docs/user-guide/SASD-Math-Toolkit-Handbuch-V1.0-DE.pdf
+          cp docs/user-guide/LaTeX/SASD-Math-Toolkit-Handbook-V1.0-EN.pdf docs/user-guide/SASD-Math-Toolkit-Handbook-V1.0-EN.pdf
+
+      - name: Commit generated PDFs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/user-guide/SASD-Math-Toolkit-Handbuch-V1.0-DE.pdf docs/user-guide/SASD-Math-Toolkit-Handbook-V1.0-EN.pdf
+          if git diff --cached --quiet; then
+            echo "PDF handbooks are already up to date."
+          else
+            git commit -m "Publish German and English V1.0 PDF handbooks"
+            git push
+          fi
