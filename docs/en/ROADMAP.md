@@ -16,21 +16,23 @@ The historical Borland-inspired feature-transfer phase is complete. It remains a
 
 ## M2 — Publication quality and release audit
 
-The historical compatibility catalog and all eleven planned user-handbook chapters are complete. Publication-quality API/test audits, cross-cutting diagnostic documentation, and a pragmatic performance pass are also complete for the classical foundation.
+The historical compatibility catalog and all eleven classical user-handbook chapters are complete. Publication-quality API/test audits, cross-cutting diagnostic documentation, and a pragmatic performance pass are also complete for the classical foundation.
 
-The final repository-wide release audit is still required before a public 1.0 tag. Because modernization has now started, that audit should be run against the actual release candidate instead of freezing development merely to audit an intermediate state.
+The final repository-wide release audit is still required before a public 1.0 tag. Because modernization has started, that audit will run against the actual release candidate rather than an intermediate historical-only state.
 
 ## M3 — Modernization 2026 (in progress)
 
 The project now evolves beyond the 1980s feature catalog. The detailed plan is in [`MODERNIZATION-2026.md`](MODERNIZATION-2026.md).
 
-### M3.1 — Modern dense linear algebra and regression (in progress)
+### M3.1 — Modern dense linear algebra and regression (advanced)
 
 - Householder QR factorization: **implemented**
-- General/polynomial least squares migrated from normal equations to QR: **implemented**
-- Cholesky / symmetric factorizations: next
-- SVD, rank diagnostics, pseudoinverse, robust least squares
-- condition-number estimates and matrix norms
+- General/polynomial least squares migrated from normal equations: **implemented**
+- Cholesky factorization, reusable solves and log-determinant: **implemented**
+- One-sided Jacobi SVD for arbitrary dense matrix shapes: **implemented**
+- Numerical rank, pseudoinverse, minimum-norm least squares and 2-norm condition diagnostics: **implemented**
+- Matrix norms and decomposition convenience utilities: next cleanup slice
+- Optional mature BLAS/LAPACK-class backend: later, benchmark driven
 
 ### M3.2 — Sparse linear algebra
 
@@ -46,7 +48,7 @@ Dormand-Prince, dense output, event detection, lower-allocation vector-state API
 
 ### M3.5 — Statistics, random and special functions
 
-Stable descriptive statistics, distributions, quantiles, regression diagnostics, reproducible random streams, special functions and PCA after SVD.
+Stable descriptive statistics, distributions, quantiles, regression diagnostics, reproducible random streams, special functions and PCA on the SVD foundation.
 
 ### M3.6 — Geometry, transforms and simulation
 
@@ -54,7 +56,7 @@ Vector3/4, transforms, quaternions, curves/intersections, broader FFT support an
 
 ### M3.7 — Performance backends and release engineering
 
-Benchmarks, optional BLAS/LAPACK adapters, measured SIMD, package/API compatibility checks and release automation.
+Benchmarks, optional BLAS/LAPACK adapters, measured SIMD, package/API compatibility checks, release automation, and regeneration of the German/English LaTeX PDF handbooks at release-candidate boundaries.
 
 ## M4 — Multi-language implementations
 
