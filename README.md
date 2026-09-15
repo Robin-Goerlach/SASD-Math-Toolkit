@@ -8,7 +8,7 @@ The library is intended to become a common base for projects such as the **SASD 
 
 The historical Borland-inspired feature-transfer phase is functionally complete. It remains a compatibility/reference baseline, **not** a source-code port and no longer the boundary of future development. Historical source code is neither required nor copied.
 
-Modernization is now in progress. Householder QR is the default robust dense least-squares foundation, and Cholesky factorization now provides the specialized path for symmetric positive-definite systems. The broader plan is documented in [`docs/en/MODERNIZATION-2026.md`](docs/en/MODERNIZATION-2026.md).
+Modernization is now in progress. The dense numerical foundation includes **Householder QR**, **Cholesky**, and a **one-sided Jacobi singular value decomposition**. General/polynomial least squares no longer rely on normal equations; the general basis API can use SVD for rank-deficient or underdetermined minimum-norm problems. The broader plan is documented in [`docs/en/MODERNIZATION-2026.md`](docs/en/MODERNIZATION-2026.md).
 
 A final repository-wide release audit is still required before a public 1.0 tag; it will be run against the actual release candidate so modern APIs are included too.
 
@@ -43,10 +43,10 @@ Implemented now:
 - Interpolation: Lagrange, Newton divided differences, natural and clamped cubic splines
 - Numerical differentiation: function, tabular and spline differentiation
 - Numerical integration: composite/adaptive rules, Romberg and Gauss-Legendre with diagnostics
-- Linear algebra: row-major dense matrices, determinant, Gaussian elimination, reusable pivoted LU, **Householder QR**, **Cholesky**, inverse, residual diagnostics and Gauss-Seidel
+- Linear algebra: row-major dense matrices, determinant, Gaussian elimination, reusable pivoted LU, **Householder QR**, **Cholesky**, **SVD with numerical rank, 2-norm condition diagnostics and pseudoinverse**, inverse, residual diagnostics and Gauss-Seidel
 - Eigenvalues: immutable eigenpairs, residual diagnostics, power/inverse-power, Wielandt deflation and cyclic Jacobi
 - Differential equations: RK4 convenience family, adaptive RKF45, Adams predictor-corrector and linear/nonlinear shooting
-- Least squares: polynomial/general-basis fits use **Householder QR**; named power-law, exponential, logarithmic and five-term Fourier models remain available
+- Least squares: polynomial/general-basis fits prefer **Householder QR**; general-basis fitting falls back to SVD for rank-deficient/underdetermined minimum-norm problems; named power-law, exponential, logarithmic and five-term Fourier models retain their domain/identifiability contracts
 - FFT/transforms: radix-2 complex/real FFT, compact real spectra, real/complex convolution and cross-correlation
 - Graphical demo: deterministic self-contained HTML/SVG report
 - Geometry seed: immutable `Vector2D`
@@ -65,8 +65,8 @@ Target framework: **.NET 10**.
 
 - Numerical algorithms are deterministic and independent from UI, files and console I/O.
 - Input validation is explicit; malformed calls use normal .NET argument exceptions.
-- Expected iterative/adaptive non-convergence is reported through status-bearing result types.
-- Status, value, residual, rank and error estimate are separate concepts.
+- Expected iterative/adaptive non-convergence is reported through status-bearing result types where that is part of the public workflow.
+- Status, value, residual, rank, conditioning and error estimate are separate concepts.
 - Tolerances are explicit and problem-specific; no mutable global convergence tolerance exists.
 - Numerically more stable formulations replace historical internals when public compatibility can be preserved.
 - Public APIs use ordinary .NET types and `System.Numerics.Complex` where appropriate.
@@ -78,7 +78,9 @@ Target framework: **.NET 10**.
 ## Documentation
 
 - 2026 modernization plan: [`docs/en/MODERNIZATION-2026.md`](docs/en/MODERNIZATION-2026.md)
+- QR design note: [`docs/en/QR-FACTORIZATION.md`](docs/en/QR-FACTORIZATION.md)
 - Cholesky design note: [`docs/en/CHOLESKY-FACTORIZATION.md`](docs/en/CHOLESKY-FACTORIZATION.md)
+- SVD design note: [`docs/en/SINGULAR-VALUE-DECOMPOSITION.md`](docs/en/SINGULAR-VALUE-DECOMPOSITION.md)
 - Performance policy: [`docs/en/PERFORMANCE.md`](docs/en/PERFORMANCE.md)
 - Diagnostic conventions: [`docs/en/NUMERICAL-DIAGNOSTICS.md`](docs/en/NUMERICAL-DIAGNOSTICS.md)
 - Clean-room policy: [`docs/en/CLEAN-ROOM.md`](docs/en/CLEAN-ROOM.md)
