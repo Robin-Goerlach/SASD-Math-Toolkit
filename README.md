@@ -41,7 +41,7 @@ Implemented now:
 - Interpolation: Lagrange, Newton divided differences, natural cubic spline and clamped cubic spline
 - Numerical differentiation: function derivatives with Richardson/five-point formulas, tabular two/three/five-point methods on uniform or non-uniform grids, and first/second derivatives of cubic splines
 - Numerical integration: composite trapezoid, composite Simpson, adaptive Simpson with diagnostic results, Romberg with convergence diagnostics, five-point Gauss-Legendre and adaptive Gauss-Legendre
-- Linear algebra: determinant, Gaussian elimination, partial pivoting, reusable LU factorization/solve, inverse and Gauss-Seidel iteration
+- Linear algebra: finite dense matrices, matrix/vector multiplication, determinant, Gaussian elimination with optional partial pivoting, reusable LU factorization/solve, inverse, residual diagnostics and Gauss-Seidel iteration with breakdown status
 - Eigenvalues: power method, LU-backed inverse power method, Wielandt deflation/second eigenpair and cyclic Jacobi complete symmetric eigensystems
 - Differential equations: fixed-step RK4 for scalar first-order, scalar second-order, scalar nth-order, coupled first-order and coupled second-order systems; adaptive RKF45; fourth-order Adams-Bashforth/Adams-Moulton predictor-corrector; linear and nonlinear shooting for scalar second-order Dirichlet boundary-value problems
 - Least squares: polynomial and arbitrary linear-basis fitting plus named power-law, exponential, logarithmic and five-term Fourier models with residual diagnostics
@@ -71,7 +71,7 @@ Target framework: **.NET 10**.
 
 ## Documentation
 
-Technical documentation includes architecture/roadmap material and focused notes for stable numerical domains. Publication-quality notes currently include root finding, interpolation and numerical integration in both English and German, in addition to the existing domain notes for polynomial roots, differentiation, LU/eigenvalues, ODE methods, least-squares models, real FFT, convolution/correlation and the graphical demo.
+Technical documentation includes architecture/roadmap material and focused notes for stable numerical domains. Publication-quality notes currently include root finding, interpolation, numerical integration, and matrices/linear systems in both English and German, in addition to the existing domain notes for polynomial roots, differentiation, LU/eigenvalues, ODE methods, least-squares models, real FFT, convolution/correlation and the graphical demo.
 
 Clean-room policy: [`docs/en/CLEAN-ROOM.md`](docs/en/CLEAN-ROOM.md).
 
