@@ -18,7 +18,7 @@ Das Benutzerhandbuch richtet sich an Anwendungsentwickler, Lernende und technisc
 6. Matrizen und lineare Gleichungssysteme
 7. Eigenwerte und Eigenvektoren
 8. [Gewöhnliche Differentialgleichungen und Randwertprobleme](differentialgleichungen.md)
-9. Least-Squares-Approximation
+9. [Least-Squares-Approximation](least-squares.md)
 10. FFT, Faltung und Korrelation
 11. Numerische Rezepte, Diagnose und typische Fehlerfälle
 

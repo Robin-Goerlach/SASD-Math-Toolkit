@@ -12,15 +12,17 @@
 
 Implemented across the major domains: scalar and complex roots, reusable polynomial/Horner/deflation support, polynomial/spline interpolation, the complete historical V1 differentiation catalog, integration, dense linear algebra with reusable pivoted LU factorization, the complete historical V1 eigenvalue catalog, RK4/RKF45/Adams ODE integration, least squares and radix-2 FFT.
 
-The root-finding slice includes the complete historical V1 root catalog. Direct LU factorization is complete through `LuFactorization`. The eigenvalue slice is complete through power iteration, inverse power iteration, Wielandt deflation and cyclic Jacobi. Differentiation is complete for V1. The RK4 ODE convenience family covers scalar first-order, scalar second-order, scalar nth-order, coupled first-order and coupled second-order systems on the same shared system RK4 core. Adaptive scalar RKF45 and fourth-order Adams-Bashforth/Adams-Moulton predictor-corrector integration are also available. The historical V1 boundary-value slice now covers both linear and nonlinear RK4-backed shooting for scalar second-order Dirichlet problems.
+The root-finding slice includes the complete historical V1 root catalog. Direct LU factorization is complete through `LuFactorization`. The eigenvalue slice is complete through power iteration, inverse power iteration, Wielandt deflation and cyclic Jacobi. Differentiation is complete for V1. The RK4 ODE convenience family covers scalar first-order, scalar second-order, scalar nth-order, coupled first-order and coupled second-order systems on the same shared system RK4 core. Adaptive scalar RKF45 and fourth-order Adams-Bashforth/Adams-Moulton predictor-corrector integration are also available. The historical V1 boundary-value slice covers both linear and nonlinear RK4-backed shooting for scalar second-order Dirichlet problems.
 
-A C#/.NET user handbook under `docs/user-guide/` grows alongside stable implementation milestones rather than reusing the historical Pascal documentation.
+The least-squares slice already had polynomial and arbitrary linear-basis fitting. Historical-style named model coverage has now started with a positive-domain power-law fit, including an explicit result model and original-domain residual diagnostics.
+
+A C#/.NET user handbook under `docs/user-guide/` grows alongside stable implementation milestones rather than reusing the historical Pascal documentation. The least-squares chapter has now started alongside the named model work.
 
 The intent remains to validate architecture across the whole product before filling every historical routine.
 
 ## M2 — Complete V1 compatibility catalog
 
-Close every item marked `planned` in `BORLAND-V1-COMPATIBILITY.md`, especially the remaining FFT helpers and demonstration/sample applications. Complete or explicitly supersede the remaining items marked `partial`, notably named least-squares helpers and the compact real-spectrum FFT convenience API.
+Close every item marked `planned` in `BORLAND-V1-COMPATIBILITY.md`, especially the remaining named least-squares models, FFT helpers and demonstration/sample applications. Complete or explicitly supersede remaining items marked `partial`, notably the five-term Fourier convenience API and compact real-spectrum FFT convenience API.
 
 Quality gate for V1:
 
