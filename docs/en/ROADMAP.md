@@ -43,9 +43,11 @@ Additional dense utilities remain possible, but the managed reference foundation
 - Coordinate/dense/raw-CSR construction with explicit duplicate policy: **implemented**
 - Sparse matvec with reusable output buffers: **implemented**
 - Transpose, dense conversion and inexpensive sparse norms: **implemented**
-- Conjugate Gradient for SPD sparse systems: **next**
+- Shared sparse iterative options/result diagnostics: **implemented**
+- Conjugate Gradient for SPD sparse systems with true-residual verification: **implemented**
+- Diagonal/Jacobi preconditioning for CG: **next**
 - Dedicated CSC: later when sustained column-oriented workloads justify it
-- GMRES, BiCGSTAB and preconditioning: later slices
+- GMRES and BiCGSTAB: subsequent solver slices
 
 ### M3.3 — Optimization and nonlinear systems
 
