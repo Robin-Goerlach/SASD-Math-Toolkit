@@ -12,5 +12,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <ProjectReference Include="../../../src/dotnet/Sasd.Math.Toolkit/Sasd.Math.Toolkit.csproj" />
+    <ProjectReference Include="../../../samples/dotnet/Sasd.Math.Toolkit.Sample/Sasd.Math.Toolkit.Sample.csproj" />
   </ItemGroup>
 </Project>

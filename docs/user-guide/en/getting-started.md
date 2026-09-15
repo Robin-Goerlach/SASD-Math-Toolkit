@@ -33,6 +33,18 @@ Console.WriteLine(derivative);
 
 The result should be close to `Math.Cos(0.3)`. Numerical methods return approximations, so comparisons should normally use tolerances rather than exact floating-point equality.
 
+## Run the graphical numerical demo
+
+The repository contains a cross-platform sample that exercises real toolkit APIs and generates a self-contained HTML/SVG report:
+
+```bash
+dotnet run --project samples/dotnet/Sasd.Math.Toolkit.Sample/Sasd.Math.Toolkit.Sample.csproj
+```
+
+Open the generated `sasd-math-toolkit-demo.html` file in a browser. The report currently includes root finding, integration, compact real FFT analysis, convolution and correlation. It has no network or JavaScript dependency, so it is also useful as a deterministic smoke/demo artifact.
+
+This sample replaces the role of the historical graphics demonstrations with newly written C#/.NET code. Rendering remains outside the numerical library so application projects are not forced to depend on a particular UI or charting technology.
+
 ## Error handling
 
 Programming-contract errors such as incompatible dimensions, invalid indices or non-finite inputs are generally reported through standard .NET exceptions. Iterative algorithms whose convergence can legitimately fail usually return a result object containing status, iteration count and residual information.

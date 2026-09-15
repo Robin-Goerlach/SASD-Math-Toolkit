@@ -55,6 +55,6 @@ Status legend: **done** = callable implementation exists now; **partial** = doma
 | Real convolution | done | FFT-backed `ConvolveReal` sharing the complex core |
 | Complex cross-correlation | done | `CrossCorrelateComplex` with explicit conjugation and lag convention |
 | Real cross-correlation | done | `CrossCorrelateReal` sharing the complex correlation core |
-| Graphics demo applications | planned | samples/visualization after numerical V1 core |
+| Graphics demo applications | done | cross-platform `Sasd.Math.Toolkit.Sample` HTML/SVG report; clean-room replacement for the historical graphics-demo role |
 
-The historical catalog is a minimum compatibility target. SASD APIs may expose safer defaults or more general forms rather than reproducing old procedure signatures literally.
+The historical catalog is now functionally covered. The compatibility target remains a minimum: SASD APIs may expose safer defaults or more general forms rather than reproducing old procedure signatures literally. V1 release work continues with handbook completion, consistency checks and a final audit.

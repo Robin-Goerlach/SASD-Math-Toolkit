@@ -1,12 +1,21 @@
-using Sasd.Numerics.Integration;
-using Sasd.Numerics.RootFinding;
+using System.Text;
+using Sasd.Math.Toolkit.Sample;
 
-var root = RootSolvers.NewtonRaphson(
-    x => System.Math.Cos(x) - x,
-    x => -System.Math.Sin(x) - 1.0,
-    initialGuess: 0.0);
+var outputPath = args.Length switch
+{
+    0 => Path.Combine(Environment.CurrentDirectory, "sasd-math-toolkit-demo.html"),
+    1 => Path.GetFullPath(args[0]),
+    _ => throw new ArgumentException("Pass at most one optional output path for the generated HTML report.")
+};
 
-Console.WriteLine($"cos(x) = x -> root {root.Root:G17}, iterations {root.Iterations}");
+var directory = Path.GetDirectoryName(outputPath);
+if (!string.IsNullOrWhiteSpace(directory))
+{
+    Directory.CreateDirectory(directory);
+}
 
-var integral = NumericalIntegration.AdaptiveSimpson(System.Math.Sin, 0.0, System.Math.PI);
-Console.WriteLine($"Integral of sin(x) from 0 to pi -> {integral:G17}");
+var html = NumericalDemoReport.Create();
+File.WriteAllText(outputPath, html, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+
+Console.WriteLine("SASD Math Toolkit numerical demo report generated successfully.");
+Console.WriteLine($"Open this file in a browser: {outputPath}");

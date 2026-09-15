@@ -4,19 +4,25 @@
 
 Repository-Struktur, .NET-10-Projekt, Tests, Sample, CI, englische/deutsche Dokumentation und Clean-Room-Regeln.
 
-## M1 – Breiter numerischer Vertikalschnitt (gestartet und erweitert)
+## M1 – Breiter numerischer Vertikalschnitt (historischer V1-Algorithmuskatalog erledigt)
 
-Bereits implementiert sind wichtige Verfahren aus nahezu allen V1-Bereichen: reelle und komplexe Nullstellensuche, wiederverwendbare Polynom-/Horner-/Deflationsfunktionen, Interpolation/Splines, der vollständige historische V1-Differentiationsbereich, Integration, lineare Algebra mit wiederverwendbarer LU-Faktorisierung, der vollständige historische V1-Eigenwertbereich, RK4/RKF45/Adams-Verfahren, Least Squares und FFT.
+Der historische numerische Methodenkatalog ist in den Bereichen reelle/komplexe Nullstellensuche, Interpolation/Splines, Differentiation, Integration, dichte lineare Algebra, Eigenwerte, RK4/RKF45/Adams, Randwert-Shooting, Least Squares, FFT, Faltung und Korrelation abgedeckt.
 
-Der V1-Bereich der Nullstellensuche ist vollständig abgedeckt. Auch direkte LU-Faktorisierung, Eigenwertbereich und Differentiation sind vollständig. Die RK4-Komfortfamilie im ODE-Bereich deckt skalare Gleichungen erster, zweiter und n-ter Ordnung sowie gekoppelte Systeme erster und zweiter Ordnung ab und verwendet dabei denselben gemeinsamen System-RK4-Kern. Zusätzlich stehen adaptives skalares RKF45 und der Adams-Bashforth-/Adams-Moulton-Prädiktor-Korrektor vierter Ordnung zur Verfügung. Der historische V1-Randwertbereich deckt lineares und nichtlineares RK4-gestütztes Shooting für skalare Dirichlet-Probleme zweiter Ordnung ab. Der historische V1-Least-Squares-Modellbereich ist durch den allgemeinen linearen Basis- und Polynomkern sowie benannte Potenzgesetz-, Exponential-, logarithmische und fünfgliedrige Fouriermodelle mit expliziten Diagnosewerten abgedeckt. Auch der historische Transformationsbereich ist numerisch vollständig: komplexe und reelle FFT, kompaktes Realspektrum sowie reelle/komplexe Faltung und Kreuzkorrelation verwenden dieselbe Radix-2-Grundlage.
+Die Implementierung teilt bewusst gemeinsame Grundlagen, statt Formeln für Komfort-APIs zu duplizieren: LU-Faktorisierung ist wiederverwendbar, höhere RK4-Varianten werden auf den gemeinsamen Systemintegrator zurückgeführt, transformierte Least-Squares-Modelle nutzen den allgemeinen Basissolver und Faltung/Korrelation bauen auf dem gemeinsamen komplexen FFT-Kern auf.
 
 Unter `docs/user-guide/` wächst parallel ein eigenes C#/.NET-Benutzerhandbuch. Es begleitet stabile Implementierungsmeilensteine und verwendet nicht das historische Pascal-Handbuch wieder.
 
-Damit wird früh geprüft, ob die Architektur für die ganze Produktfamilie trägt, statt erst ein Kapitel vollständig zu perfektionieren und später grundlegende Entscheidungen wieder ändern zu müssen.
+## M2 – V1 vollständig (Funktionskatalog erledigt; Release-Härtung läuft)
 
-## M2 – V1 vollständig
+Die historische Demo-/Grafikrolle wird nun durch die plattformunabhängige Anwendung `Sasd.Math.Toolkit.Sample` abgedeckt. Sie erzeugt einen deterministischen eigenständigen HTML-/SVG-Numerikbericht, ohne UI-Abhängigkeiten in die wiederverwendbare Bibliothek einzubauen.
 
-Der numerische Algorithmuskatalog ist jetzt abgedeckt. Als historischer Kompatibilitätspunkt bleibt die Demo-/Grafikanwendungsebene. Die V1-Arbeit verlagert sich damit von neuen Kernalgorithmen auf Samples, die Vervollständigung des Benutzerhandbuchs, API-Konsistenzprüfungen und das abschließende Kompatibilitäts-Audit.
+Damit sind alle Zeilen der `BORLAND-V1-COMPATIBILITY.md` funktional abgedeckt. Die verbleibende V1-Arbeit besteht nicht mehr aus historischen Algorithmen, sondern aus Release-Härtung:
+
+- fehlende Kapitel des Benutzerhandbuchs für stabile V1-Bereiche vervollständigen;
+- API-Konsistenz und öffentliche Oberfläche systematisch prüfen;
+- XML-Dokumentation und Fehlersemantik aller öffentlichen Algorithmen prüfen;
+- ausführbare Beispiele dort ergänzen, wo sie das Handbuch verbessern;
+- abschließendes Kompatibilitäts-/Test-Audit sowie Release Notes und Versionierung vorbereiten.
 
 V1 ist erst fertig, wenn jeder öffentliche Algorithmus getestet und dokumentiert ist, die stabilen V1-Bereiche im Benutzerhandbuch beschrieben sind und keine öffentlichen Platzhalter mit `NotImplementedException` existieren.
 

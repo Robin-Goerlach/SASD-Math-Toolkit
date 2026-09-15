@@ -33,6 +33,18 @@ Console.WriteLine(derivative);
 
 Das Ergebnis sollte nahe bei `Math.Cos(0.3)` liegen. Numerische Verfahren liefern Näherungen; Gleitkommaergebnisse sollten daher normalerweise mit Toleranzen und nicht auf exakte Gleichheit verglichen werden.
 
+## Grafische Numerik-Demo starten
+
+Das Repository enthält ein plattformunabhängiges Sample, das echte Toolkit-APIs ausführt und einen eigenständigen HTML-/SVG-Bericht erzeugt:
+
+```bash
+dotnet run --project samples/dotnet/Sasd.Math.Toolkit.Sample/Sasd.Math.Toolkit.Sample.csproj
+```
+
+Die erzeugte Datei `sasd-math-toolkit-demo.html` kann anschließend in einem Browser geöffnet werden. Der Bericht enthält derzeit Nullstellensuche, Integration, kompakte Real-FFT, Faltung und Korrelation. Netzwerkzugriff und JavaScript werden nicht benötigt, sodass der Bericht zugleich als deterministisches Demo-/Smoke-Artefakt geeignet ist.
+
+Dieses Sample ersetzt die Rolle der historischen Grafikdemos durch neu geschriebenen C#/.NET-Code. Das Rendering bleibt außerhalb der Numerikbibliothek, damit Anwendungsprojekte nicht an eine bestimmte UI- oder Chart-Technologie gebunden werden.
+
 ## Fehlerbehandlung
 
 Verletzungen von Programmverträgen wie unpassende Dimensionen, ungültige Indizes oder nicht-endliche Eingaben werden im Allgemeinen über normale .NET-Ausnahmen gemeldet. Iterative mathematisch gültige Verfahren, deren Konvergenz scheitern kann, liefern dagegen typischerweise Ergebnisobjekte mit Status, Iterationszahl und Residuum.

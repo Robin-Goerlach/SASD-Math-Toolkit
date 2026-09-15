@@ -8,19 +8,25 @@
 - Clean-room policy
 - Common iteration status/result conventions
 
-## M1 — Broad numerical foundation (in progress; vertical slice expanded)
+## M1 — Broad numerical foundation (done for the historical V1 algorithm catalog)
 
-Implemented across the major domains: scalar and complex roots, reusable polynomial/Horner/deflation support, polynomial/spline interpolation, the complete historical V1 differentiation catalog, integration, dense linear algebra with reusable pivoted LU factorization, the complete historical V1 eigenvalue catalog, RK4/RKF45/Adams ODE integration, least squares and radix-2 FFT.
+The historical numerical method catalog is covered across scalar and complex roots, interpolation/splines, differentiation, integration, dense linear algebra, eigenvalues, RK4/RKF45/Adams ODE integration, boundary-value shooting, least-squares approximation, FFT, convolution and correlation.
 
-The root-finding slice includes the complete historical V1 root catalog. Direct LU factorization is complete through `LuFactorization`. The eigenvalue slice is complete through power iteration, inverse power iteration, Wielandt deflation and cyclic Jacobi. Differentiation is complete for V1. The RK4 ODE convenience family covers scalar first-order, scalar second-order, scalar nth-order, coupled first-order and coupled second-order systems on the same shared system RK4 core. Adaptive scalar RKF45 and fourth-order Adams-Bashforth/Adams-Moulton predictor-corrector integration are also available. The historical V1 boundary-value slice covers both linear and nonlinear RK4-backed shooting for scalar second-order Dirichlet problems. The historical V1 least-squares model set is covered by the general linear-basis and polynomial engines plus named power-law, exponential, logarithmic and five-term Fourier models with explicit residual diagnostics. The historical transform slice is also numerically complete: complex and real FFT, compact real spectra, and real/complex convolution and cross-correlation all share the same radix-2 foundation.
+The implementation deliberately shares foundations instead of cloning formulas across convenience APIs: LU factorization is reusable, higher-order RK4 variants reduce to the common system integrator, transformed least-squares models reuse the general basis solver, and convolution/correlation build on the shared complex FFT core.
 
 A C#/.NET user handbook under `docs/user-guide/` grows alongside stable implementation milestones rather than reusing the historical Pascal documentation.
 
-The intent remains to validate architecture across the whole product before filling every historical routine.
+## M2 — Complete V1 compatibility catalog (functional catalog done; release hardening in progress)
 
-## M2 — Complete V1 compatibility catalog
+The historical demonstration/graphics role is now covered by the cross-platform `Sasd.Math.Toolkit.Sample` application, which generates a deterministic self-contained HTML/SVG numerical report without introducing UI dependencies into the reusable library.
 
-The numerical algorithm catalog is now covered. The remaining historical compatibility item is the demonstration/graphics application layer. V1 work therefore shifts from adding core numerical methods toward samples, handbook completion, API consistency checks and the final compatibility audit.
+All rows in `BORLAND-V1-COMPATIBILITY.md` are therefore functionally covered. Remaining V1 work is release hardening rather than additional historical algorithms:
+
+- complete the remaining user-handbook chapters for stable V1 areas;
+- perform an API consistency and public-surface audit;
+- verify XML documentation and error semantics across all public algorithms;
+- expand executable examples where a handbook chapter benefits from them;
+- perform the final compatibility/test audit and prepare release notes/versioning.
 
 Quality gate for V1:
 
