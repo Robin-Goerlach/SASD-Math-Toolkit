@@ -11,7 +11,7 @@ on:
       - 'docs/user-guide/LaTeX/**'
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: handbook-pdf-main
@@ -55,19 +55,7 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish PDFs in user-guide root
-        run: |
-          cp docs/user-guide/LaTeX/SASD-Math-Toolkit-Handbuch-V1.0-DE.pdf docs/user-guide/SASD-Math-Toolkit-Handbuch-V1.0-DE.pdf
-          cp docs/user-guide/LaTeX/SASD-Math-Toolkit-Handbook-V1.0-EN.pdf docs/user-guide/SASD-Math-Toolkit-Handbook-V1.0-EN.pdf
-
-      - name: Commit generated PDFs
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/user-guide/SASD-Math-Toolkit-Handbuch-V1.0-DE.pdf docs/user-guide/SASD-Math-Toolkit-Handbook-V1.0-EN.pdf
-          if git diff --cached --quiet; then
-            echo "PDF handbooks are already up to date."
-          else
-            git commit -m "Publish German and English V1.0 RC1 PDF handbooks"
-            git push
-          fi
+      # Deliberately do not commit generated PDFs from CI. PDF producer metadata can
+      # change binary bytes between otherwise equivalent builds. Release snapshots
+      # under docs/user-guide/ are updated explicitly at RC/release boundaries after
+      # inspection, while ordinary CI stays read-only and cannot mutate main.

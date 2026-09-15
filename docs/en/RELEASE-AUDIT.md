@@ -25,6 +25,7 @@ The package identifier for the audit candidate is `1.0.0-rc.1`. A final `1.0.0` 
 - **Deterministic publication path:** changes to Markdown handbook chapters, LaTeX sources or the handbook workflow rebuild both editions on `main`.
 - **PDF validation:** CI verifies that both generated PDF files are non-empty and structurally readable with `pdfinfo` before publication.
 - **Release inspection artifact:** each handbook build uploads both generated PDFs as a retained GitHub Actions artifact so the exact build outputs can be inspected independently of the committed copies.
+- **CI mutation control:** handbook CI is read-only. It builds, validates and uploads PDFs but does not auto-commit regenerated binaries to `main`; PDF producer metadata can otherwise create binary churn without editorial changes. Committed PDF snapshots are updated deliberately at RC/release boundaries after inspection.
 - **Visual inspection:** the RC1 artifact was rendered page-by-page. The English edition contains 81 PDF pages and the German edition 79 PDF pages. Contact-sheet review of every rendered page plus full-size inspection of release-critical pages found no clipped text, overlaps, black squares, broken glyphs or missing chapter content. Title pages, contents, chapters 12/13, appendices and provenance pages render correctly.
 - **Committed editions:** the regenerated English and German RC1 PDFs are synchronized with the current Markdown/LaTeX release-candidate content.
 
