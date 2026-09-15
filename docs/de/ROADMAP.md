@@ -14,9 +14,9 @@ Die RK4-Komfortfamilie deckt skalare Gleichungen erster, zweiter und n-ter Ordnu
 
 Der historische Kompatibilitätskatalog einschließlich grafischer Demo-Ebene ist implementiert. Die Arbeit konzentriert sich deshalb jetzt auf die Qualität einer veröffentlichbaren V1 statt auf weitere historische Algorithmen.
 
-Das eigenständige C#/.NET-Benutzerhandbuch unter `docs/user-guide/` wird Fachbereich für Fachbereich vervollständigt. Nullstellensuche, Interpolation und numerische Integration besitzen jetzt ausführliche Handbuchkapitel sowie API-/Test-Audits. Die Integration stellt zusätzlich nicht brechende Detailergebnisse für adaptive Verfahren und Romberg bereit, damit Anwendungen Konvergenzdiagnosen nicht verwerfen müssen.
+Das eigenständige C#/.NET-Benutzerhandbuch unter `docs/user-guide/` wird Fachbereich für Fachbereich vervollständigt. Nullstellensuche, Interpolation, numerische Integration sowie Matrizen/lineare Gleichungssysteme besitzen jetzt ausführliche Handbuchkapitel und API-/Test-Audits. Beim linearen Algebra-Audit wurden insbesondere die Endlichkeitsinvariante von Matrizen, direkte Solver-Validierung, LU-Diagnosezustand, Residualprüfung und Gauss-Seidel-Breakdown-Erkennung gehärtet, ohne die Referenzimplementierung unnötig zu verkomplizieren.
 
-Als Nächstes folgen Matrizen und lineare Gleichungssysteme sowie danach Eigenwerte. Anschließend kommen das fachübergreifende Diagnosekapitel und das abschließende V1-Audit.
+Als Nächstes folgen die Eigenwerte. Anschließend kommen das fachübergreifende Diagnosekapitel und das abschließende V1-Audit.
 
 V1 ist erst fertig, wenn jeder öffentliche Algorithmus getestet und dokumentiert ist, wichtige Fehler-/Abbruchzustände regressionstestet sind, die stabilen V1-Bereiche im Benutzerhandbuch beschrieben sind und keine öffentlichen Platzhalter mit `NotImplementedException` existieren.
 

@@ -6,22 +6,26 @@ namespace Sasd.Numerics.LinearAlgebra;
 /// Stores a reusable LU factorization with partial pivoting for a square dense matrix.
 /// </summary>
 /// <remarks>
-/// The factorization follows the convention <c>P * A = L * U</c>, where <c>P</c>
-/// is represented by <see cref="Permutation"/>. The lower and upper triangular
-/// factors share one internal matrix in the usual compact representation; public
-/// factor properties return independent matrices so callers cannot mutate the
-/// stored decomposition.
+/// The factorization follows the convention <c>P * A = L * U</c>, where <c>P</c> is represented
+/// by <see cref="Permutation"/>. The lower and upper triangular factors share one internal matrix
+/// in compact form; public factor properties return independent matrices so callers cannot mutate
+/// the stored decomposition.
 /// </remarks>
 public sealed class LuFactorization
 {
     private readonly DenseMatrix _lu;
     private readonly int[] _permutation;
 
-    private LuFactorization(DenseMatrix lu, int[] permutation, int pivotSign)
+    private LuFactorization(
+        DenseMatrix lu,
+        int[] permutation,
+        int pivotSign,
+        double pivotTolerance)
     {
         _lu = lu;
         _permutation = permutation;
         PivotSign = pivotSign;
+        PivotTolerance = pivotTolerance;
     }
 
     /// <summary>
@@ -35,11 +39,20 @@ public sealed class LuFactorization
     public int PivotSign { get; }
 
     /// <summary>
+    /// Gets the absolute pivot threshold that was used when creating this factorization.
+    /// </summary>
+    /// <remarks>
+    /// This records the decomposition policy for diagnostics. It must not be interpreted as a
+    /// condition-number estimate.
+    /// </remarks>
+    public double PivotTolerance { get; }
+
+    /// <summary>
     /// Gets a copy of the row permutation used by the factorization.
     /// </summary>
     /// <remarks>
-    /// Row <c>i</c> of <c>P * A</c> is row <c>Permutation[i]</c> of the original
-    /// matrix. A copy is returned deliberately to keep the factorization immutable.
+    /// Row <c>i</c> of <c>P * A</c> is row <c>Permutation[i]</c> of the original matrix. A copy is
+    /// returned deliberately to keep the factorization immutable.
     /// </remarks>
     public int[] Permutation => (int[])_permutation.Clone();
 
@@ -85,13 +98,13 @@ public sealed class LuFactorization
     }
 
     /// <summary>
-    /// Computes an LU decomposition with partial pivoting.
+    /// Computes an LU decomposition with partial row pivoting.
     /// </summary>
     /// <param name="matrix">Square matrix to factor. The input matrix is not modified.</param>
-    /// <param name="pivotTolerance">Absolute threshold below which a pivot is treated as singular.</param>
+    /// <param name="pivotTolerance">Positive absolute threshold below which a pivot is treated as singular.</param>
     /// <returns>A reusable factorization of <paramref name="matrix"/>.</returns>
     /// <exception cref="ArgumentException">Thrown when the matrix is not square.</exception>
-    /// <exception cref="ArithmeticException">Thrown when the matrix is singular or numerically singular.</exception>
+    /// <exception cref="ArithmeticException">Thrown when the matrix is singular, numerically singular, or arithmetic overflows.</exception>
     public static LuFactorization Decompose(
         DenseMatrix matrix,
         double pivotTolerance = NumericConstants.NearlyZero)
@@ -99,7 +112,7 @@ public sealed class LuFactorization
         ArgumentNullException.ThrowIfNull(matrix);
         NumericGuard.Positive(pivotTolerance, nameof(pivotTolerance));
 
-        if (matrix.Rows != matrix.Columns)
+        if (!matrix.IsSquare)
         {
             throw new ArgumentException("Matrix must be square.", nameof(matrix));
         }
@@ -111,10 +124,9 @@ public sealed class LuFactorization
 
         for (var pivotColumn = 0; pivotColumn < size; pivotColumn++)
         {
-            // Partial pivoting chooses the largest available magnitude in the current
-            // column. This is intentionally the classical, easy-to-audit algorithm;
-            // more elaborate scaling strategies can be added later if requirements
-            // justify the additional complexity.
+            // Partial pivoting chooses the largest available magnitude in the current column.
+            // This is intentionally the classical, easy-to-audit strategy; scaled pivoting or
+            // condition estimation can be added later without changing the public solve model.
             var pivotRow = pivotColumn;
             var pivotMagnitude = System.Math.Abs(lu[pivotColumn, pivotColumn]);
             for (var row = pivotColumn + 1; row < size; row++)
@@ -140,27 +152,28 @@ public sealed class LuFactorization
                 pivotSign = -pivotSign;
             }
 
-            // Store L below the diagonal and U on/above the diagonal in the same
-            // matrix. Keeping this compact representation makes repeated solves cheap
-            // without obscuring the textbook elimination steps.
+            // Store L below the diagonal and U on/above the diagonal in the same matrix.
             var pivot = lu[pivotColumn, pivotColumn];
             for (var row = pivotColumn + 1; row < size; row++)
             {
-                lu[row, pivotColumn] /= pivot;
-                var multiplier = lu[row, pivotColumn];
+                var multiplier = lu[row, pivotColumn] / pivot;
+                EnsureFiniteComputation(multiplier, "LU factorization produced a non-finite multiplier.");
+                lu[row, pivotColumn] = multiplier;
 
                 for (var column = pivotColumn + 1; column < size; column++)
                 {
-                    lu[row, column] -= multiplier * lu[pivotColumn, column];
+                    var updated = lu[row, column] - (multiplier * lu[pivotColumn, column]);
+                    EnsureFiniteComputation(updated, "LU factorization produced a non-finite matrix entry.");
+                    lu[row, column] = updated;
                 }
             }
         }
 
-        return new LuFactorization(lu, permutation, pivotSign);
+        return new LuFactorization(lu, permutation, pivotSign, pivotTolerance);
     }
 
     /// <summary>
-    /// Solves <c>A * x = b</c> using the stored factorization.
+    /// Solves <c>A*x=b</c> using the stored factorization.
     /// </summary>
     public double[] Solve(IReadOnlyList<double> rightHandSide)
     {
@@ -170,24 +183,27 @@ public sealed class LuFactorization
             throw new ArgumentException("Right-hand side length must match matrix size.", nameof(rightHandSide));
         }
 
-        var forward = new double[Size];
-
-        // Because P*A=L*U, the right-hand side must be permuted in exactly the
-        // same way as the matrix rows before forward substitution.
-        for (var row = 0; row < Size; row++)
+        for (var i = 0; i < rightHandSide.Count; i++)
         {
-            var value = rightHandSide[_permutation[row]];
-            if (!double.IsFinite(value))
+            if (!double.IsFinite(rightHandSide[i]))
             {
                 throw new ArgumentOutOfRangeException(nameof(rightHandSide), "Right-hand side values must be finite.");
             }
+        }
 
+        var forward = new double[Size];
+
+        // Because P*A=L*U, b must be permuted exactly like the rows of A before
+        // forward substitution through the unit-lower-triangular factor.
+        for (var row = 0; row < Size; row++)
+        {
+            var value = rightHandSide[_permutation[row]];
             for (var column = 0; column < row; column++)
             {
                 value -= _lu[row, column] * forward[column];
+                EnsureFiniteComputation(value, "LU forward substitution produced a non-finite value.");
             }
 
-            // L has an implicit unit diagonal, so no division is required here.
             forward[row] = value;
         }
 
@@ -198,16 +214,18 @@ public sealed class LuFactorization
             for (var column = row + 1; column < Size; column++)
             {
                 value -= _lu[row, column] * solution[column];
+                EnsureFiniteComputation(value, "LU back substitution produced a non-finite value.");
             }
 
             solution[row] = value / _lu[row, row];
+            EnsureFiniteComputation(solution[row], "LU back substitution produced a non-finite solution value.");
         }
 
         return solution;
     }
 
     /// <summary>
-    /// Solves <c>A * X = B</c> for several right-hand sides stored as columns.
+    /// Solves <c>A*X=B</c> for several right-hand sides stored as columns.
     /// </summary>
     public DenseMatrix Solve(DenseMatrix rightHandSides)
     {
@@ -246,6 +264,7 @@ public sealed class LuFactorization
         for (var i = 0; i < Size; i++)
         {
             determinant *= _lu[i, i];
+            EnsureFiniteComputation(determinant, "LU determinant computation overflowed.");
         }
 
         return determinant;
@@ -255,4 +274,12 @@ public sealed class LuFactorization
     /// Computes the inverse by solving once for all columns of the identity matrix.
     /// </summary>
     public DenseMatrix Inverse() => Solve(DenseMatrix.Identity(Size));
+
+    private static void EnsureFiniteComputation(double value, string message)
+    {
+        if (!double.IsFinite(value))
+        {
+            throw new ArithmeticException(message);
+        }
+    }
 }

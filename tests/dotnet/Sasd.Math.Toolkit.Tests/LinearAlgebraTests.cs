@@ -1,3 +1,4 @@
+using Sasd.Numerics.Common;
 using Sasd.Numerics.LinearAlgebra;
 
 namespace Sasd.Math.Toolkit.Tests;
@@ -5,10 +6,47 @@ namespace Sasd.Math.Toolkit.Tests;
 public sealed class LinearAlgebraTests
 {
     [Fact]
+    public void DenseMatrix_ValidatesDimensionsIndicesAndFiniteEntries()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => new DenseMatrix(0, 2));
+        Assert.Throws<ArgumentOutOfRangeException>(() => new DenseMatrix(2, 0));
+        Assert.Throws<ArgumentOutOfRangeException>(() => new DenseMatrix(new double[,] { { double.NaN } }));
+
+        var matrix = new DenseMatrix(2, 2);
+        Assert.Throws<ArgumentOutOfRangeException>(() => matrix[0, 0] = double.PositiveInfinity);
+        Assert.Throws<ArgumentOutOfRangeException>(() => _ = matrix[-1, 0]);
+        Assert.Throws<ArgumentOutOfRangeException>(() => _ = matrix[0, 2]);
+        Assert.True(matrix.IsSquare);
+    }
+
+    [Fact]
+    public void DenseMatrix_MultiplicationValidatesShapeAndArithmeticRange()
+    {
+        var matrix = new DenseMatrix(new double[,] { { 1.0, 2.0 } });
+        Assert.Throws<ArgumentException>(() => matrix.Multiply(new[] { 1.0 }));
+        Assert.Throws<ArgumentOutOfRangeException>(() => matrix.Multiply(new[] { 1.0, double.NaN }));
+        Assert.Throws<ArgumentException>(() => matrix.Multiply(new DenseMatrix(3, 1)));
+
+        var huge = new DenseMatrix(new double[,] { { double.MaxValue } });
+        Assert.Throws<ArithmeticException>(() => huge.Multiply(new[] { 2.0 }));
+    }
+
+    [Fact]
     public void Determinant_IsCorrect()
     {
         var matrix = new DenseMatrix(new double[,] { { 4.0, 7.0 }, { 2.0, 6.0 } });
         Assert.Equal(10.0, LinearSystemSolvers.Determinant(matrix), 10);
+    }
+
+    [Fact]
+    public void Determinant_ReportsNumericalZeroAndRejectsInvalidToleranceOrOverflow()
+    {
+        var singular = new DenseMatrix(new double[,] { { 1.0, 2.0 }, { 2.0, 4.0 } });
+        Assert.Equal(0.0, LinearSystemSolvers.Determinant(singular));
+        Assert.Throws<ArgumentOutOfRangeException>(() => LinearSystemSolvers.Determinant(singular, 0.0));
+
+        var huge = new DenseMatrix(new double[,] { { double.MaxValue, 0.0 }, { 0.0, 2.0 } });
+        Assert.Throws<ArithmeticException>(() => LinearSystemSolvers.Determinant(huge));
     }
 
     [Fact]
@@ -18,6 +56,37 @@ public sealed class LinearAlgebraTests
         var result = LinearSystemSolvers.SolveGaussian(matrix, new[] { 11.0, 13.0 });
         Assert.Equal(64.0 / 9.0, result[0], 10);
         Assert.Equal(-29.0 / 9.0, result[1], 10);
+    }
+
+    [Fact]
+    public void GaussianSolve_PivotingHandlesZeroLeadingPivotWithoutMutatingInputs()
+    {
+        var matrix = new DenseMatrix(new double[,] { { 0.0, 2.0 }, { 1.0, 3.0 } });
+        var rightHandSide = new[] { 4.0, 7.0 };
+
+        var solution = LinearSystemSolvers.SolveGaussian(matrix, rightHandSide, partialPivoting: true);
+
+        Assert.Equal(1.0, solution[0], 12);
+        Assert.Equal(2.0, solution[1], 12);
+        Assert.Equal(0.0, matrix[0, 0]);
+        Assert.Equal(2.0, matrix[0, 1]);
+        Assert.Equal(new[] { 4.0, 7.0 }, rightHandSide);
+
+        Assert.Throws<ArithmeticException>(() =>
+            LinearSystemSolvers.SolveGaussian(matrix, rightHandSide, partialPivoting: false));
+    }
+
+    [Fact]
+    public void DirectSolvers_RejectNonFiniteRightHandSidesAndInvalidPivotTolerance()
+    {
+        var matrix = DenseMatrix.Identity(2);
+
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            LinearSystemSolvers.SolveGaussian(matrix, new[] { 1.0, double.NaN }));
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            LinearSystemSolvers.SolveGaussian(matrix, new[] { 1.0, 2.0 }, pivotTolerance: 0.0));
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            LuFactorization.Decompose(matrix, pivotTolerance: 0.0));
     }
 
     [Fact]
@@ -64,6 +133,22 @@ public sealed class LinearAlgebraTests
     }
 
     [Fact]
+    public void LuFactorization_SolvesMultipleRightHandSidesAndKeepsDiagnosticStateDefensive()
+    {
+        var matrix = new DenseMatrix(new double[,] { { 3.0, 1.0 }, { 1.0, 2.0 } });
+        var factorization = LuFactorization.Decompose(matrix, 1e-12);
+        var rightHandSides = new DenseMatrix(new double[,] { { 1.0, 0.0 }, { 0.0, 1.0 } });
+
+        var solution = factorization.Solve(rightHandSides);
+        AssertIdentity(matrix.Multiply(solution), 1e-12);
+        Assert.Equal(1e-12, factorization.PivotTolerance);
+
+        var firstPermutation = factorization.Permutation;
+        firstPermutation[0] = 99;
+        Assert.NotEqual(99, factorization.Permutation[0]);
+    }
+
+    [Fact]
     public void LuFactorization_ComputesDeterminantAndInverse()
     {
         var matrix = new DenseMatrix(new double[,] { { 4.0, 7.0 }, { 2.0, 6.0 } });
@@ -79,10 +164,62 @@ public sealed class LinearAlgebraTests
     }
 
     [Fact]
+    public void LuFactorization_DeterminantRejectsOverflow()
+    {
+        var huge = new DenseMatrix(new double[,] { { double.MaxValue, 0.0 }, { 0.0, 2.0 } });
+        var factorization = LuFactorization.Decompose(huge);
+        Assert.Throws<ArithmeticException>(() => factorization.Determinant());
+    }
+
+    [Fact]
     public void LuFactorization_RejectsSingularMatrix()
     {
         var singular = new DenseMatrix(new double[,] { { 1.0, 2.0 }, { 2.0, 4.0 } });
         Assert.Throws<ArithmeticException>(() => LuFactorization.Decompose(singular));
+    }
+
+    [Fact]
+    public void GaussSeidel_ConvergesForDiagonallyDominantSystemAndReportsResidual()
+    {
+        var matrix = new DenseMatrix(new double[,] { { 4.0, 1.0 }, { 2.0, 3.0 } });
+        var rightHandSide = new[] { 1.0, 2.0 };
+
+        var result = LinearSystemSolvers.GaussSeidel(
+            matrix,
+            rightHandSide,
+            tolerance: 1e-12,
+            maximumIterations: 200);
+
+        Assert.True(result.Converged);
+        Assert.Equal(IterationStatus.Converged, result.Status);
+        Assert.InRange(result.Value[0], 0.1 - 1e-11, 0.1 + 1e-11);
+        Assert.InRange(result.Value[1], 0.6 - 1e-11, 0.6 + 1e-11);
+        Assert.InRange(result.Residual, 0.0, 1e-12);
+    }
+
+    [Fact]
+    public void GaussSeidel_ReportsBreakdownForZeroDiagonal()
+    {
+        var matrix = new DenseMatrix(new double[,] { { 0.0, 1.0 }, { 1.0, 2.0 } });
+        var result = LinearSystemSolvers.GaussSeidel(matrix, new[] { 1.0, 1.0 });
+
+        Assert.False(result.Converged);
+        Assert.Equal(IterationStatus.NumericalBreakdown, result.Status);
+        Assert.Contains("diagonal", result.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void ResidualInfinityNorm_ValidatesDimensionsAndFiniteValues()
+    {
+        var matrix = new DenseMatrix(new double[,] { { 2.0, 0.0 }, { 0.0, 3.0 } });
+
+        Assert.Equal(0.0, LinearSystemSolvers.ResidualInfinityNorm(matrix, new[] { 2.0, 2.0 }, new[] { 4.0, 6.0 }));
+        Assert.Throws<ArgumentException>(() =>
+            LinearSystemSolvers.ResidualInfinityNorm(matrix, new[] { 1.0 }, new[] { 1.0, 1.0 }));
+        Assert.Throws<ArgumentException>(() =>
+            LinearSystemSolvers.ResidualInfinityNorm(matrix, new[] { 1.0, 1.0 }, new[] { 1.0 }));
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            LinearSystemSolvers.ResidualInfinityNorm(matrix, new[] { 1.0, double.NaN }, new[] { 1.0, 1.0 }));
     }
 
     [Fact]
