@@ -22,7 +22,7 @@ The dense reference foundation is now broad enough to support the next moderniza
 
 ## M3.2 — Sparse linear algebra — in progress
 
-The storage/arithmetic foundation is now implemented:
+The storage/arithmetic foundation and first SPD iterative solver are now implemented:
 
 - **canonical immutable CSR storage — implemented**;
 - **coordinate assembly with explicit duplicate aggregation — implemented**;
@@ -30,12 +30,15 @@ The storage/arithmetic foundation is now implemented:
 - **sparse matrix-vector multiplication with reusable span buffers — implemented**;
 - **transpose without dense materialization — implemented**;
 - **sparse max-entry, 1-, infinity- and Frobenius norms — implemented**;
-- Conjugate Gradient for symmetric positive-definite sparse systems — **next**;
-- CSC support when sustained column-oriented consumers justify a dedicated representation;
-- later GMRES and BiCGSTAB for more general systems;
-- preconditioner abstractions only when the first solver needs them.
+- **shared sparse absolute/relative residual convergence options — implemented**;
+- **shared status-bearing sparse linear-solve result diagnostics — implemented**;
+- **Conjugate Gradient for symmetric positive-definite sparse systems — implemented**;
+- **symmetry/positive-diagonal diagnostics and true-residual convergence verification — implemented**;
+- Jacobi/diagonal preconditioning for CG — **next**;
+- GMRES and BiCGSTAB for more general systems — subsequent slices;
+- CSC support only when sustained column-oriented consumers justify a dedicated representation.
 
-Sparse solver diagnostics will reuse the existing `IterationStatus`, residual and tolerance conventions rather than introducing a second convergence model. The CSR API already exposes an allocation-free matrix-vector destination overload specifically so iterative solvers can reuse work vectors.
+Sparse solvers reuse the toolkit-wide `IterationStatus` vocabulary and the stopping rule `||b-A*x||2 <= max(absTol, relTol*||b||2)`. CG verifies a claimed convergence against the explicitly recomputed true residual and reports `NumericalBreakdown` for invalid/non-finite search curvature rather than pretending convergence.
 
 ## M3.3 — Optimization and nonlinear systems
 
