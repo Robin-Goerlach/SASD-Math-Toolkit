@@ -1,14 +1,6 @@
 # SASD Math Toolkit User Handbook — C#/.NET
 
-This is the user-facing handbook for the SASD Math Toolkit. It is written specifically for the current C#/.NET API and grows in parallel with V1 quality work.
-
-The handbook is **not** a transcription, translation or repackaging of the historical Borland Pascal handbook. The historical product is used only as a functional milestone for V1. Explanations, examples, API names, warnings and workflows in this handbook are newly written for SASD Math Toolkit.
-
-## Intended audience
-
-The handbook is for application developers, students and technically oriented users who want to apply the numerical routines without first reading the implementation source. Each chapter should answer four practical questions: what problem does the method solve, when should it be used, how is it called from C#, and what numerical limitations should be expected?
-
-## Chapter structure
+The first eleven chapters form the completed classical V1 handbook. New chapters now document the 2026 modernization layer.
 
 1. [Getting started](getting-started.md)
 2. [Roots of equations](root-finding.md)
@@ -21,13 +13,8 @@ The handbook is for application developers, students and technically oriented us
 9. [Least-squares approximation](least-squares.md)
 10. [FFT, convolution and correlation](fft-convolution-correlation.md)
 11. [Numerical recipes, diagnostics and common failure modes](diagnostics-common-failure-modes.md)
+12. [Modern dense linear algebra — 2026 additions](modern-dense-linear-algebra.md)
 
-The V1 handbook now covers all planned chapters. The remaining V1 work is a final cross-repository audit to make sure public APIs, examples, technical documentation, compatibility claims and release metadata agree with the implementation.
+## PDF edition
 
-## Documentation layers
-
-The user handbook emphasizes usage and interpretation. Technical design notes remain under `docs/en/`, while the source code contains XML/API comments. The compatibility matrix in `docs/en/BORLAND-V1-COMPATIBILITY.md` tracks historical V1 coverage separately from handbook completeness.
-
-## LaTeX/PDF edition
-
-A typeset German and English PDF edition is generated from these Markdown chapters. The layout and build pipeline live under [`../LaTeX/`](../LaTeX/). Markdown remains the editorial source of truth, while LaTeX provides book typography, table of contents, chapter design and PDF output.
+The committed V1.0 PDFs are generated from Markdown through `../LaTeX/`. Markdown remains the editorial source of truth. During active modernization the PDFs may intentionally lag behind Markdown; both PDF editions and the LaTeX chapter order will be regenerated at the next release-candidate boundary.
