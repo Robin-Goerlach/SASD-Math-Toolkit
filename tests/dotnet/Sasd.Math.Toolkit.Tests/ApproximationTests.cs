@@ -70,6 +70,6 @@ public sealed class ApproximationTests
         Assert.Equal(1.0, coefficients[0], 12);
         Assert.Equal(-2.0, coefficients[1], 12);
         Assert.Equal(3.0, coefficients[2], 12);
-        Assert.Equal(6.25, LeastSquares.EvaluatePolynomial(coefficients, 1.5), 12);
+        Assert.Equal(4.75, LeastSquares.EvaluatePolynomial(coefficients, 1.5), 12);
     }
 }
