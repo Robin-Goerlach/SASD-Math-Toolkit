@@ -46,8 +46,8 @@ Status legend: **done** = callable implementation exists now; **partial** = doma
 | General linear-basis least squares | done | `LeastSquares.FitBasis` |
 | Polynomial least squares | done | `LeastSquares.FitPolynomial`; five-term polynomial is degree 4 |
 | Power least-squares model | done | `LeastSquares.FitPowerLaw` + `PowerLawFitResult` |
-| Exponential least-squares model | planned | named transformed-model helper next |
-| Logarithmic least-squares model | planned | named model helper planned |
+| Exponential least-squares model | done | `LeastSquares.FitExponential` + `ExponentialFitResult` |
+| Logarithmic least-squares model | planned | named transformed-model helper next |
 | Five-term Fourier least-squares model | partial | representable through `FitBasis`; dedicated historical-style helper/result planned |
 | Complex FFT | done | radix-2 `Forward` / `Inverse` |
 | Real FFT | done | `ForwardReal` (compact real-spectrum API planned) |

@@ -59,6 +59,61 @@ public sealed class ApproximationTests
     }
 
     [Fact]
+    public void ExponentialFit_RecoversExactGrowthOrDecayParameters()
+    {
+        const double expectedScale = 2.5;
+        const double expectedRate = -0.7;
+        double[] x = [-2.0, -1.0, 0.0, 1.0, 2.0];
+        var y = x.Select(value => expectedScale * System.Math.Exp(expectedRate * value)).ToArray();
+
+        var result = LeastSquares.FitExponential(x, y);
+
+        Assert.InRange(result.Scale, expectedScale - 1e-12, expectedScale + 1e-12);
+        Assert.InRange(result.Rate, expectedRate - 1e-12, expectedRate + 1e-12);
+        Assert.Equal(x.Length, result.SampleCount);
+        Assert.InRange(result.RootMeanSquareError, 0.0, 1e-12);
+        Assert.InRange(
+            result.Evaluate(0.75),
+            expectedScale * System.Math.Exp(expectedRate * 0.75) - 1e-12,
+            expectedScale * System.Math.Exp(expectedRate * 0.75) + 1e-12);
+    }
+
+    [Fact]
+    public void ExponentialFit_ReportsResidualsInOriginalDomain()
+    {
+        double[] x = [0.0, 0.5, 1.0, 1.5];
+        double[] y = [2.0, 2.8, 4.2, 6.1];
+
+        var result = LeastSquares.FitExponential(x, y);
+
+        var expectedSse = x
+            .Select((value, index) => y[index] - result.Evaluate(value))
+            .Sum(residual => residual * residual);
+
+        Assert.Equal(expectedSse, result.ResidualSumOfSquares, 12);
+        Assert.Equal(System.Math.Sqrt(expectedSse / x.Length), result.RootMeanSquareError, 12);
+    }
+
+    [Fact]
+    public void ExponentialFit_RejectsInvalidInputsAndUndeterminedRate()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => LeastSquares.FitExponential(
+            [0.0, 1.0],
+            [1.0, 0.0]));
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => LeastSquares.FitExponential(
+            [0.0, double.NaN],
+            [1.0, 2.0]));
+
+        Assert.Throws<ArgumentException>(() => LeastSquares.FitExponential(
+            [2.0, 2.0, 2.0],
+            [1.0, 2.0, 3.0]));
+
+        var result = LeastSquares.FitExponential([0.0, 1.0], [2.0, 4.0]);
+        Assert.Throws<ArgumentOutOfRangeException>(() => result.Evaluate(double.PositiveInfinity));
+    }
+
+    [Fact]
     public void PolynomialFit_StillReconstructsQuadraticExactly()
     {
         double[] x = [-2.0, -1.0, 0.0, 1.0, 2.0];

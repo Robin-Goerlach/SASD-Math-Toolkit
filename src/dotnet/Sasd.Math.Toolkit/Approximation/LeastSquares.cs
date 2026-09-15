@@ -12,7 +12,7 @@ namespace Sasd.Numerics.Approximation;
 /// Future high-performance or ill-conditioned workloads may use QR/SVD backends behind the same
 /// higher-level SASD APIs.
 /// </remarks>
-public static class LeastSquares
+public static partial class LeastSquares
 {
     /// <summary>
     /// Fits a polynomial <c>c0 + c1*x + ... + cn*x^n</c> in the least-squares sense.
@@ -103,101 +103,6 @@ public static class LeastSquares
         }
 
         return LinearSystemSolvers.SolveGaussian(normal, rhs, partialPivoting: true);
-    }
-
-    /// <summary>
-    /// Fits the positive-domain power model <c>y = a * x^b</c>.
-    /// </summary>
-    /// <remarks>
-    /// The method applies the standard logarithmic transformation
-    /// <c>ln(y) = ln(a) + b*ln(x)</c> and performs an ordinary linear least-squares
-    /// fit in log space. Consequently every x and y sample must be strictly positive.
-    /// The reported residual diagnostics are calculated afterwards in the original y domain.
-    /// </remarks>
-    public static PowerLawFitResult FitPowerLaw(
-        IReadOnlyList<double> x,
-        IReadOnlyList<double> y)
-    {
-        NumericGuard.SameLength(x, y, nameof(x), nameof(y));
-        if (x.Count < 2)
-        {
-            throw new ArgumentException("At least two data points are required to fit a power law.", nameof(x));
-        }
-
-        var logX = new double[x.Count];
-        var logY = new double[y.Count];
-
-        for (var i = 0; i < x.Count; i++)
-        {
-            if (!double.IsFinite(x[i]) || x[i] <= 0.0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(x), "Power-law fitting requires finite x values greater than zero.");
-            }
-
-            if (!double.IsFinite(y[i]) || y[i] <= 0.0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(y), "Power-law fitting requires finite y values greater than zero.");
-            }
-
-            logX[i] = System.Math.Log(x[i]);
-            logY[i] = System.Math.Log(y[i]);
-        }
-
-        var firstLogX = logX[0];
-        var hasDistinctAbscissa = false;
-        for (var i = 1; i < logX.Length; i++)
-        {
-            if (logX[i] != firstLogX)
-            {
-                hasDistinctAbscissa = true;
-                break;
-            }
-        }
-
-        if (!hasDistinctAbscissa)
-        {
-            throw new ArgumentException("At least two distinct x values are required to determine a power-law exponent.", nameof(x));
-        }
-
-        // In transformed coordinates this is simply a straight line:
-        // log(y) = intercept + exponent * log(x).
-        var transformedCoefficients = FitBasis(
-            logX,
-            logY,
-            [static _ => 1.0, static value => value]);
-
-        var scale = System.Math.Exp(transformedCoefficients[0]);
-        var exponent = transformedCoefficients[1];
-        if (!double.IsFinite(scale) || scale <= 0.0 || !double.IsFinite(exponent))
-        {
-            throw new ArithmeticException("Power-law fitting produced non-finite model parameters.");
-        }
-
-        var residualSumOfSquares = 0.0;
-        for (var i = 0; i < x.Count; i++)
-        {
-            var predicted = scale * System.Math.Pow(x[i], exponent);
-            if (!double.IsFinite(predicted))
-            {
-                throw new ArithmeticException("The fitted power law produced a non-finite prediction for an input sample.");
-            }
-
-            var residual = y[i] - predicted;
-            residualSumOfSquares += residual * residual;
-        }
-
-        if (!double.IsFinite(residualSumOfSquares))
-        {
-            throw new ArithmeticException("Power-law residual calculation overflowed or became non-finite.");
-        }
-
-        var rootMeanSquareError = System.Math.Sqrt(residualSumOfSquares / x.Count);
-        return new PowerLawFitResult(
-            scale,
-            exponent,
-            x.Count,
-            residualSumOfSquares,
-            rootMeanSquareError);
     }
 
     /// <summary>

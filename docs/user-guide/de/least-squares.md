@@ -1,6 +1,6 @@
 # Least-Squares-Approximation
 
-Least-Squares-Verfahren passen ein Modell an mehr Beobachtungen an, als sich normalerweise exakt treffen lassen. Das SASD Math Toolkit unterstützt bereits Polynomfits und beliebige Modelle, die als lineare Kombination aufruferspezifischer Basisfunktionen formuliert werden können. Im Rahmen der V1-Kompatibilität kommen nun schrittweise komfortable benannte Kurvenmodelle hinzu.
+Least-Squares-Verfahren passen ein Modell an mehr Beobachtungen an, als sich normalerweise exakt treffen lassen. Das SASD Math Toolkit unterstützt Polynomanpassungen und beliebige Modelle, die als lineare Kombination aufruferspezifischer Basisfunktionen formuliert werden können. Im Rahmen der V1-Kompatibilität kommen schrittweise komfortable benannte Kurvenmodelle hinzu.
 
 ## Polynomanpassung
 
@@ -44,13 +44,44 @@ Console.WriteLine(fit.Evaluate(3.0));
 Console.WriteLine(fit.RootMeanSquareError);
 ```
 
-Der Solver logarithmiert die Daten und passt
+Der Solver logarithmiert beide Koordinaten und passt
 
 `ln(y) = ln(a) + b*ln(x)`
 
-an. Daher müssen sämtliche x- und y-Werte strikt größer als null sein. Gleichzeitig bedeutet dies, dass die Least-Squares-Zielfunktion im Logarithmusraum und nicht direkt in den ursprünglichen y-Werten minimiert wird.
+an. Daher müssen sämtliche x- und y-Werte strikt größer als null sein.
 
-`ResidualSumOfSquares` und `RootMeanSquareError` werden trotzdem im ursprünglichen y-Raum ausgegeben, damit ihre Einheiten unmittelbar verständlich bleiben. Sie sind nützliche Diagnosewerte, ändern aber nicht die beim Fit minimierte Zielfunktion.
+## Exponentielle Anpassung
+
+Der Exponential-Helfer passt
+
+`y = a * exp(b*x)`
+
+an. Das eignet sich für Verläufe, die näherungsweise exponentiell von x abhängen, zum Beispiel einfache Wachstums- oder Zerfallsmodelle. x darf jeder endliche reelle Wert sein; y muss positiv sein, weil intern die Gerade
+
+`ln(y) = ln(a) + b*x`
+
+angepasst wird.
+
+```csharp
+using Sasd.Numerics.Approximation;
+
+double[] x = [0.0, 1.0, 2.0, 3.0];
+var y = x.Select(value => 2.5 * Math.Exp(-0.7 * value)).ToArray();
+
+var fit = LeastSquares.FitExponential(x, y);
+
+Console.WriteLine(fit.Scale); // ungefähr 2,5
+Console.WriteLine(fit.Rate);  // ungefähr -0,7
+Console.WriteLine(fit.Evaluate(1.5));
+```
+
+Ein positives `Rate` beschreibt Wachstum, ein negatives Zerfall und null ein konstantes positives Modell. Mindestens zwei unterschiedliche x-Werte sind notwendig, damit die Rate bestimmbar ist.
+
+## Residuen bei transformierten Modellen verstehen
+
+Sowohl Potenzgesetz- als auch Exponentialanpassung minimieren quadrierte Residuen nach einer logarithmischen Transformation. `ResidualSumOfSquares` und `RootMeanSquareError` werden trotzdem im ursprünglichen y-Raum ausgegeben, damit ihre Einheiten anschaulich bleiben.
+
+Diese Unterscheidung ist wichtig: Ein im Logarithmusraum optimaler Fit ist nicht automatisch derjenige, der additive Fehler in den ursprünglichen Einheiten minimiert. Falls genau dieses Fehlermodell fachlich entscheidend ist, sollten die transformierten Helfer als beschreibende beziehungsweise Referenz-Fits verstanden werden und nicht als universelles statistisches Optimum.
 
 ## Beliebige lineare Basisfunktionen
 
@@ -58,14 +89,14 @@ Lässt sich ein Modell als
 
 `c0*f0(x) + c1*f1(x) + ...`
 
-formulieren, kann es direkt mit `FitBasis` angepasst werden. Dieser allgemeine Mechanismus bildet auch die gemeinsame Grundlage für mehrere benannte historische Modellhelfer.
+formulieren, kann es direkt mit `FitBasis` angepasst werden. Dieser allgemeine Mechanismus bildet auch die gemeinsame numerische Grundlage für mehrere benannte historische Modellhelfer.
 
 ## Praktische Prüfung
 
-Ein Fit sollte nicht nur anhand seiner Parameter beurteilt werden. Residuen sollten geplottet oder zumindest geprüft werden; systematische Strukturen sprechen häufig für ein unpassendes Modell. Bei transformierten Modellen wie dem Potenzgesetz ist außerdem wichtig, dass ein guter Fit im Logarithmusraum nicht automatisch dem besten Fit für additive Fehler in den ursprünglichen Einheiten entspricht.
+Ein Fit sollte nicht nur anhand seiner Parameter beurteilt werden. Residuen sollten geplottet oder zumindest geprüft werden; systematische Strukturen sprechen häufig für ein unpassendes Modell. Bei transformierten Modellen sollte zusätzlich geprüft werden, ob die angenommene multiplikative Fehlerstruktur fachlich sinnvoll ist.
 
 Die aktuelle Referenzimplementierung verwendet Normalgleichungen. Für die V1-Kompatibilität und moderate, vernünftig skalierte Probleme ist das ausreichend. Für schwierigere Regressionsaufgaben sollen später QR-/SVD-Backends ergänzt werden.
 
 ## Fortschritt der V1-Modelle
 
-Der Potenzgesetz-Helfer ist jetzt implementiert. Eigene Helfer für Exponential-, Logarithmus- und fünfgliedrige Fouriermodelle folgen noch. Das Verhalten eines fünfgliedrigen Polynoms ist bereits mit `FitPolynomial(..., degree: 4)` verfügbar; ein zusätzlicher Komfortname ist daher optional und keine numerische Voraussetzung.
+Potenzgesetz- und Exponential-Helfer sind jetzt implementiert. Eigene Helfer für logarithmische und fünfgliedrige Fouriermodelle folgen noch. Das Verhalten eines fünfgliedrigen Polynoms ist bereits mit `FitPolynomial(..., degree: 4)` verfügbar; ein zusätzlicher Komfortname ist daher optional und keine numerische Voraussetzung.
