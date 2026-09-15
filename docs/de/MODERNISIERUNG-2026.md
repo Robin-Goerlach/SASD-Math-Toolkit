@@ -10,16 +10,30 @@ Der historische Numerical-Methods-Kompatibilitätskatalog ist abgeschlossen. Die
 - **wiederverwendbare Cholesky-Lösungen sowie Determinanten-/Log-Determinanten-Diagnostik — implementiert**
 - **einseitige Jacobi-SVD für hohe, quadratische und breite dichte Matrizen — implementiert**
 - **Singulärwerte, numerischer Rang, Pseudoinverse, 2-Norm-Konditionsdiagnostik und Minimalnorm-Least-Squares — implementiert**
-- Matrixnormen und weitere Zerlegungshilfen — nächster Aufräumschritt
+- **Matrix-1-, Unendlich-, Frobenius- und Spektralnorm — implementiert**
+- **gemeinsame Rang-, Nullitäts- und 2-Norm-Konditionsdiagnostik — implementiert**
 - später: optionaler LAPACK-artiger Backend hinter stabilen SASD-Zerlegungskonzepten
 
 QR bleibt für dichtes Least Squares mit vollem Spaltenrang der bevorzugte Weg, weil es günstiger als eine vollständige SVD ist. Cholesky liefert den strukturierten Pfad für SPD-Systeme. Die SVD übernimmt jetzt rangdefiziente und unterbestimmte Probleme und bildet zugleich die mathematische Basis für spätere PCA- und fortgeschrittene Regressionsdiagnostik.
 
-Die aktuelle Managed-SVD ist bewusst eine nachvollziehbare einseitige Jacobi-Referenzimplementierung. Sie vermeidet `A^T*A`, verwendet skalierungsbewusste Spaltenorthogonalisierung und hält die Rangabschneidung explizit. Für große Hochdurchsatz-Workloads kann später ein optionaler etablierter nativer Backend ergänzt werden, ohne die höheren SASD-Verträge zu ändern.
+Die aktuelle Managed-SVD ist bewusst eine nachvollziehbare einseitige Jacobi-Referenzimplementierung. Sie vermeidet `A^T*A`, verwendet skalierungsbewusste Spaltenorthogonalisierung und hält die Rangabschneidung explizit. Die neue Matrixdiagnostik verwendet dieselbe SVD gemeinsam für Spektralnorm, Rang, Nullität und Kondition, statt mehrfach identische Zerlegungen auszuführen.
 
-## M3.2 — Dünnbesetzte lineare Algebra
+Die dichte Referenzbasis ist damit breit genug, um in die nächste Modernisierungsschicht zu wechseln, ohne vorzugeben, bereits ein Hersteller-BLAS/LAPACK zu ersetzen. Weitere dichte Hilfen können bei konkretem Bedarf ergänzt werden.
 
-CSR/CSC, Sparse-Matrix-Vektor-Multiplikation, Conjugate Gradient, GMRES, BiCGSTAB und Preconditioner.
+## M3.2 — Dünnbesetzte lineare Algebra — nächster großer Meilenstein
+
+Der erste Sparse-Meilenstein soll zunächst Datenhaltung und Rechenregeln sauber festlegen, bevor iterative Solver darauf aufgebaut werden:
+
+- CSR-Speicherung für effiziente zeilenorientierte Arithmetik;
+- deterministischer Aufbau und explizite Regel für doppelte Einträge;
+- Sparse-Matrix-Vektor-Multiplikation ohne dichte Materialisierung;
+- Strukturvalidierung und Konvertierungshilfen;
+- CSC-Unterstützung, sobald spaltenorientierte Verbraucher sie rechtfertigen;
+- Conjugate Gradient für symmetrisch positiv definite dünnbesetzte Systeme;
+- später GMRES und BiCGSTAB für allgemeinere Systeme;
+- Preconditioner-Abstraktionen erst dann, wenn der erste Solver sie tatsächlich benötigt.
+
+Sparse-Solver sollen die vorhandenen `IterationStatus`-, Residual- und Toleranzkonventionen wiederverwenden und kein zweites Konvergenzmodell erfinden.
 
 ## M3.3 — Optimierung und nichtlineare Systeme
 
@@ -31,7 +45,7 @@ Dormand-Prince, Dense Output, Event Detection, wiederverwendbare Vektor-State-AP
 
 ## M3.5 — Statistik, Zufall und Spezialfunktionen
 
-Stabile deskriptive Statistik, Verteilungen/Quantile, Regressionsdiagnostik, Hypothesentest-Bausteine, reproduzierbare Zufallsströme, Spezialfunktionen und **PCA auf Basis der neuen SVD**.
+Stabile deskriptive Statistik, Verteilungen/Quantile, Regressionsdiagnostik, Hypothesentest-Bausteine, reproduzierbare Zufallsströme, Spezialfunktionen und **PCA auf Basis der SVD**.
 
 ## M3.6 — Geometrie, Transformationen und Simulation
 
