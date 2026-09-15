@@ -50,7 +50,7 @@ Status legend: **done** = callable implementation exists now; **partial** = doma
 | Logarithmic least-squares model | done | `LeastSquares.FitLogarithmic` + `LogarithmicFitResult` |
 | Five-term Fourier least-squares model | done | `LeastSquares.FitFiveTermFourier` / `FitFiveTermFourierForPeriod` + `FiveTermFourierFitResult` |
 | Complex FFT | done | radix-2 `Forward` / `Inverse` |
-| Real FFT | done | `ForwardReal` (compact real-spectrum API planned) |
+| Real FFT | done | full `ForwardReal` plus compact `ForwardRealCompact` / `InverseReal` with `RealFftSpectrum` |
 | Complex convolution | planned | transform domain exists; public helper planned |
 | Real convolution | done | `ConvolveReal` |
 | Complex cross-correlation | planned | public helper planned |

@@ -19,7 +19,7 @@ Das Benutzerhandbuch richtet sich an Anwendungsentwickler, Lernende und technisc
 7. Eigenwerte und Eigenvektoren
 8. [Gewöhnliche Differentialgleichungen und Randwertprobleme](differentialgleichungen.md)
 9. [Least-Squares-Approximation](least-squares.md)
-10. FFT, Faltung und Korrelation
+10. [FFT, Faltung und Korrelation](fft-faltung-korrelation.md)
 11. Numerische Rezepte, Diagnose und typische Fehlerfälle
 
 Kapitel werden ergänzt oder ausgebaut, sobald die zugehörige Implementierung einen stabilen Meilenstein erreicht. Dadurch bleiben Beispiele mit real vorhandenem Code synchron und dokumentieren keine APIs, die nur geplant sind.

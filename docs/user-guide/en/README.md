@@ -19,7 +19,7 @@ The handbook is for application developers, students and technically oriented us
 7. Eigenvalues and eigenvectors
 8. [Ordinary differential equations and boundary-value problems](ordinary-differential-equations.md)
 9. [Least-squares approximation](least-squares.md)
-10. FFT, convolution and correlation
+10. [FFT, convolution and correlation](fft-convolution-correlation.md)
 11. Numerical recipes, diagnostics and common failure modes
 
 Chapters are added or expanded when the corresponding implementation reaches a stable milestone. This keeps examples synchronized with real code instead of documenting planned APIs that do not yet exist.
