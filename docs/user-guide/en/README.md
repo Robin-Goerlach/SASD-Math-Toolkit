@@ -18,7 +18,7 @@ The handbook is for application developers, students and technically oriented us
 6. Matrices and linear systems
 7. Eigenvalues and eigenvectors
 8. [Ordinary differential equations and boundary-value problems](ordinary-differential-equations.md)
-9. Least-squares approximation
+9. [Least-squares approximation](least-squares.md)
 10. FFT, convolution and correlation
 11. Numerical recipes, diagnostics and common failure modes
 
