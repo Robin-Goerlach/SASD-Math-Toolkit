@@ -5,6 +5,7 @@
 .idea/
 TestResults/
 coverage/
+artifacts/
 *.user
 *.suo
 *.nupkg

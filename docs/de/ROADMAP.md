@@ -10,11 +10,13 @@ Implementiert sind Nullstellensuche, Polynom-/Horner-/Deflationsfunktionen, Inte
 
 Die Borland-inspirierte Übertragungsphase ist damit funktional abgeschlossen. Sie bleibt als Kompatibilitäts-/Referenzbaseline erhalten, bestimmt aber nicht mehr die zukünftige Produktgrenze.
 
-## M2 – Veröffentlichungsqualität und Release-Audit
+## M2 – Veröffentlichungsqualität und Release-Audit (Release-Candidate-Audit läuft)
 
 Der historische Kompatibilitätskatalog und alle elf klassischen Kapitel des Benutzerhandbuchs sind vollständig. Die fachbezogenen API-/Test-Audits, die gemeinsame Diagnostikdokumentation und eine pragmatische Performance-Runde sind für das klassische Fundament ebenfalls abgeschlossen.
 
-Vor einem öffentlichen 1.0-Tag bleibt das abschließende repositoryweite Release-Audit erforderlich. Da die Modernisierung begonnen hat, läuft dieses Audit gegen den tatsächlichen Release Candidate statt gegen einen historischen Zwischenstand.
+Das repositoryweite Audit prüft jetzt den tatsächlich modernisierten Kandidaten `1.0.0-rc.1`. Paketmetadaten, Paket-/Symbolerzeugung, Prüfung der Paketinhalte, Sample-Smoke-Ausführung und aktuelle GitHub-Actions-Runtime-Major-Versionen gehören zum normalen CI-Gate. Offen bleiben die Synchronisierung und visuelle Prüfung von LaTeX/PDF sowie anschließend die finale Windows-Abnahme gegen den exakten Candidate-Commit. Vor diesen Gates wird kein finales öffentliches 1.0-Tag erzeugt.
+
+Siehe [`RELEASE-AUDIT.md`](RELEASE-AUDIT.md) für das Audit-Protokoll.
 
 ## M3 – Modernisierung 2026 (in Arbeit)
 
@@ -53,7 +55,7 @@ Weitere dichte Hilfen bleiben möglich, aber das Managed-Referenzfundament ist v
 - Konsolidierung von öffentlicher Sparse-API/XML-Dokumentation und Allokationsmodell: **abgeschlossen**
 - eigenes CSC und stärkere Incomplete-Factorization-Preconditioner: später bei konkretem Bedarf
 
-Der nächste Repository-Schritt ist das **repositoryweite Release-Candidate-Audit**. Für diese Release-Grenze ist kein weiterer Sparse-Solver erforderlich.
+M3.2 ist für diese Release-Grenze eingefroren, abgesehen von Audit-Fixes. Der aktuelle Schwerpunkt ist Release-Candidate-Härtung und nicht zusätzlicher Sparse-Solver-Umfang.
 
 ### M3.3 – Optimierung und nichtlineare Systeme
 

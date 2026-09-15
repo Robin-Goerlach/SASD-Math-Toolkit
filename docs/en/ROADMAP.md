@@ -14,11 +14,13 @@ Implemented across the major domains: scalar and complex roots, polynomial/Horne
 
 The historical Borland-inspired feature-transfer phase is complete. It remains a compatibility/reference baseline rather than the future scope boundary.
 
-## M2 — Publication quality and release audit
+## M2 — Publication quality and release audit (release-candidate audit in progress)
 
 The historical compatibility catalog and all eleven classical user-handbook chapters are complete. Publication-quality API/test audits, cross-cutting diagnostic documentation, and a pragmatic performance pass are also complete for the classical foundation.
 
-The final repository-wide release audit is still required before a public 1.0 tag. Because modernization has started, that audit will run against the actual release candidate rather than an intermediate historical-only state.
+The repository-wide audit now targets the real modernized `1.0.0-rc.1` candidate. Package metadata, package/symbol generation, package-content checks, sample smoke execution and current GitHub Actions runtime majors are part of the normal CI gate. The remaining release gates are LaTeX/PDF synchronization and visual inspection, followed by a final Windows acceptance run against the exact candidate commit. No public final 1.0 tag is created before those gates pass.
+
+See [`RELEASE-AUDIT.md`](RELEASE-AUDIT.md) for the audit record.
 
 ## M3 — Modernization 2026 (in progress)
 
@@ -57,7 +59,7 @@ Additional dense utilities remain possible, but the managed reference foundation
 - Sparse public-API/XML/allocation consolidation: **completed**
 - Dedicated CSC and stronger incomplete-factorization preconditioners: later when concrete workloads justify them
 
-The next repository step is the **repository-wide release-candidate audit**. No additional sparse solver is required for this release boundary.
+M3.2 is frozen at this release boundary except for audit fixes. The current work is release-candidate hardening, not additional sparse-solver scope.
 
 ### M3.3 — Optimization and nonlinear systems
 

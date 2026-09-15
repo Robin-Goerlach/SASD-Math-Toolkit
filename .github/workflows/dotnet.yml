@@ -10,16 +10,46 @@ permissions:
   contents: read
 
 jobs:
-  build-test:
-    runs-on: ubuntu-latest
+  build-test-pack-smoke:
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '10.0.x'
+
       - name: Restore
         run: dotnet restore Sasd.Math.Toolkit.slnx
+
       - name: Build
         run: dotnet build Sasd.Math.Toolkit.slnx --configuration Release --no-restore
+
       - name: Test
         run: dotnet test Sasd.Math.Toolkit.slnx --configuration Release --no-build --verbosity normal
+
+      - name: Pack release candidate
+        run: dotnet pack src/dotnet/Sasd.Math.Toolkit/Sasd.Math.Toolkit.csproj --configuration Release --no-build --output artifacts/packages
+
+      - name: Verify package contents
+        shell: bash
+        run: |
+          set -euo pipefail
+          package="$(find artifacts/packages -maxdepth 1 -name 'Sasd.Math.Toolkit.1.0.0-rc.1.nupkg' -print -quit)"
+          symbols="$(find artifacts/packages -maxdepth 1 -name 'Sasd.Math.Toolkit.1.0.0-rc.1.snupkg' -print -quit)"
+          test -n "$package"
+          test -n "$symbols"
+          unzip -l "$package" | grep -q 'lib/net10.0/Sasd.Math.Toolkit.dll'
+          unzip -l "$package" | grep -q 'lib/net10.0/Sasd.Math.Toolkit.xml'
+          unzip -l "$package" | grep -Eq '[[:space:]]README.md$'
+          unzip -p "$package" 'Sasd.Math.Toolkit.nuspec' | grep -q '<id>Sasd.Math.Toolkit</id>'
+          unzip -p "$package" 'Sasd.Math.Toolkit.nuspec' | grep -Eq '<license[^>]*>MIT</license>'
+
+      - name: Run sample smoke test
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/demo
+          dotnet run --project samples/dotnet/Sasd.Math.Toolkit.Sample/Sasd.Math.Toolkit.Sample.csproj --configuration Release --no-build -- artifacts/demo/sasd-math-toolkit-demo.html | tee artifacts/sample-output.txt
+          test -s artifacts/demo/sasd-math-toolkit-demo.html
+          grep -q '<svg' artifacts/demo/sasd-math-toolkit-demo.html
+          grep -q 'Sparse reference solve' artifacts/sample-output.txt

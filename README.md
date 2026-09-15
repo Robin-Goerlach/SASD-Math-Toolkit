@@ -10,11 +10,11 @@ The historical Borland-inspired feature-transfer phase is functionally complete.
 
 Modernization is now in progress. The modern dense numerical foundation includes **Householder QR**, **Cholesky**, a **one-sided Jacobi singular value decomposition**, stable matrix norms and shared rank/nullity/conditioning diagnostics. General/polynomial least squares no longer rely on normal equations; the general basis API can use SVD for rank-deficient or underdetermined minimum-norm problems.
 
-The current **M3.2 sparse foundation is complete for the next release boundary**: immutable canonical CSR, sparse arithmetic/norms, **Conjugate Gradient**, a solver-neutral preconditioner abstraction, **Jacobi preconditioning**, **Preconditioned Conjugate Gradient (PCG)**, **restarted GMRES** and **BiCGSTAB** with right preconditioning, true-residual verification and explicit numerical-breakdown diagnostics. Structured cross-solver release cases, a public independent residual diagnostic and a release-facing sparse smoke example are also in place. The next repository step is the release-candidate audit rather than another sparse solver.
+The current **M3.2 sparse foundation is complete for the next release boundary**: immutable canonical CSR, sparse arithmetic/norms, **Conjugate Gradient**, a solver-neutral preconditioner abstraction, **Jacobi preconditioning**, **Preconditioned Conjugate Gradient (PCG)**, **restarted GMRES** and **BiCGSTAB** with right preconditioning, true-residual verification and explicit numerical-breakdown diagnostics. Structured cross-solver release cases, a public independent residual diagnostic and a release-facing sparse smoke example are also in place.
 
-A final repository-wide release audit is still required before a public 1.0 tag; it will run against the actual release candidate so modern APIs are included too.
+The repository-wide release-candidate audit is now in progress. Package/release engineering uses the explicit **`1.0.0-rc.1`** candidate identity while the documentation/PDF gate and final Windows acceptance remain open. There is no public final `1.0.0` release yet.
 
-See [`docs/en/BORLAND-V1-COMPATIBILITY.md`](docs/en/BORLAND-V1-COMPATIBILITY.md) for the classical implementation matrix and [`docs/en/MODERNIZATION-2026.md`](docs/en/MODERNIZATION-2026.md) for the modern roadmap.
+See [`docs/en/BORLAND-V1-COMPATIBILITY.md`](docs/en/BORLAND-V1-COMPATIBILITY.md) for the classical implementation matrix, [`docs/en/MODERNIZATION-2026.md`](docs/en/MODERNIZATION-2026.md) for the modern roadmap and [`docs/en/RELEASE-AUDIT.md`](docs/en/RELEASE-AUDIT.md) for the release gates.
 
 ## Repository architecture
 
@@ -31,7 +31,7 @@ SASD-Math-Toolkit/
 │   ├── en/                     # primary technical documentation
 │   ├── de/                     # German technical documentation
 │   └── user-guide/             # Markdown handbook + LaTeX/PDF editions
-└── .github/workflows/          # build and test automation
+└── .github/workflows/          # build, test and release-candidate validation
 ```
 
 Future language trees are peers of `dotnet`. Language-neutral behavior belongs in `spec/`, not in one language implementation.
@@ -54,15 +54,16 @@ Implemented now:
 - Demonstration layer: deterministic self-contained HTML/SVG report plus a sparse GMRES/BiCGSTAB release smoke solve
 - Geometry seed: immutable `Vector2D`
 
-## Build
+## Build, test and pack
 
 ```bash
 dotnet restore Sasd.Math.Toolkit.slnx
 dotnet build Sasd.Math.Toolkit.slnx --configuration Release
-dotnet test Sasd.Math.Toolkit.slnx --configuration Release
+dotnet test Sasd.Math.Toolkit.slnx --configuration Release --no-build
+dotnet pack src/dotnet/Sasd.Math.Toolkit/Sasd.Math.Toolkit.csproj --configuration Release --no-build --output artifacts/packages
 ```
 
-Target framework: **.NET 10**.
+Target framework: **.NET 10**. The normal GitHub Actions gate performs Release restore/build/test, creates and inspects the NuGet/symbol packages, and runs the executable demo/sparse smoke path.
 
 ## Design rules
 
@@ -84,6 +85,8 @@ Target framework: **.NET 10**.
 
 ## Documentation
 
+- Release audit: [`docs/en/RELEASE-AUDIT.md`](docs/en/RELEASE-AUDIT.md) / [`docs/de/RELEASE-AUDIT.md`](docs/de/RELEASE-AUDIT.md)
+- Changelog: [`CHANGELOG.md`](CHANGELOG.md)
 - 2026 modernization plan: [`docs/en/MODERNIZATION-2026.md`](docs/en/MODERNIZATION-2026.md)
 - QR design note: [`docs/en/QR-FACTORIZATION.md`](docs/en/QR-FACTORIZATION.md)
 - Cholesky design note: [`docs/en/CHOLESKY-FACTORIZATION.md`](docs/en/CHOLESKY-FACTORIZATION.md)
@@ -101,7 +104,7 @@ Target framework: **.NET 10**.
 - English user handbook: [`docs/user-guide/en/README.md`](docs/user-guide/en/README.md)
 - Deutsches Benutzerhandbuch: [`docs/user-guide/de/README.md`](docs/user-guide/de/README.md)
 
-The **Markdown handbook is the editorial source of truth and is updated continuously with each modernization milestone**. The LaTeX directory is the typesetting/build layer. The committed V1.0 PDFs remain a stable classical edition while modernization continues; LaTeX chapter ordering/metadata and both PDFs are synchronized from the current Markdown at release-candidate boundaries.
+The **Markdown handbook is the editorial source of truth and is updated continuously with each modernization milestone**. The LaTeX directory is the typesetting/build layer. The committed V1.0 PDFs remain the previous stable classical edition until the release-candidate documentation gate synchronizes chapters 12/13, front/back matter and both generated PDFs.
 
 ## License
 
