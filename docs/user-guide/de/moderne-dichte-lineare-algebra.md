@@ -94,6 +94,38 @@ Für eine numerisch vollrangige Matrix liefert `ConditionNumber` das Verhältnis
 
 Eine große Konditionszahl bedeutet, dass kleine Störungen der Eingangsdaten deutlich größere Änderungen der Lösung verursachen können. Sie bewertet nicht die Qualität der Implementierung, sondern die Empfindlichkeit des mathematischen Problems.
 
+## Matrixnormen und gemeinsamer Diagnosebericht
+
+Moderne numerische Anwendungen müssen häufig mehr beantworten als „hat der Solver einen Vektor geliefert?“. Matrixskalierung, Rang und Nullraumdimension entscheiden oft darüber, ob ein Ergebnis fachlich belastbar ist.
+
+Der Helfer `MatrixNorms` bietet die gebräuchlichsten Normen:
+
+```csharp
+var one = MatrixNorms.OneNorm(a);
+var infinity = MatrixNorms.InfinityNorm(a);
+var frobenius = MatrixNorms.FrobeniusNorm(a);
+var spectral = MatrixNorms.SpectralNorm(a);
+```
+
+`OneNorm` ist die größte absolute Spaltensumme, `InfinityNorm` die größte absolute Zeilensumme, `FrobeniusNorm` die euklidische Norm aller Einträge und `SpectralNorm` der größte Singulärwert. Frobenius- und Absolutsummenberechnung verwenden skalierte Akkumulation, damit große endliche Einträge nicht unnötig früh zu Zwischenüberläufen führen.
+
+Wer mehrere Diagnosen gemeinsam benötigt, sollte eine einzige Analyse verwenden:
+
+```csharp
+var diagnostics = MatrixConditionDiagnostics.Analyze(a);
+
+Console.WriteLine(diagnostics.EstimatedRank);
+Console.WriteLine(diagnostics.LeftNullity);
+Console.WriteLine(diagnostics.RightNullity);
+Console.WriteLine(diagnostics.ConditionNumber2);
+```
+
+Der gemeinsame Bericht berechnet die günstigen eintragsbasierten Normen direkt und verwendet genau eine SVD gemeinsam für Spektralnorm, Rang und 2-Norm-Kondition. Dadurch werden versehentlich mehrfach ausgeführte identische Zerlegungen vermieden.
+
+Linke und rechte Nullität werden bewusst getrennt dargestellt. Eine breite 2x3-Matrix kann vollen rechteckigen Rang 2 und trotzdem rechte Nullität 1 besitzen. Bei einem unterbestimmten System beschreibt dieser rechte Nullraum genau die Richtungen, die zu einer Lösung addiert werden können, ohne die rechte Seite zu verändern.
+
+Ein kleines Residuum und eine große Konditionszahl können gleichzeitig auftreten. Das Residuum sagt, dass der berechnete Vektor die dargestellten Gleichungen gut erfüllt; die Konditionszahl sagt, dass die dargestellten Gleichungen selbst empfindlich auf kleinste Störungen reagieren können.
+
 ## Least-Squares-Routing im Toolkit
 
 Die allgemeine API `LeastSquares.FitBasis` wählt den dichten Solver jetzt bewusst:
@@ -112,7 +144,8 @@ Benannte Modelle dürfen strengere Identifizierbarkeitsregeln behalten. So weist
 | Quadratisches/hohes Vollrang-Least-Squares | Householder-QR |
 | Rangdefizientes Least Squares | SVD |
 | Unterbestimmtes Minimalnorm-System | SVD |
-| Numerischer Rang / 2-Norm-Kondition | SVD |
+| Matrixskalierung / 1-, Unendlich-, Frobeniusnorm | `MatrixNorms` |
+| Numerischer Rang / 2-Norm-Kondition | SVD oder `MatrixConditionDiagnostics` |
 | Explizite Pseudoinverse benötigt | SVD |
 | Sehr großer dichter Produktions-Workload | Später optionaler BLAS/LAPACK-artiger Backend |
 
