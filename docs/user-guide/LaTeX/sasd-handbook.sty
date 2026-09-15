@@ -1,0 +1,172 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{sasd-handbook}[2026/09/15 SASD Math Toolkit handbook style]
+
+% Shared visual language for the German and English SASD Math Toolkit manuals.
+% Build with LuaLaTeX. Chapter fragments are generated from the Markdown user
+% guide by Pandoc so Markdown remains the editorial source of truth.
+
+\RequirePackage{fontspec}
+\setmainfont{DejaVu Serif}
+\setsansfont{DejaVu Sans}
+\setmonofont[Scale=MatchLowercase]{DejaVu Sans Mono}
+
+\RequirePackage{microtype}
+\RequirePackage[a4paper,inner=25mm,outer=20mm,top=23mm,bottom=25mm,headsep=8mm]{geometry}
+\RequirePackage{xcolor}
+\RequirePackage{graphicx}
+\RequirePackage{tikz}
+\usetikzlibrary{calc}
+\RequirePackage{amsmath,amssymb,mathtools}
+\RequirePackage{booktabs}
+\RequirePackage{longtable}
+\RequirePackage{tabularx}
+\RequirePackage{array}
+\RequirePackage{enumitem}
+\RequirePackage{listings}
+\RequirePackage[most]{tcolorbox}
+\RequirePackage[explicit]{titlesec}
+\RequirePackage{fancyhdr}
+\RequirePackage{lastpage}
+\RequirePackage{xurl}
+\RequirePackage{hyperref}
+\RequirePackage{bookmark}
+\RequirePackage{caption}
+\RequirePackage{etoolbox}
+
+% SASD palette: contemporary, while the chapter treatment is inspired by the
+% restrained rules and large chapter numbers of the historical 1987 manual.
+\definecolor{sasdBlue}{HTML}{173F5F}
+\definecolor{sasdBlue2}{HTML}{20639B}
+\definecolor{sasdTeal}{HTML}{2A9D8F}
+\definecolor{sasdGold}{HTML}{E9C46A}
+\definecolor{sasdRed}{HTML}{B44747}
+\definecolor{sasdInk}{HTML}{26343F}
+\definecolor{sasdGray}{HTML}{66727D}
+\definecolor{sasdLight}{HTML}{F4F7F9}
+\definecolor{sasdCode}{HTML}{F7F8FA}
+\definecolor{sasdLine}{HTML}{D5DEE5}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=sasdBlue2,
+  urlcolor=sasdTeal,
+  citecolor=sasdBlue2,
+  pdfauthor={Robin Goerlach; SASD-GmbH},
+  pdftitle={\HandbookPdfTitle},
+  pdfsubject={SASD Math Toolkit CSharp/.NET handbook Version 1.0},
+  pdfkeywords={SASD, CSharp, .NET 10, numerical methods, mathematics}
+}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.52em}
+\setlength{\emergencystretch}{2.5em}
+\setlist[itemize]{leftmargin=1.55em,itemsep=0.18em,topsep=0.2em}
+\setlist[enumerate]{leftmargin=1.8em,itemsep=0.18em,topsep=0.2em}
+\renewcommand{\arraystretch}{1.14}
+
+% Chapter openings echo the visual grammar of the historical handbook: a quiet
+% CHAPTER label, a dominant chapter number, a rule and an italic title. Text,
+% APIs and examples are entirely SASD/.NET material.
+\titleformat{\chapter}[display]
+  {\normalfont}
+  {\begin{tabular*}{\textwidth}{@{}l@{\extracolsep{\fill}}r@{}}
+     \sffamily\bfseries\small\color{sasdGray}\MakeUppercase{\chaptername} &
+     \sffamily\bfseries\fontsize{42}{42}\selectfont\color{sasdBlue}\thechapter
+   \end{tabular*}%
+   \vspace{0.15em}\color{sasdLine}\titlerule}
+  {0.7em}
+  {\raggedleft\itshape\bfseries\color{sasdInk}\fontsize{23}{28}\selectfont #1}
+  [\vspace{0.15em}\color{sasdLine}\titlerule]
+\titlespacing*{\chapter}{0pt}{-0.6em}{2.1em}
+
+\titleformat{\section}
+  {\Large\bfseries\itshape\color{sasdInk}}
+  {\thesection}{0.75em}{#1}
+  [\vspace{0.18em}\color{sasdLine}\titlerule]
+\titlespacing*{\section}{0pt}{1.7em}{0.75em}
+
+\titleformat{\subsection}
+  {\large\bfseries\color{sasdBlue2}}
+  {\thesubsection}{0.7em}{#1}
+\titlespacing*{\subsection}{0pt}{1.35em}{0.45em}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE]{\small\color{sasdGray}\textsc{SASD Math Toolkit}}
+\fancyhead[RO]{\small\color{sasdGray}\nouppercase{\leftmark}}
+\fancyfoot[LE,RO]{\small\color{sasdGray}\thepage\ / \pageref{LastPage}}
+\fancyfoot[LO,RE]{\small\color{sasdGray}\HandbookFooter}
+\renewcommand{\headrulewidth}{0.35pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  backgroundcolor=\color{sasdCode},
+  frame=single,
+  rulecolor=\color{sasdLine},
+  framerule=0.5pt,
+  framesep=6pt,
+  xleftmargin=4pt,
+  xrightmargin=4pt,
+  showstringspaces=false,
+  breaklines=true,
+  breakatwhitespace=false,
+  columns=fullflexible,
+  keepspaces=true,
+  tabsize=4,
+  captionpos=b
+}
+
+\newtcolorbox{sasdnote}[1]{
+  enhanced,breakable,colback=sasdLight,colframe=sasdBlue2,boxrule=0.7pt,arc=1.1mm,
+  title=#1,fonttitle=\bfseries,coltitle=white,colbacktitle=sasdBlue2,
+  attach boxed title to top left={xshift=2mm,yshift=-2mm},
+  boxed title style={arc=1mm,boxrule=0pt},top=4mm,bottom=2.5mm,left=3mm,right=3mm
+}
+\newtcolorbox{sasdwarning}[1]{
+  enhanced,breakable,colback=red!3,colframe=sasdRed,boxrule=0.7pt,arc=1.1mm,
+  title=#1,fonttitle=\bfseries,coltitle=white,colbacktitle=sasdRed,
+  attach boxed title to top left={xshift=2mm,yshift=-2mm},
+  boxed title style={arc=1mm,boxrule=0pt},top=4mm,bottom=2.5mm,left=3mm,right=3mm
+}
+\newtcolorbox{sasdtip}[1]{
+  enhanced,breakable,colback=green!3,colframe=sasdTeal,boxrule=0.7pt,arc=1.1mm,
+  title=#1,fonttitle=\bfseries,coltitle=white,colbacktitle=sasdTeal,
+  attach boxed title to top left={xshift=2mm,yshift=-2mm},
+  boxed title style={arc=1mm,boxrule=0pt},top=4mm,bottom=2.5mm,left=3mm,right=3mm
+}
+
+% Pandoc fragment compatibility.
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\providecommand{\passthrough}[1]{#1}
+\providecommand{\pandocbounded}[1]{#1}
+
+\newcommand{\SASDTitlePage}{%
+  \begin{titlepage}
+  \thispagestyle{empty}
+  \begin{tikzpicture}[remember picture,overlay]
+    \fill[sasdInk] (current page.south west) rectangle (current page.north east);
+    \fill[sasdBlue] (current page.south west) rectangle ([yshift=5.0cm]current page.south east);
+    \fill[sasdTeal] ([xshift=0.0cm,yshift=-3.2cm]current page.north west) rectangle ([xshift=2.4cm,yshift=-3.7cm]current page.north east);
+    \fill[sasdGold] ([yshift=-3.8cm]current page.north west) rectangle ([yshift=-3.94cm]current page.north east);
+  \end{tikzpicture}
+  \vspace*{1.6cm}
+  {\color{white}\sffamily\bfseries\fontsize{19}{23}\selectfont SASD-GmbH\par}
+  \vspace{2.1cm}
+  {\color{white}\rmfamily\bfseries\fontsize{34}{40}\selectfont SASD Math Toolkit\par}
+  \vspace{0.35cm}
+  {\color{sasdGold}\rmfamily\itshape\fontsize{22}{27}\selectfont \HandbookSubtitle\par}
+  \vspace{0.8cm}
+  {\color{white}\sffamily\fontsize{16}{20}\selectfont \HandbookVersionText\par}
+  \vfill
+  \begin{minipage}{0.82\textwidth}
+    {\color{white}\sffamily\large \HandbookTagline\par}
+    \vspace{0.8cm}
+    {\color{white!82}\sffamily\normalsize \HandbookRepositoryRef\par}
+  \end{minipage}
+  \vspace{0.8cm}
+  \end{titlepage}
+}
+
+\newcommand{\api}[1]{\nolinkurl{#1}}
+\newcommand{\repo}{\href{https://github.com/Robin-Goerlach/SASD-Math-Toolkit}{github.com/Robin-Goerlach/SASD-Math-Toolkit}}
