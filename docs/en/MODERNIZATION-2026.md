@@ -22,7 +22,7 @@ The dense reference foundation is now broad enough to support the next moderniza
 
 ## M3.2 — Sparse linear algebra — in progress
 
-The storage/arithmetic foundation and first SPD iterative solver are now implemented:
+The storage/arithmetic foundation, first SPD Krylov solver and first reusable preconditioning layer are now implemented:
 
 - **canonical immutable CSR storage — implemented**;
 - **coordinate assembly with explicit duplicate aggregation — implemented**;
@@ -34,11 +34,16 @@ The storage/arithmetic foundation and first SPD iterative solver are now impleme
 - **shared status-bearing sparse linear-solve result diagnostics — implemented**;
 - **Conjugate Gradient for symmetric positive-definite sparse systems — implemented**;
 - **symmetry/positive-diagonal diagnostics and true-residual convergence verification — implemented**;
-- Jacobi/diagonal preconditioning for CG — **next**;
-- GMRES and BiCGSTAB for more general systems — subsequent slices;
-- CSC support only when sustained column-oriented consumers justify a dedicated representation.
+- **solver-neutral `ISparsePreconditioner` application contract — implemented**;
+- **Jacobi/diagonal preconditioner with explicit diagonal-threshold semantics — implemented**;
+- **Preconditioned Conjugate Gradient with `r^T M^-1 r` and curvature validation — implemented**;
+- restarted GMRES for general nonsymmetric systems — **next**;
+- BiCGSTAB — subsequent solver slice;
+- CSC and stronger incomplete-factorization preconditioners only when sustained workloads justify them.
 
-Sparse solvers reuse the toolkit-wide `IterationStatus` vocabulary and the stopping rule `||b-A*x||2 <= max(absTol, relTol*||b||2)`. CG verifies a claimed convergence against the explicitly recomputed true residual and reports `NumericalBreakdown` for invalid/non-finite search curvature rather than pretending convergence.
+Sparse solvers reuse the toolkit-wide `IterationStatus` vocabulary and the stopping rule `||b-A*x||2 <= max(absTol, relTol*||b||2)`. CG/PCG verifies a claimed convergence against the explicitly recomputed true residual. PCG additionally treats non-positive/non-finite `r^T M^-1 r` as a contract breakdown rather than silently using an invalid preconditioner.
+
+The preconditioner abstraction is deliberately solver-neutral. Jacobi provides the first cheap baseline; future GMRES/BiCGSTAB and later incomplete-factorization methods can reuse the same operation where their mathematical contracts permit.
 
 ## M3.3 — Optimization and nonlinear systems
 
