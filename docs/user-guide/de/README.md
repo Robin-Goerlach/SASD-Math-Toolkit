@@ -20,9 +20,9 @@ Das Benutzerhandbuch richtet sich an Anwendungsentwickler, Lernende und technisc
 8. [Gewöhnliche Differentialgleichungen und Randwertprobleme](differentialgleichungen.md)
 9. [Least-Squares-Approximation](least-squares.md)
 10. [FFT, Faltung und Korrelation](fft-faltung-korrelation.md)
-11. Numerische Rezepte, Diagnose und typische Fehlerfälle
+11. [Numerische Rezepte, Diagnostik und typische Fehlerfälle](diagnostik-fehlerfaelle.md)
 
-Kapitel werden ergänzt oder ausgebaut, sobald die zugehörige Implementierung einen stabilen Meilenstein erreicht. Dadurch bleiben Beispiele mit real vorhandenem Code synchron und dokumentieren keine APIs, die nur geplant sind.
+Das geplante V1-Benutzerhandbuch ist damit in allen Kapiteln vorhanden. Für V1 verbleibt nun das abschließende repositoryweite Audit, damit öffentliche APIs, Beispiele, technische Dokumentation, Kompatibilitätsaussagen und Release-Metadaten mit der Implementierung übereinstimmen.
 
 ## Dokumentationsebenen
 

@@ -8,7 +8,7 @@ The library is intended to become a common base for projects such as the **SASD 
 
 Version 1 targets the functional scope of Borland's historical *Turbo Pascal Numerical Methods Toolbox* as a compatibility/reference milestone, **not** as a source-code port. The implementation in this repository is new code with modern APIs, tests and documentation. Historical source code is neither required nor copied.
 
-The V1 catalog contains roots, interpolation, differentiation, integration, linear algebra/eigenvalues, initial- and boundary-value ODE methods, least-squares approximation, FFT/convolution/correlation and demonstration applications. The historical compatibility catalog is now implemented; current V1 work focuses on handbook completion and release-quality auditing.
+The V1 catalog contains roots, interpolation, differentiation, integration, linear algebra/eigenvalues, initial- and boundary-value ODE methods, least-squares approximation, FFT/convolution/correlation and demonstration applications. The historical compatibility catalog is implemented and all planned user-handbook chapters now exist; the remaining V1 work is the final repository-wide release audit.
 
 See [`docs/en/BORLAND-V1-COMPATIBILITY.md`](docs/en/BORLAND-V1-COMPATIBILITY.md) for the implementation matrix.
 
@@ -62,8 +62,10 @@ Target framework: **.NET 10**.
 ## Design rules
 
 - Numerical algorithms are deterministic and independent from UI, files and console I/O.
-- Input validation is explicit.
-- Iterative/adaptive algorithms expose termination status, iteration/refinement counts and residual/error information where useful.
+- Input validation is explicit; malformed calls use normal .NET argument exceptions.
+- Expected iterative/adaptive non-convergence is reported through status-bearing result types rather than hidden behind a scalar return value.
+- Status, value, residual and error estimate are separate concepts. A converged flag is not a proof of exactness, and a small residual does not erase poor conditioning.
+- Tolerances are explicit and problem-specific; no mutable global convergence tolerance exists.
 - Public APIs use ordinary .NET data types and `System.Numerics.Complex` where appropriate.
 - Algorithms stay understandable and well documented before micro-optimization begins.
 - Large-scale/high-performance workloads may later use optional BLAS/LAPACK or other mature backends behind SASD abstractions.
@@ -71,16 +73,14 @@ Target framework: **.NET 10**.
 
 ## Documentation
 
-Technical documentation includes architecture/roadmap material and focused notes for stable numerical domains. Publication-quality notes now include root finding, interpolation, numerical integration, matrices/linear systems, and eigenvalues/eigenvectors in both English and German, in addition to the existing domain notes for polynomial roots, differentiation, LU, ODE methods, least-squares models, real FFT, convolution/correlation and the graphical demo.
+Technical documentation includes architecture/roadmap material, focused domain notes and the cross-cutting diagnostic contract. Publication-quality notes now include root finding, interpolation, numerical integration, matrices/linear systems, eigenvalues/eigenvectors and numerical diagnostics in both English and German, in addition to the existing domain notes for polynomial roots, differentiation, LU, ODE methods, least-squares models, real FFT, convolution/correlation and the graphical demo.
 
-Clean-room policy: [`docs/en/CLEAN-ROOM.md`](docs/en/CLEAN-ROOM.md).
+- Diagnostic conventions: [`docs/en/NUMERICAL-DIAGNOSTICS.md`](docs/en/NUMERICAL-DIAGNOSTICS.md)
+- Clean-room policy: [`docs/en/CLEAN-ROOM.md`](docs/en/CLEAN-ROOM.md)
+- English user handbook: [`docs/user-guide/en/README.md`](docs/user-guide/en/README.md)
+- Deutsches Benutzerhandbuch: [`docs/user-guide/de/README.md`](docs/user-guide/de/README.md)
 
-User handbook:
-
-- English: [`docs/user-guide/en/README.md`](docs/user-guide/en/README.md)
-- Deutsch: [`docs/user-guide/de/README.md`](docs/user-guide/de/README.md)
-
-The handbook is written for the SASD C#/.NET API and grows with stable milestones; it is not a redistribution of the historical Pascal handbook.
+The handbook is written for the SASD C#/.NET API and is not a redistribution of the historical Pascal handbook.
 
 ## License
 

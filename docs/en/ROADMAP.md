@@ -14,15 +14,15 @@ Implemented across the major domains: scalar and complex roots, reusable polynom
 
 The RK4 ODE convenience family covers scalar first-order, scalar second-order, scalar nth-order, coupled first-order and coupled second-order systems on the same shared system RK4 core. Adaptive scalar RKF45 and fourth-order Adams-Bashforth/Adams-Moulton predictor-corrector integration are also available. The historical boundary-value slice covers both linear and nonlinear RK4-backed shooting. The least-squares model set includes general linear-basis and polynomial fitting plus named power-law, exponential, logarithmic and five-term Fourier models. The transform slice includes complex and real FFT, compact real spectra, and real/complex convolution and cross-correlation.
 
-## M2 — V1 publication quality (in progress)
+## M2 — V1 publication quality (final audit remaining)
 
-The historical compatibility catalog, including the graphical demonstration layer, is implemented. Work therefore focuses on release quality rather than on adding more historical algorithms.
+The historical compatibility catalog, including the graphical demonstration layer, is implemented. Publication-quality handbook/API audits have been completed for root finding, interpolation, numerical integration, matrices/linear systems and eigenvalues/eigenvectors.
 
-The independent C#/.NET user handbook under `docs/user-guide/` is being completed domain by domain. Root finding, interpolation, numerical integration, matrices/linear systems, and eigenvalues/eigenvectors have now received publication-quality handbook chapters plus API/test audits.
+The cross-cutting diagnostics milestone is also complete. The handbook now documents exception-vs-status semantics, residuals versus forward errors, error estimates, tolerance scaling, numerical breakdowns, conditioning, independent verification and reproducibility. The common `IterativeResult<T>` contract now explicitly exposes `HasFiniteResidual`, while `IterationStatus` and `NumericConstants` document their intended semantics in the public API comments.
 
-The eigenvalue audit adds immutable eigenpair results, stable scaled normalization/norm calculations, explicit inverse-iteration pivot tolerance, an independent public eigenpair residual diagnostic, validation of source eigenpairs before Wielandt deflation, and clearer Jacobi convergence semantics while keeping the reference implementation intentionally understandable.
+All eleven planned V1 user-handbook chapters are now present in English and German.
 
-The next handbook milestone is the cross-cutting numerical recipes/diagnostics/common-failure-modes chapter. After that, perform the final V1 audit across public APIs, examples, documentation, compatibility claims and release metadata.
+The remaining V1 milestone is a **final repository-wide release audit**. It should verify public API consistency, XML comments, examples, handbook links, technical notes, compatibility claims, absence of public placeholders, package/release metadata, deterministic sample behavior and CI coverage before assigning a V1 release tag.
 
 Quality gate for V1:
 
@@ -32,6 +32,8 @@ Quality gate for V1:
 - API and usage documentation in English; German user/developer overview synchronized.
 - User-handbook chapters for the stable V1 areas, with C# examples and numerical interpretation guidance.
 - No `NotImplementedException` in public numerical APIs.
+- Cross-cutting diagnostic conventions documented and reflected in result APIs.
+- Final release audit completed before the V1 tag.
 
 ## M3 — SASD core mathematics
 

@@ -20,9 +20,9 @@ The handbook is for application developers, students and technically oriented us
 8. [Ordinary differential equations and boundary-value problems](ordinary-differential-equations.md)
 9. [Least-squares approximation](least-squares.md)
 10. [FFT, convolution and correlation](fft-convolution-correlation.md)
-11. Numerical recipes, diagnostics and common failure modes
+11. [Numerical recipes, diagnostics and common failure modes](diagnostics-common-failure-modes.md)
 
-Chapters are added or expanded when the corresponding implementation reaches a stable milestone. This keeps examples synchronized with real code instead of documenting planned APIs that do not yet exist.
+The V1 handbook now covers all planned chapters. The remaining V1 work is a final cross-repository audit to make sure public APIs, examples, technical documentation, compatibility claims and release metadata agree with the implementation.
 
 ## Documentation layers
 
