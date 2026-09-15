@@ -15,7 +15,8 @@ namespace Sasd.Numerics.Approximation;
 /// <para>
 /// Rank-deficient and underdetermined general-basis fits fall back to the singular value
 /// decomposition and therefore return a tolerance-aware minimum-norm solution instead of failing
-/// solely because the design matrix lacks full column rank.
+/// solely because the design matrix lacks full column rank. Named models that require identifiable
+/// parameters can opt into the stricter full-column-rank path while sharing the same design builder.
 /// </para>
 /// </remarks>
 public static partial class LeastSquares
@@ -26,8 +27,7 @@ public static partial class LeastSquares
     /// creating delegates and repeatedly calling <see cref="System.Math.Pow(double, double)"/>.
     /// A polynomial fit still requires at least <c>degree + 1</c> observations; this keeps the
     /// convenience API away from surprising underdetermined coefficient choices. The completed
-    /// full-rank design is solved with Householder QR, with SVD available as a defensive fallback
-    /// if the sampled polynomial basis is numerically rank deficient.
+    /// design is solved with QR when it has full column rank and SVD otherwise.
     /// </remarks>
     public static double[] FitPolynomial(IReadOnlyList<double> x, IReadOnlyList<double> y, int degree)
     {
@@ -70,7 +70,7 @@ public static partial class LeastSquares
             }
         }
 
-        return SolveModernLeastSquares(design, y);
+        return SolveModernLeastSquares(design, y, requireFullColumnRank: false);
     }
 
     /// <summary>Fits a model that is linear in the supplied basis functions.</summary>
@@ -83,48 +83,15 @@ public static partial class LeastSquares
     /// <para>
     /// Full-column-rank square/tall designs use Householder QR. Rank-deficient or underdetermined
     /// designs use the SVD and return its tolerance-aware minimum-norm solution. This makes the
-    /// general basis API suitable for modern regression building blocks without changing the
-    /// simpler polynomial convenience contract.
+    /// general basis API suitable for modern regression building blocks without changing stricter
+    /// named-model contracts that require individually identifiable parameters.
     /// </para>
     /// </remarks>
     public static double[] FitBasis(
         IReadOnlyList<double> x,
         IReadOnlyList<double> y,
-        IReadOnlyList<Func<double, double>> basisFunctions)
-    {
-        NumericGuard.SameLength(x, y, nameof(x), nameof(y));
-        ArgumentNullException.ThrowIfNull(basisFunctions);
-        if (x.Count == 0)
-        {
-            throw new ArgumentException("At least one data point is required.", nameof(x));
-        }
-
-        if (basisFunctions.Count == 0)
-        {
-            throw new ArgumentException("At least one basis function is required.", nameof(basisFunctions));
-        }
-
-        var bases = new Func<double, double>[basisFunctions.Count];
-        for (var basis = 0; basis < bases.Length; basis++)
-        {
-            bases[basis] = basisFunctions[basis]
-                ?? throw new ArgumentException("Basis functions must not contain null entries.", nameof(basisFunctions));
-        }
-
-        var design = new DenseMatrix(x.Count, bases.Length);
-        for (var sample = 0; sample < x.Count; sample++)
-        {
-            var xValue = x[sample];
-            EnsureFiniteSample(xValue, y[sample], sample);
-            var row = design.GetMutableRowSpan(sample);
-            for (var basis = 0; basis < bases.Length; basis++)
-            {
-                row[basis] = EvaluateBasis(bases[basis], xValue);
-            }
-        }
-
-        return SolveModernLeastSquares(design, y);
-    }
+        IReadOnlyList<Func<double, double>> basisFunctions) =>
+        FitBasisCore(x, y, basisFunctions, requireFullColumnRank: false);
 
     /// <summary>Evaluates polynomial coefficients ordered from constant term to highest degree.</summary>
     public static double EvaluatePolynomial(IReadOnlyList<double> coefficients, double x)
@@ -152,7 +119,66 @@ public static partial class LeastSquares
         return result;
     }
 
-    private static double[] SolveModernLeastSquares(DenseMatrix design, IReadOnlyList<double> y)
+    /// <summary>
+    /// Shared basis-fit path for named models that require uniquely identifiable coefficients.
+    /// </summary>
+    private static double[] FitBasisRequiringFullColumnRank(
+        IReadOnlyList<double> x,
+        IReadOnlyList<double> y,
+        IReadOnlyList<Func<double, double>> basisFunctions) =>
+        FitBasisCore(x, y, basisFunctions, requireFullColumnRank: true);
+
+    private static double[] FitBasisCore(
+        IReadOnlyList<double> x,
+        IReadOnlyList<double> y,
+        IReadOnlyList<Func<double, double>> basisFunctions,
+        bool requireFullColumnRank)
+    {
+        NumericGuard.SameLength(x, y, nameof(x), nameof(y));
+        ArgumentNullException.ThrowIfNull(basisFunctions);
+        if (x.Count == 0)
+        {
+            throw new ArgumentException("At least one data point is required.", nameof(x));
+        }
+
+        if (basisFunctions.Count == 0)
+        {
+            throw new ArgumentException("At least one basis function is required.", nameof(basisFunctions));
+        }
+
+        if (requireFullColumnRank && x.Count < basisFunctions.Count)
+        {
+            throw new ArgumentException(
+                "This named model requires at least as many samples as independent coefficients.",
+                nameof(x));
+        }
+
+        var bases = new Func<double, double>[basisFunctions.Count];
+        for (var basis = 0; basis < bases.Length; basis++)
+        {
+            bases[basis] = basisFunctions[basis]
+                ?? throw new ArgumentException("Basis functions must not contain null entries.", nameof(basisFunctions));
+        }
+
+        var design = new DenseMatrix(x.Count, bases.Length);
+        for (var sample = 0; sample < x.Count; sample++)
+        {
+            var xValue = x[sample];
+            EnsureFiniteSample(xValue, y[sample], sample);
+            var row = design.GetMutableRowSpan(sample);
+            for (var basis = 0; basis < bases.Length; basis++)
+            {
+                row[basis] = EvaluateBasis(bases[basis], xValue);
+            }
+        }
+
+        return SolveModernLeastSquares(design, y, requireFullColumnRank);
+    }
+
+    private static double[] SolveModernLeastSquares(
+        DenseMatrix design,
+        IReadOnlyList<double> y,
+        bool requireFullColumnRank)
     {
         // QR remains the preferred path when it applies: it is cheaper than a complete SVD and
         // already gives a robust full-rank least-squares solution without normal equations.
@@ -163,10 +189,21 @@ public static partial class LeastSquares
             {
                 return qr.SolveLeastSquares(y);
             }
+
+            if (requireFullColumnRank)
+            {
+                throw new ArithmeticException(
+                    "The model design matrix is numerically rank deficient; its coefficients are not uniquely identifiable.");
+            }
+        }
+        else if (requireFullColumnRank)
+        {
+            throw new ArithmeticException(
+                "The model design matrix is underdetermined; its coefficients are not uniquely identifiable.");
         }
 
         // SVD is the principled fallback for rank deficiency and wide/underdetermined designs.
-        // It also keeps the rank threshold and minimum-norm semantics explicit and reusable.
+        // It keeps rank truncation and minimum-norm semantics explicit and reusable.
         var svd = SingularValueDecomposition.Decompose(design);
         return svd.SolveLeastSquares(y);
     }
