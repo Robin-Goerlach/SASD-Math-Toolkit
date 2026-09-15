@@ -71,7 +71,7 @@ Target framework: **.NET 10**.
 
 ## Documentation
 
-Technical documentation includes architecture/roadmap material and focused notes for stable numerical domains. Root-finding design is documented in [`docs/en/ROOT-FINDING.md`](docs/en/ROOT-FINDING.md) and [`docs/de/NULLSTELLENSUCHE.md`](docs/de/NULLSTELLENSUCHE.md); the existing domain notes under `docs/en/` and `docs/de/` cover polynomial roots, differentiation, LU/eigenvalues, ODE methods, least-squares models, real FFT, convolution/correlation and the graphical demo.
+Technical documentation includes architecture/roadmap material and focused notes for stable numerical domains. Root finding is documented in [`docs/en/ROOT-FINDING.md`](docs/en/ROOT-FINDING.md) / [`docs/de/NULLSTELLENSUCHE.md`](docs/de/NULLSTELLENSUCHE.md), and interpolation in [`docs/en/INTERPOLATION.md`](docs/en/INTERPOLATION.md) / [`docs/de/INTERPOLATION.md`](docs/de/INTERPOLATION.md). Existing domain notes cover polynomial roots, differentiation, LU/eigenvalues, ODE methods, least-squares models, real FFT, convolution/correlation and the graphical demo.
 
 Clean-room policy: [`docs/en/CLEAN-ROOM.md`](docs/en/CLEAN-ROOM.md).
 

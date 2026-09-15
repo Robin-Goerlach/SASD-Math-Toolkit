@@ -12,7 +12,7 @@ The handbook is for application developers, students and technically oriented us
 
 1. [Getting started](getting-started.md)
 2. [Roots of equations](root-finding.md)
-3. Interpolation
+3. [Interpolation](interpolation.md)
 4. [Numerical differentiation](differentiation.md)
 5. Numerical integration
 6. Matrices and linear systems

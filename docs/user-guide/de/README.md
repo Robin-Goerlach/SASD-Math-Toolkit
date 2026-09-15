@@ -12,7 +12,7 @@ Das Benutzerhandbuch richtet sich an Anwendungsentwickler, Lernende und technisc
 
 1. [Erste Schritte](erste-schritte.md)
 2. [Nullstellen von Gleichungen](nullstellen.md)
-3. Interpolation
+3. [Interpolation](interpolation.md)
 4. [Numerische Differentiation](differentiation.md)
 5. Numerische Integration
 6. Matrizen und lineare Gleichungssysteme

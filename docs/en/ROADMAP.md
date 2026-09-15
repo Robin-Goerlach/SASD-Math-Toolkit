@@ -18,7 +18,7 @@ The RK4 ODE convenience family covers scalar first-order, scalar second-order, s
 
 The historical compatibility catalog, including the graphical demonstration layer, is now implemented. Work therefore focuses on the quality required for a release rather than on adding more historical algorithms.
 
-The independent C#/.NET user handbook under `docs/user-guide/` is being completed domain by domain. The root-finding chapter is complete and covers bisection, Newton-Raphson, secant, Newton-Horner, Muller, Laguerre and all-roots deflation workflows. The next handbook areas are interpolation, integration, matrices/linear systems and eigenvalues before a cross-cutting diagnostics chapter and final V1 audit.
+The independent C#/.NET user handbook under `docs/user-guide/` is being completed domain by domain. Root finding and interpolation now have complete English/German handbook chapters plus focused API/failure-mode audits. The next handbook areas are integration, matrices/linear systems and eigenvalues before a cross-cutting diagnostics chapter and final V1 audit.
 
 Quality gate for V1:
 

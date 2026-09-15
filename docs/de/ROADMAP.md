@@ -14,7 +14,7 @@ Die RK4-Komfortfamilie deckt skalare Gleichungen erster, zweiter und n-ter Ordnu
 
 Der historische Kompatibilitätskatalog einschließlich grafischer Demo-Ebene ist implementiert. Die Arbeit konzentriert sich deshalb jetzt auf die Qualität einer veröffentlichbaren V1 statt auf weitere historische Algorithmen.
 
-Das eigenständige C#/.NET-Benutzerhandbuch unter `docs/user-guide/` wird Fachbereich für Fachbereich vervollständigt. Das Kapitel zur Nullstellensuche ist fertig und behandelt Bisektion, Newton-Raphson, Sekante, Newton-Horner, Muller, Laguerre und den All-Roots-/Deflationsablauf. Als Nächstes folgen Interpolation, Integration, Matrizen/lineare Gleichungssysteme und Eigenwerte; anschließend das fachübergreifende Diagnosekapitel und das abschließende V1-Audit.
+Das eigenständige C#/.NET-Benutzerhandbuch unter `docs/user-guide/` wird Fachbereich für Fachbereich vervollständigt. Nullstellensuche und Interpolation besitzen jetzt vollständige deutsche/englische Handbuchkapitel sowie gezielte Audits von API und Fehlerfällen. Als Nächstes folgen Integration, Matrizen/lineare Gleichungssysteme und Eigenwerte; anschließend das fachübergreifende Diagnosekapitel und das abschließende V1-Audit.
 
 V1 ist erst fertig, wenn jeder öffentliche Algorithmus getestet und dokumentiert ist, wichtige Fehler-/Abbruchzustände regressionstestet sind, die stabilen V1-Bereiche im Benutzerhandbuch beschrieben sind und keine öffentlichen Platzhalter mit `NotImplementedException` existieren.
 
