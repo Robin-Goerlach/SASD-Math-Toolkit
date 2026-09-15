@@ -27,3 +27,7 @@ The V1 handbook now covers all planned chapters. The remaining V1 work is a fina
 ## Documentation layers
 
 The user handbook emphasizes usage and interpretation. Technical design notes remain under `docs/en/`, while the source code contains XML/API comments. The compatibility matrix in `docs/en/BORLAND-V1-COMPATIBILITY.md` tracks historical V1 coverage separately from handbook completeness.
+
+## LaTeX/PDF edition
+
+A typeset German and English PDF edition is generated from these Markdown chapters. The layout and build pipeline live under [`../LaTeX/`](../LaTeX/). Markdown remains the editorial source of truth, while LaTeX provides book typography, table of contents, chapter design and PDF output.
