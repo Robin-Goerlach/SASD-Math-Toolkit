@@ -22,7 +22,7 @@ Die dichte Referenzbasis ist breit genug, um in die nächste Modernisierungsschi
 
 ## M3.2 — Dünnbesetzte lineare Algebra — in Arbeit
 
-Das Speicher-/Arithmetikfundament und der erste SPD-Solver sind jetzt implementiert:
+Das Speicher-/Arithmetikfundament, der erste SPD-Krylov-Solver und die erste wiederverwendbare Preconditioning-Schicht sind jetzt implementiert:
 
 - **kanonische unveränderliche CSR-Speicherung — implementiert**;
 - **Koordinatenaufbau mit expliziter Aggregation doppelter Einträge — implementiert**;
@@ -34,11 +34,16 @@ Das Speicher-/Arithmetikfundament und der erste SPD-Solver sind jetzt implementi
 - **gemeinsames statusbasiertes Sparse-Linear-Solve-Ergebnismodell — implementiert**;
 - **Conjugate Gradient für symmetrisch positiv definite Sparse-Systeme — implementiert**;
 - **Symmetrie-/Positivdiagonal-Diagnostik und Verifikation des echten Residuums — implementiert**;
-- Jacobi-/Diagonal-Preconditioning für CG — **als Nächstes**;
-- GMRES und BiCGSTAB für allgemeinere Systeme — folgende Schritte;
-- CSC erst dann, wenn dauerhaft spaltenorientierte Verbraucher eine eigene Darstellung rechtfertigen.
+- **solverneutraler `ISparsePreconditioner`-Apply-Vertrag — implementiert**;
+- **Jacobi-/Diagonal-Preconditioner mit expliziter Diagonalschwelle — implementiert**;
+- **Preconditioned Conjugate Gradient mit Prüfung von `r^T M^-1 r` und Suchrichtungskrümmung — implementiert**;
+- Restarted GMRES für allgemeine nichtsymmetrische Systeme — **als Nächstes**;
+- BiCGSTAB — folgender Solver-Schritt;
+- CSC und stärkere Incomplete-Factorization-Preconditioner erst bei dauerhaft begründetem Bedarf.
 
-Sparse-Solver verwenden das toolkitweite `IterationStatus`-Vokabular und die Abbruchregel `||b-A*x||2 <= max(absTol, relTol*||b||2)`. CG verifiziert behauptete Konvergenz gegen das explizit neu berechnete echte Residuum und meldet `NumericalBreakdown` bei ungültiger/nichtendlicher Suchrichtungskrümmung statt Konvergenz vorzutäuschen.
+Sparse-Solver verwenden das toolkitweite `IterationStatus`-Vokabular und die Abbruchregel `||b-A*x||2 <= max(absTol, relTol*||b||2)`. CG/PCG verifiziert behauptete Konvergenz gegen das explizit neu berechnete echte Residuum. PCG behandelt zusätzlich ein nichtpositives oder nichtendliches `r^T M^-1 r` als Vertragsverletzung, statt mit einem ungeeigneten Preconditioner weiterzurechnen.
+
+Die Preconditioner-Abstraktion ist bewusst solverneutral. Jacobi bildet die erste preiswerte Baseline; spätere GMRES-/BiCGSTAB-Solver und Incomplete-Factorization-Verfahren können denselben Operationsvertrag verwenden, soweit ihre mathematischen Anforderungen passen.
 
 ## M3.3 — Optimierung und nichtlineare Systeme
 
