@@ -20,19 +20,22 @@ Vor einem öffentlichen 1.0-Tag bleibt das abschließende repositoryweite Releas
 
 Das Projekt entwickelt sich bewusst über den Funktionskatalog der 1980er-Jahre hinaus. Der detaillierte Plan steht in [`MODERNISIERUNG-2026.md`](MODERNISIERUNG-2026.md).
 
-### M3.1 – Moderne dichte lineare Algebra und Regression (weit fortgeschritten)
+### M3.1 – Moderne dichte lineare Algebra und Regression (Fundament abgeschlossen)
 
 - Householder-QR-Faktorisierung: **implementiert**
 - Allgemeines/Polynom-Least-Squares von Normalgleichungen weggeführt: **implementiert**
 - Cholesky-Faktorisierung, wiederverwendbare Lösungen und Log-Determinante: **implementiert**
 - Einseitige Jacobi-SVD für beliebige dichte Matrixformen: **implementiert**
 - Numerischer Rang, Pseudoinverse, Minimalnorm-Least-Squares und 2-Norm-Konditionsdiagnostik: **implementiert**
-- Matrixnormen und Zerlegungs-Hilfsfunktionen: nächster Aufräumschritt
+- Matrix-1-, Unendlich-, Frobenius- und Spektralnorm: **implementiert**
+- Gemeinsamer Bericht für Rang, linke/rechte Nullität und Kondition: **implementiert**
 - optionaler etablierter BLAS-/LAPACK-artiger Backend: später und benchmarkgetrieben
 
-### M3.2 – Dünnbesetzte lineare Algebra
+Weitere dichte Hilfen bleiben möglich, aber das Managed-Referenzfundament ist jetzt vollständig genug, um Sparse-Arbeit nicht weiter aufzuschieben.
 
-CSR/CSC, Sparse-Matvec, CG, GMRES, BiCGSTAB und Preconditioning.
+### M3.2 – Dünnbesetzte lineare Algebra (als Nächstes)
+
+CSR/CSC, Sparse-Matvec, CG, GMRES, BiCGSTAB und Preconditioning. Der erste Schritt legt CSR-Aufbau, Validierung und Matrix-Vektor-Arithmetik fest, bevor iterative Solver ergänzt werden.
 
 ### M3.3 – Optimierung und nichtlineare Systeme
 
