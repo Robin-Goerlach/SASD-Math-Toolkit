@@ -75,11 +75,37 @@ Console.WriteLine(fit.Evaluate(1.5));
 
 `Rate` is positive for growth, negative for decay and zero for a constant positive model. At least two distinct x values are required; otherwise the rate cannot be identified.
 
-## Understanding residual diagnostics for transformed models
+## Logarithmic fitting
 
-Both power-law and exponential fitting minimize squared residuals after a logarithmic transformation. `ResidualSumOfSquares` and `RootMeanSquareError` are nevertheless reported in the original y domain to make their units intuitive.
+The logarithmic helper fits
 
-This distinction matters. A model that is optimal for logarithmic residuals is not necessarily the model that would minimize additive errors in the original units. If that error model matters to the application, use the transformed helpers as descriptive/reference fits rather than assuming they are a universal statistical optimum.
+`y = a + b * ln(x)`.
+
+Use it when x must remain positive and the response changes approximately linearly with the logarithm of x. Unlike the power-law and exponential helpers, y itself is **not** transformed, so y may be negative, zero or positive as long as it is finite.
+
+```csharp
+using Sasd.Numerics.Approximation;
+
+double[] x = [1.0, 2.0, 4.0, 8.0];
+double[] y = [2.0, 3.1, 4.0, 5.2];
+
+var fit = LeastSquares.FitLogarithmic(x, y);
+
+Console.WriteLine(fit.Intercept);
+Console.WriteLine(fit.LogCoefficient);
+Console.WriteLine(fit.Evaluate(3.0));
+Console.WriteLine(fit.RootMeanSquareError);
+```
+
+`Intercept` is the fitted value at `x = 1`, because `ln(1) = 0`. `LogCoefficient` is the change in the fitted response per unit change in `ln(x)`; it is not the ordinary slope with respect to x.
+
+## Understanding residual diagnostics and transformations
+
+Power-law and exponential fitting transform y before the straight-line fit. They therefore minimize squared residuals in a logarithmic y domain. Their `ResidualSumOfSquares` and `RootMeanSquareError` values are calculated afterwards in the original y domain for easier interpretation.
+
+The logarithmic helper is different: it transforms only x. Its y values remain untouched, so its reported original-domain residual sum of squares is also the objective minimized by ordinary least squares.
+
+This distinction matters when choosing a model. A curve that is optimal after transforming y is not necessarily the curve that minimizes additive errors in the original units.
 
 ## Arbitrary linear basis functions
 
@@ -91,10 +117,10 @@ then `FitBasis` can fit it directly. This is also the common numerical foundatio
 
 ## Practical checks
 
-Always plot or inspect residuals instead of relying only on fitted parameters. Repeat the analysis with a simpler or more appropriate model when residuals show systematic structure. For transformed models, compare results against the scientific or engineering meaning of the assumed multiplicative error structure.
+Always plot or inspect residuals instead of relying only on fitted parameters. Repeat the analysis with a simpler or more appropriate model when residuals show systematic structure. For transformed models, make sure the transformation and implied error structure make sense for the scientific or engineering problem.
 
 The current reference implementation uses normal equations. That is adequate for the V1 compatibility layer and moderate well-scaled problems, but QR/SVD will be preferable for difficult regression workloads in a later numerical-backend milestone.
 
 ## V1 model progress
 
-The power-law and exponential helpers are now implemented. Dedicated logarithmic and five-term Fourier helpers remain to be added. Five-term polynomial behavior is already available through `FitPolynomial(..., degree: 4)`; a dedicated convenience name is optional rather than numerically necessary.
+Power-law, exponential and logarithmic helpers are now implemented. The dedicated five-term Fourier helper remains to be added. Five-term polynomial behavior is already available through `FitPolynomial(..., degree: 4)`; a dedicated convenience name is optional rather than numerically necessary.

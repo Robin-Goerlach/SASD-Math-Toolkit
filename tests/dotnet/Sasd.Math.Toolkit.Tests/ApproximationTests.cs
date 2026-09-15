@@ -114,6 +114,66 @@ public sealed class ApproximationTests
     }
 
     [Fact]
+    public void LogarithmicFit_RecoversExactParametersIncludingNegativeYValues()
+    {
+        const double expectedIntercept = 1.25;
+        const double expectedLogCoefficient = -2.5;
+        double[] x = [1.0, System.Math.E, System.Math.Exp(2.0), System.Math.Exp(3.0)];
+        var y = x
+            .Select(value => expectedIntercept + (expectedLogCoefficient * System.Math.Log(value)))
+            .ToArray();
+
+        var result = LeastSquares.FitLogarithmic(x, y);
+
+        Assert.InRange(result.Intercept, expectedIntercept - 1e-12, expectedIntercept + 1e-12);
+        Assert.InRange(
+            result.LogCoefficient,
+            expectedLogCoefficient - 1e-12,
+            expectedLogCoefficient + 1e-12);
+        Assert.Equal(x.Length, result.SampleCount);
+        Assert.InRange(result.RootMeanSquareError, 0.0, 1e-12);
+        Assert.InRange(
+            result.Evaluate(System.Math.Exp(1.5)),
+            expectedIntercept + (expectedLogCoefficient * 1.5) - 1e-12,
+            expectedIntercept + (expectedLogCoefficient * 1.5) + 1e-12);
+    }
+
+    [Fact]
+    public void LogarithmicFit_ReportsTheSameOriginalYResidualObjectiveItMinimizes()
+    {
+        double[] x = [1.0, 2.0, 4.0, 8.0];
+        double[] y = [3.0, 4.2, 4.8, 6.1];
+
+        var result = LeastSquares.FitLogarithmic(x, y);
+
+        var expectedSse = x
+            .Select((value, index) => y[index] - result.Evaluate(value))
+            .Sum(residual => residual * residual);
+
+        Assert.Equal(expectedSse, result.ResidualSumOfSquares, 12);
+        Assert.Equal(System.Math.Sqrt(expectedSse / x.Length), result.RootMeanSquareError, 12);
+    }
+
+    [Fact]
+    public void LogarithmicFit_RejectsInvalidDomainNonFiniteYAndUndeterminedCoefficient()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => LeastSquares.FitLogarithmic(
+            [0.0, 1.0],
+            [1.0, 2.0]));
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => LeastSquares.FitLogarithmic(
+            [1.0, 2.0],
+            [1.0, double.NaN]));
+
+        Assert.Throws<ArgumentException>(() => LeastSquares.FitLogarithmic(
+            [2.0, 2.0, 2.0],
+            [-1.0, 0.0, 1.0]));
+
+        var result = LeastSquares.FitLogarithmic([1.0, 2.0], [-1.0, 1.0]);
+        Assert.Throws<ArgumentOutOfRangeException>(() => result.Evaluate(0.0));
+    }
+
+    [Fact]
     public void PolynomialFit_StillReconstructsQuadraticExactly()
     {
         double[] x = [-2.0, -1.0, 0.0, 1.0, 2.0];

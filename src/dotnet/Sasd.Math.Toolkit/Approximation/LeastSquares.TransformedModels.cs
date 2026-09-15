@@ -136,12 +136,74 @@ public static partial class LeastSquares
     }
 
     /// <summary>
+    /// Fits the logarithmic model <c>y = a + b*ln(x)</c>.
+    /// </summary>
+    /// <remarks>
+    /// Only the explanatory coordinate is transformed. The dependent observations remain in
+    /// their original units, so ordinary least squares on <c>ln(x)</c> minimizes the same
+    /// original-domain y residuals that are reported by the result object. Every x value must
+    /// be finite and strictly positive; y may be any finite real value.
+    /// </remarks>
+    public static LogarithmicFitResult FitLogarithmic(
+        IReadOnlyList<double> x,
+        IReadOnlyList<double> y)
+    {
+        NumericGuard.SameLength(x, y, nameof(x), nameof(y));
+        RequireAtLeastTwoSamples(x.Count, nameof(x), "fit a logarithmic model");
+
+        var logX = new double[x.Count];
+        for (var i = 0; i < x.Count; i++)
+        {
+            if (!double.IsFinite(x[i]) || x[i] <= 0.0)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(x),
+                    "Logarithmic fitting requires finite x values greater than zero.");
+            }
+
+            if (!double.IsFinite(y[i]))
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(y),
+                    "Logarithmic fitting requires finite y values.");
+            }
+
+            logX[i] = System.Math.Log(x[i]);
+        }
+
+        var (intercept, logCoefficient) = FitStraightLine(
+            logX,
+            y,
+            nameof(x),
+            "At least two distinct x values are required to determine a logarithmic coefficient.");
+
+        if (!double.IsFinite(intercept) || !double.IsFinite(logCoefficient))
+        {
+            throw new ArithmeticException("Logarithmic fitting produced non-finite model parameters.");
+        }
+
+        var (residualSumOfSquares, rootMeanSquareError) = ComputeOriginalDomainDiagnostics(
+            x,
+            y,
+            value => intercept + (logCoefficient * System.Math.Log(value)),
+            "logarithmic model");
+
+        return new LogarithmicFitResult(
+            intercept,
+            logCoefficient,
+            x.Count,
+            residualSumOfSquares,
+            rootMeanSquareError);
+    }
+
+    /// <summary>
     /// Fits a straight line <c>intercept + slope*x</c> through the shared linear-basis engine.
     /// </summary>
     /// <remarks>
     /// Keeping this transformation-specific adapter in one place prevents the named curve
-    /// models from each growing their own miniature regression implementation. The upcoming
-    /// logarithmic model can reuse the same path after transforming only its x coordinate.
+    /// models from each growing their own miniature regression implementation. Power-law,
+    /// exponential and logarithmic helpers differ only in how they prepare coordinates and
+    /// reconstruct the model around this common linear fit.
     /// </remarks>
     private static (double Intercept, double Slope) FitStraightLine(
         IReadOnlyList<double> x,
@@ -180,10 +242,10 @@ public static partial class LeastSquares
     /// Calculates residual diagnostics in the original observation domain.
     /// </summary>
     /// <remarks>
-    /// Transformed least-squares models minimize residuals in transformed coordinates. We still
-    /// expose original-domain RSS and RMSE because they have the same physical units as the input
-    /// data and are therefore easier for callers to interpret. These diagnostics must not be
-    /// mistaken for the objective function minimized by the transformed fit.
+    /// Some transformed least-squares models minimize residuals in transformed coordinates,
+    /// while models that transform only x (such as the logarithmic model) still minimize
+    /// original-y residuals. This helper deliberately reports diagnostics in the observation
+    /// domain in either case so callers can compare errors in the units they supplied.
     /// </remarks>
     private static (double ResidualSumOfSquares, double RootMeanSquareError)
         ComputeOriginalDomainDiagnostics(

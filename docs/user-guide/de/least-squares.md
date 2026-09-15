@@ -77,11 +77,37 @@ Console.WriteLine(fit.Evaluate(1.5));
 
 Ein positives `Rate` beschreibt Wachstum, ein negatives Zerfall und null ein konstantes positives Modell. Mindestens zwei unterschiedliche x-Werte sind notwendig, damit die Rate bestimmbar ist.
 
-## Residuen bei transformierten Modellen verstehen
+## Logarithmische Anpassung
 
-Sowohl Potenzgesetz- als auch Exponentialanpassung minimieren quadrierte Residuen nach einer logarithmischen Transformation. `ResidualSumOfSquares` und `RootMeanSquareError` werden trotzdem im ursprünglichen y-Raum ausgegeben, damit ihre Einheiten anschaulich bleiben.
+Der logarithmische Helfer passt
 
-Diese Unterscheidung ist wichtig: Ein im Logarithmusraum optimaler Fit ist nicht automatisch derjenige, der additive Fehler in den ursprünglichen Einheiten minimiert. Falls genau dieses Fehlermodell fachlich entscheidend ist, sollten die transformierten Helfer als beschreibende beziehungsweise Referenz-Fits verstanden werden und nicht als universelles statistisches Optimum.
+`y = a + b * ln(x)`
+
+an. Er eignet sich, wenn x positiv bleiben muss und sich die Antwort näherungsweise linear mit dem Logarithmus von x verändert. Anders als beim Potenzgesetz- und Exponential-Helfer wird y selbst **nicht** transformiert. y darf deshalb negativ, null oder positiv sein, solange der Wert endlich ist.
+
+```csharp
+using Sasd.Numerics.Approximation;
+
+double[] x = [1.0, 2.0, 4.0, 8.0];
+double[] y = [2.0, 3.1, 4.0, 5.2];
+
+var fit = LeastSquares.FitLogarithmic(x, y);
+
+Console.WriteLine(fit.Intercept);
+Console.WriteLine(fit.LogCoefficient);
+Console.WriteLine(fit.Evaluate(3.0));
+Console.WriteLine(fit.RootMeanSquareError);
+```
+
+`Intercept` entspricht dem angepassten Wert bei `x = 1`, weil `ln(1) = 0`. `LogCoefficient` beschreibt die Änderung des Modells pro Einheit von `ln(x)` und ist nicht die gewöhnliche Steigung bezüglich x.
+
+## Residuen und Transformationen verstehen
+
+Potenzgesetz- und Exponentialanpassung transformieren y vor dem Geraden-Fit. Sie minimieren daher quadrierte Residuen in einem logarithmischen y-Raum. Ihre Werte `ResidualSumOfSquares` und `RootMeanSquareError` werden anschließend trotzdem im ursprünglichen y-Raum berechnet, damit sie leichter interpretierbar sind.
+
+Beim logarithmischen Helfer ist es anders: Nur x wird transformiert. Die y-Werte bleiben unverändert, sodass seine ausgegebene Residuenquadratsumme im ursprünglichen y-Raum zugleich die von Least Squares minimierte Zielfunktion ist.
+
+Diese Unterscheidung ist bei der Modellauswahl wichtig. Eine nach Transformation von y optimale Kurve ist nicht zwingend diejenige, die additive Fehler in den ursprünglichen Einheiten minimiert.
 
 ## Beliebige lineare Basisfunktionen
 
@@ -93,10 +119,10 @@ formulieren, kann es direkt mit `FitBasis` angepasst werden. Dieser allgemeine M
 
 ## Praktische Prüfung
 
-Ein Fit sollte nicht nur anhand seiner Parameter beurteilt werden. Residuen sollten geplottet oder zumindest geprüft werden; systematische Strukturen sprechen häufig für ein unpassendes Modell. Bei transformierten Modellen sollte zusätzlich geprüft werden, ob die angenommene multiplikative Fehlerstruktur fachlich sinnvoll ist.
+Ein Fit sollte nicht nur anhand seiner Parameter beurteilt werden. Residuen sollten geplottet oder zumindest geprüft werden; systematische Strukturen sprechen häufig für ein unpassendes Modell. Bei transformierten Modellen sollte zusätzlich geprüft werden, ob Transformation und implizite Fehlerstruktur fachlich sinnvoll sind.
 
 Die aktuelle Referenzimplementierung verwendet Normalgleichungen. Für die V1-Kompatibilität und moderate, vernünftig skalierte Probleme ist das ausreichend. Für schwierigere Regressionsaufgaben sollen später QR-/SVD-Backends ergänzt werden.
 
 ## Fortschritt der V1-Modelle
 
-Potenzgesetz- und Exponential-Helfer sind jetzt implementiert. Eigene Helfer für logarithmische und fünfgliedrige Fouriermodelle folgen noch. Das Verhalten eines fünfgliedrigen Polynoms ist bereits mit `FitPolynomial(..., degree: 4)` verfügbar; ein zusätzlicher Komfortname ist daher optional und keine numerische Voraussetzung.
+Potenzgesetz-, Exponential- und logarithmische Helfer sind jetzt implementiert. Der dedizierte fünfgliedrige Fourier-Helfer fehlt noch. Das Verhalten eines fünfgliedrigen Polynoms ist bereits mit `FitPolynomial(..., degree: 4)` verfügbar; ein zusätzlicher Komfortname ist daher optional und keine numerische Voraussetzung.
