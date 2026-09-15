@@ -44,21 +44,11 @@ Console.WriteLine(fit.Evaluate(3.0));
 Console.WriteLine(fit.RootMeanSquareError);
 ```
 
-The solver takes logarithms and fits
-
-`ln(y) = ln(a) + b*ln(x)`.
-
-Therefore every x and y sample must be strictly greater than zero. This also means the least-squares objective is minimized in log space, not directly in the original y values.
+The solver takes logarithms and fits `ln(y) = ln(a) + b*ln(x)`. Every x and y sample must therefore be strictly positive.
 
 ## Exponential fitting
 
-The exponential helper fits
-
-`y = a * exp(b*x)`.
-
-This form is useful for processes that are approximately exponential in x, including simple growth and decay curves. Here x may be any finite real value, but y must be positive because the implementation fits the transformed straight line
-
-`ln(y) = ln(a) + b*x`.
+The exponential helper fits `y = a * exp(b*x)`. x may be any finite real value, but y must be positive because the implementation fits `ln(y) = ln(a) + b*x`.
 
 ```csharp
 using Sasd.Numerics.Approximation;
@@ -73,15 +63,11 @@ Console.WriteLine(fit.Rate);  // approximately -0.7
 Console.WriteLine(fit.Evaluate(1.5));
 ```
 
-`Rate` is positive for growth, negative for decay and zero for a constant positive model. At least two distinct x values are required; otherwise the rate cannot be identified.
+`Rate` is positive for growth, negative for decay and zero for a constant positive model.
 
 ## Logarithmic fitting
 
-The logarithmic helper fits
-
-`y = a + b * ln(x)`.
-
-Use it when x must remain positive and the response changes approximately linearly with the logarithm of x. Unlike the power-law and exponential helpers, y itself is **not** transformed, so y may be negative, zero or positive as long as it is finite.
+The logarithmic helper fits `y = a + b * ln(x)`. x must be positive, while y may be negative, zero or positive as long as it is finite.
 
 ```csharp
 using Sasd.Numerics.Approximation;
@@ -94,33 +80,57 @@ var fit = LeastSquares.FitLogarithmic(x, y);
 Console.WriteLine(fit.Intercept);
 Console.WriteLine(fit.LogCoefficient);
 Console.WriteLine(fit.Evaluate(3.0));
-Console.WriteLine(fit.RootMeanSquareError);
 ```
 
-`Intercept` is the fitted value at `x = 1`, because `ln(1) = 0`. `LogCoefficient` is the change in the fitted response per unit change in `ln(x)`; it is not the ordinary slope with respect to x.
+`Intercept` is the fitted value at `x = 1`, because `ln(1) = 0`.
+
+## Five-term Fourier fitting
+
+For periodic data with a known fundamental period or angular frequency, use the five-term model
+
+`a0 + a1*cos(w*x) + b1*sin(w*x) + a2*cos(2*w*x) + b2*sin(2*w*x)`.
+
+```csharp
+using Sasd.Numerics.Approximation;
+
+const double period = 4.0;
+var omega = 2.0 * Math.PI / period;
+var x = Enumerable.Range(0, 20).Select(i => i * 0.2).ToArray();
+var y = x.Select(value =>
+    1.5
+    + 2.0 * Math.Cos(omega * value)
+    - 0.5 * Math.Sin(omega * value)
+    + 0.75 * Math.Cos(2.0 * omega * value)
+    + 1.25 * Math.Sin(2.0 * omega * value)).ToArray();
+
+var fit = LeastSquares.FitFiveTermFourierForPeriod(x, y, period);
+
+Console.WriteLine(fit.ConstantTerm);
+Console.WriteLine(fit.FundamentalCosineCoefficient);
+Console.WriteLine(fit.SecondHarmonicSineCoefficient);
+Console.WriteLine(fit.Evaluate(1.25));
+```
+
+The frequency is not estimated by this routine: you provide `w` directly with `FitFiveTermFourier`, or provide a period with `FitFiveTermFourierForPeriod`. At least five observations are required, and their phases must contain enough independent information to identify all five coefficients.
+
+This fit is not an FFT. It estimates a small periodic model from samples, including non-uniformly spaced samples, while an FFT analyzes frequency bins of a regularly sampled sequence.
 
 ## Understanding residual diagnostics and transformations
 
-Power-law and exponential fitting transform y before the straight-line fit. They therefore minimize squared residuals in a logarithmic y domain. Their `ResidualSumOfSquares` and `RootMeanSquareError` values are calculated afterwards in the original y domain for easier interpretation.
+Power-law and exponential fitting transform y before fitting and therefore minimize squared residuals in logarithmic y coordinates. Their reported RSS and RMSE are calculated afterwards in the original y domain.
 
-The logarithmic helper is different: it transforms only x. Its y values remain untouched, so its reported original-domain residual sum of squares is also the objective minimized by ordinary least squares.
-
-This distinction matters when choosing a model. A curve that is optimal after transforming y is not necessarily the curve that minimizes additive errors in the original units.
+Logarithmic and five-term Fourier fitting leave y unchanged. Their `ResidualSumOfSquares` is therefore directly the ordinary least-squares objective in the original y units.
 
 ## Arbitrary linear basis functions
 
-If a model can be written as
-
-`c0*f0(x) + c1*f1(x) + ...`
-
-then `FitBasis` can fit it directly. This is also the common numerical foundation for several named historical-style helpers.
+If a model can be written as `c0*f0(x) + c1*f1(x) + ...`, `FitBasis` can fit it directly. This is the common numerical foundation for the polynomial and Fourier helpers and for several named transformed models.
 
 ## Practical checks
 
-Always plot or inspect residuals instead of relying only on fitted parameters. Repeat the analysis with a simpler or more appropriate model when residuals show systematic structure. For transformed models, make sure the transformation and implied error structure make sense for the scientific or engineering problem.
+Always inspect or plot residuals instead of relying only on fitted parameters. For periodic models, confirm that the chosen fundamental period has scientific or engineering meaning; a wrong period can still produce numerical coefficients, but those coefficients may describe the data poorly.
 
 The current reference implementation uses normal equations. That is adequate for the V1 compatibility layer and moderate well-scaled problems, but QR/SVD will be preferable for difficult regression workloads in a later numerical-backend milestone.
 
 ## V1 model progress
 
-Power-law, exponential and logarithmic helpers are now implemented. The dedicated five-term Fourier helper remains to be added. Five-term polynomial behavior is already available through `FitPolynomial(..., degree: 4)`; a dedicated convenience name is optional rather than numerically necessary.
+The historical V1 least-squares model set is now covered: general linear basis, polynomial, power, exponential, logarithmic and five-term Fourier fitting all have callable APIs. Future work in this area can therefore focus on numerical robustness and broader SASD statistical requirements rather than historical feature parity.

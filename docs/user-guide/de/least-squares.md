@@ -4,11 +4,7 @@ Least-Squares-Verfahren passen ein Modell an mehr Beobachtungen an, als sich nor
 
 ## Polynomanpassung
 
-Für ein Polynom
-
-`y = c0 + c1*x + ... + cn*x^n`
-
-wird `FitPolynomial` mit dem gewünschten Grad verwendet.
+Für ein Polynom `y = c0 + c1*x + ... + cn*x^n` wird `FitPolynomial` mit dem gewünschten Grad verwendet.
 
 ```csharp
 using Sasd.Numerics.Approximation;
@@ -20,70 +16,19 @@ var coefficients = LeastSquares.FitPolynomial(x, y, degree: 2);
 var predicted = LeastSquares.EvaluatePolynomial(coefficients, 1.5);
 ```
 
-Die Koeffizienten werden nach steigender Potenz zurückgegeben: `c0`, `c1`, `c2` und so weiter.
+Die Koeffizienten werden nach steigender Potenz zurückgegeben.
 
 ## Anpassung eines Potenzgesetzes
 
-Ein Potenzgesetz besitzt die Form
-
-`y = a * x^b`.
-
-`FitPowerLaw` passt, wenn beide Variablen positiv sind und ein multiplikativer Skalierungszusammenhang plausibel ist.
-
-```csharp
-using Sasd.Numerics.Approximation;
-
-double[] x = [1.0, 2.0, 4.0, 8.0, 16.0];
-var y = x.Select(value => 3.0 * Math.Pow(value, 2.5)).ToArray();
-
-var fit = LeastSquares.FitPowerLaw(x, y);
-
-Console.WriteLine(fit.Scale);                // ungefähr 3
-Console.WriteLine(fit.Exponent);             // ungefähr 2,5
-Console.WriteLine(fit.Evaluate(3.0));
-Console.WriteLine(fit.RootMeanSquareError);
-```
-
-Der Solver logarithmiert beide Koordinaten und passt
-
-`ln(y) = ln(a) + b*ln(x)`
-
-an. Daher müssen sämtliche x- und y-Werte strikt größer als null sein.
+`FitPowerLaw` passt `y = a * x^b`. Beide Variablen müssen positiv sein, weil intern `ln(y) = ln(a) + b*ln(x)` angepasst wird.
 
 ## Exponentielle Anpassung
 
-Der Exponential-Helfer passt
-
-`y = a * exp(b*x)`
-
-an. Das eignet sich für Verläufe, die näherungsweise exponentiell von x abhängen, zum Beispiel einfache Wachstums- oder Zerfallsmodelle. x darf jeder endliche reelle Wert sein; y muss positiv sein, weil intern die Gerade
-
-`ln(y) = ln(a) + b*x`
-
-angepasst wird.
-
-```csharp
-using Sasd.Numerics.Approximation;
-
-double[] x = [0.0, 1.0, 2.0, 3.0];
-var y = x.Select(value => 2.5 * Math.Exp(-0.7 * value)).ToArray();
-
-var fit = LeastSquares.FitExponential(x, y);
-
-Console.WriteLine(fit.Scale); // ungefähr 2,5
-Console.WriteLine(fit.Rate);  // ungefähr -0,7
-Console.WriteLine(fit.Evaluate(1.5));
-```
-
-Ein positives `Rate` beschreibt Wachstum, ein negatives Zerfall und null ein konstantes positives Modell. Mindestens zwei unterschiedliche x-Werte sind notwendig, damit die Rate bestimmbar ist.
+`FitExponential` passt `y = a * exp(b*x)`. x darf jeder endliche reelle Wert sein, y muss wegen der Transformation `ln(y) = ln(a) + b*x` positiv bleiben.
 
 ## Logarithmische Anpassung
 
-Der logarithmische Helfer passt
-
-`y = a + b * ln(x)`
-
-an. Er eignet sich, wenn x positiv bleiben muss und sich die Antwort näherungsweise linear mit dem Logarithmus von x verändert. Anders als beim Potenzgesetz- und Exponential-Helfer wird y selbst **nicht** transformiert. y darf deshalb negativ, null oder positiv sein, solange der Wert endlich ist.
+`FitLogarithmic` passt `y = a + b * ln(x)`. x muss positiv sein; y darf negativ, null oder positiv sein, solange es endlich ist.
 
 ```csharp
 using Sasd.Numerics.Approximation;
@@ -96,33 +41,57 @@ var fit = LeastSquares.FitLogarithmic(x, y);
 Console.WriteLine(fit.Intercept);
 Console.WriteLine(fit.LogCoefficient);
 Console.WriteLine(fit.Evaluate(3.0));
-Console.WriteLine(fit.RootMeanSquareError);
 ```
 
-`Intercept` entspricht dem angepassten Wert bei `x = 1`, weil `ln(1) = 0`. `LogCoefficient` beschreibt die Änderung des Modells pro Einheit von `ln(x)` und ist nicht die gewöhnliche Steigung bezüglich x.
+## Fünfgliedrige Fourier-Anpassung
+
+Für periodische Daten mit bekannter Grundperiode oder Kreisfrequenz steht das Modell
+
+`a0 + a1*cos(w*x) + b1*sin(w*x) + a2*cos(2*w*x) + b2*sin(2*w*x)`
+
+zur Verfügung.
+
+```csharp
+using Sasd.Numerics.Approximation;
+
+const double period = 4.0;
+var omega = 2.0 * Math.PI / period;
+var x = Enumerable.Range(0, 20).Select(i => i * 0.2).ToArray();
+var y = x.Select(value =>
+    1.5
+    + 2.0 * Math.Cos(omega * value)
+    - 0.5 * Math.Sin(omega * value)
+    + 0.75 * Math.Cos(2.0 * omega * value)
+    + 1.25 * Math.Sin(2.0 * omega * value)).ToArray();
+
+var fit = LeastSquares.FitFiveTermFourierForPeriod(x, y, period);
+
+Console.WriteLine(fit.ConstantTerm);
+Console.WriteLine(fit.FundamentalCosineCoefficient);
+Console.WriteLine(fit.SecondHarmonicSineCoefficient);
+Console.WriteLine(fit.Evaluate(1.25));
+```
+
+Die Frequenz wird von diesem Verfahren nicht mitgeschätzt. Entweder wird `w` direkt an `FitFiveTermFourier` übergeben oder die Periode an `FitFiveTermFourierForPeriod`. Mindestens fünf Messwerte sind notwendig; ihre Phasen müssen außerdem genug unabhängige Information enthalten, um alle fünf Koeffizienten bestimmen zu können.
+
+Die Fourier-Anpassung ist keine FFT. Sie bestimmt ein kleines periodisches Modell aus Messwerten, die auch ungleichmäßig verteilt sein dürfen. Eine FFT analysiert dagegen Frequenzbins einer regelmäßig abgetasteten Folge.
 
 ## Residuen und Transformationen verstehen
 
-Potenzgesetz- und Exponentialanpassung transformieren y vor dem Geraden-Fit. Sie minimieren daher quadrierte Residuen in einem logarithmischen y-Raum. Ihre Werte `ResidualSumOfSquares` und `RootMeanSquareError` werden anschließend trotzdem im ursprünglichen y-Raum berechnet, damit sie leichter interpretierbar sind.
+Potenzgesetz- und Exponentialanpassung transformieren y und minimieren deshalb Fehler im logarithmischen y-Raum. Ihre ausgegebenen RSS-/RMSE-Werte werden anschließend im ursprünglichen y-Raum berechnet.
 
-Beim logarithmischen Helfer ist es anders: Nur x wird transformiert. Die y-Werte bleiben unverändert, sodass seine ausgegebene Residuenquadratsumme im ursprünglichen y-Raum zugleich die von Least Squares minimierte Zielfunktion ist.
-
-Diese Unterscheidung ist bei der Modellauswahl wichtig. Eine nach Transformation von y optimale Kurve ist nicht zwingend diejenige, die additive Fehler in den ursprünglichen Einheiten minimiert.
+Logarithmische und fünfgliedrige Fourier-Anpassung verändern y nicht. Bei ihnen entspricht `ResidualSumOfSquares` deshalb unmittelbar der gewöhnlichen Least-Squares-Zielfunktion in den ursprünglichen y-Einheiten.
 
 ## Beliebige lineare Basisfunktionen
 
-Lässt sich ein Modell als
-
-`c0*f0(x) + c1*f1(x) + ...`
-
-formulieren, kann es direkt mit `FitBasis` angepasst werden. Dieser allgemeine Mechanismus bildet auch die gemeinsame numerische Grundlage für mehrere benannte historische Modellhelfer.
+Lässt sich ein Modell als `c0*f0(x) + c1*f1(x) + ...` formulieren, kann es direkt mit `FitBasis` angepasst werden. Dieser allgemeine Mechanismus bildet auch die gemeinsame numerische Grundlage für Polynome, Fouriermodelle und mehrere benannte transformierte Modelle.
 
 ## Praktische Prüfung
 
-Ein Fit sollte nicht nur anhand seiner Parameter beurteilt werden. Residuen sollten geplottet oder zumindest geprüft werden; systematische Strukturen sprechen häufig für ein unpassendes Modell. Bei transformierten Modellen sollte zusätzlich geprüft werden, ob Transformation und implizite Fehlerstruktur fachlich sinnvoll sind.
+Ein Fit sollte nicht nur anhand seiner Parameter beurteilt werden. Residuen sollten geplottet oder zumindest geprüft werden. Bei periodischen Modellen sollte zusätzlich fachlich begründet werden, warum die gewählte Grundperiode sinnvoll ist; auch eine falsche Periode kann numerische Koeffizienten liefern, die das reale Verhalten aber schlecht beschreiben.
 
 Die aktuelle Referenzimplementierung verwendet Normalgleichungen. Für die V1-Kompatibilität und moderate, vernünftig skalierte Probleme ist das ausreichend. Für schwierigere Regressionsaufgaben sollen später QR-/SVD-Backends ergänzt werden.
 
 ## Fortschritt der V1-Modelle
 
-Potenzgesetz-, Exponential- und logarithmische Helfer sind jetzt implementiert. Der dedizierte fünfgliedrige Fourier-Helfer fehlt noch. Das Verhalten eines fünfgliedrigen Polynoms ist bereits mit `FitPolynomial(..., degree: 4)` verfügbar; ein zusätzlicher Komfortname ist daher optional und keine numerische Voraussetzung.
+Der historische V1-Least-Squares-Modellbereich ist jetzt abgedeckt: allgemeine lineare Basis, Polynom-, Potenz-, Exponential-, logarithmische und fünfgliedrige Fourier-Anpassung besitzen aufrufbare APIs. Weitere Arbeiten können sich damit auf numerische Robustheit und die breiteren Statistik-Anforderungen der SASD-Produktfamilie konzentrieren.
