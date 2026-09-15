@@ -41,9 +41,12 @@ Weitere dichte Hilfen bleiben möglich, aber das Managed-Referenzfundament ist v
 - Transponieren, Dense-Konvertierung und preiswerte Sparse-Normen: **implementiert**
 - Gemeinsame Sparse-Iterationsoptionen und Ergebnismodell: **implementiert**
 - Conjugate Gradient für SPD-Sparse-Systeme mit Verifikation des echten Residuums: **implementiert**
-- Diagonal-/Jacobi-Preconditioning für CG: **als Nächstes**
-- eigenes CSC: später bei dauerhaft spaltenorientierten Workloads
-- GMRES und BiCGSTAB: folgende Solver-Schritte
+- Solverneutrale `ISparsePreconditioner`-Abstraktion: **implementiert**
+- Diagonal-/Jacobi-Preconditioning: **implementiert**
+- Preconditioned Conjugate Gradient mit Prüfung des SPD-Rekurrenzvertrags: **implementiert**
+- Restarted GMRES für allgemeine nichtsymmetrische Systeme: **als Nächstes**
+- BiCGSTAB: folgender Solver-Schritt
+- eigenes CSC und stärkere Incomplete-Factorization-Preconditioner: später bei konkretem Bedarf
 
 ### M3.3 – Optimierung und nichtlineare Systeme
 
