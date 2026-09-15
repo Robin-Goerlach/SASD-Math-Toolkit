@@ -44,8 +44,10 @@ Weitere dichte Hilfen bleiben möglich, aber das Managed-Referenzfundament ist v
 - Solverneutrale `ISparsePreconditioner`-Abstraktion: **implementiert**
 - Diagonal-/Jacobi-Preconditioning: **implementiert**
 - Preconditioned Conjugate Gradient mit Prüfung des SPD-Rekurrenzvertrags: **implementiert**
-- Restarted GMRES für allgemeine nichtsymmetrische Systeme: **als Nächstes**
-- BiCGSTAB: folgender Solver-Schritt
+- Restarted GMRES für allgemeine nichtsymmetrische Systeme: **implementiert**
+- Right-preconditioned GMRES mit Modified-Gram-Schmidt-/Arnoldi- und Givens-Aktualisierung: **implementiert**
+- BiCGSTAB: **als Nächstes**
+- Konsolidierung der Sparse-Architektur und Referenzfälle: nach BiCGSTAB
 - eigenes CSC und stärkere Incomplete-Factorization-Preconditioner: später bei konkretem Bedarf
 
 ### M3.3 – Optimierung und nichtlineare Systeme
