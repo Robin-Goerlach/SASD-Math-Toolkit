@@ -45,6 +45,16 @@ jobs:
           pdfinfo "$de_pdf" | grep -q '^Pages:'
           pdfinfo "$en_pdf" | grep -q '^Pages:'
 
+      - name: Upload handbook PDFs for release inspection
+        uses: actions/upload-artifact@v7
+        with:
+          name: sasd-math-toolkit-handbooks-v1-rc1
+          path: |
+            docs/user-guide/LaTeX/SASD-Math-Toolkit-Handbuch-V1.0-DE.pdf
+            docs/user-guide/LaTeX/SASD-Math-Toolkit-Handbook-V1.0-EN.pdf
+          if-no-files-found: error
+          retention-days: 30
+
       - name: Publish PDFs in user-guide root
         run: |
           cp docs/user-guide/LaTeX/SASD-Math-Toolkit-Handbuch-V1.0-DE.pdf docs/user-guide/SASD-Math-Toolkit-Handbuch-V1.0-DE.pdf
