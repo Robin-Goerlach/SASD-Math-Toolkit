@@ -50,11 +50,11 @@ Status legend: **done** = callable implementation exists now; **partial** = doma
 | Logarithmic least-squares model | done | `LeastSquares.FitLogarithmic` + `LogarithmicFitResult` |
 | Five-term Fourier least-squares model | done | `LeastSquares.FitFiveTermFourier` / `FitFiveTermFourierForPeriod` + `FiveTermFourierFitResult` |
 | Complex FFT | done | radix-2 `Forward` / `Inverse` |
-| Real FFT | done | full `ForwardReal` plus compact `ForwardRealCompact` / `InverseReal` with `RealFftSpectrum` |
-| Complex convolution | planned | transform domain exists; public helper planned |
-| Real convolution | done | `ConvolveReal` |
-| Complex cross-correlation | planned | public helper planned |
-| Real cross-correlation | done | `CrossCorrelateReal` |
+| Real FFT | done | `ForwardReal` + compact `ForwardRealCompact` / `InverseReal` + `RealFftSpectrum` |
+| Complex convolution | done | FFT-backed `ConvolveComplex` |
+| Real convolution | done | FFT-backed `ConvolveReal` sharing the complex core |
+| Complex cross-correlation | done | `CrossCorrelateComplex` with explicit conjugation and lag convention |
+| Real cross-correlation | done | `CrossCorrelateReal` sharing the complex correlation core |
 | Graphics demo applications | planned | samples/visualization after numerical V1 core |
 
 The historical catalog is a minimum compatibility target. SASD APIs may expose safer defaults or more general forms rather than reproducing old procedure signatures literally.

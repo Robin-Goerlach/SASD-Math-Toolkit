@@ -10,12 +10,13 @@ namespace Sasd.Numerics.Transforms;
 /// sequence length, so <c>Inverse(Forward(x))</c> reconstructs <c>x</c> within floating-point
 /// round-off. The implementation intentionally favors clarity over micro-optimization.
 /// </remarks>
-public static class FastFourierTransform
+public static partial class FastFourierTransform
 {
     /// <summary>Computes the full complex radix-2 discrete Fourier spectrum.</summary>
     public static Complex[] Forward(IReadOnlyList<Complex> input)
     {
         ArgumentNullException.ThrowIfNull(input);
+        ValidateFiniteComplexInput(input, nameof(input));
         return Transform(input, inverse: false);
     }
 
@@ -23,6 +24,7 @@ public static class FastFourierTransform
     public static Complex[] Inverse(IReadOnlyList<Complex> input)
     {
         ArgumentNullException.ThrowIfNull(input);
+        ValidateFiniteComplexInput(input, nameof(input));
         return Transform(input, inverse: true);
     }
 
@@ -37,7 +39,7 @@ public static class FastFourierTransform
     public static Complex[] ForwardReal(IReadOnlyList<double> input)
     {
         ArgumentNullException.ThrowIfNull(input);
-        ValidateFiniteRealInput(input);
+        ValidateFiniteRealInput(input, nameof(input));
         return Forward(input.Select(value => new Complex(value, 0.0)).ToArray());
     }
 
@@ -116,37 +118,13 @@ public static class FastFourierTransform
         return result;
     }
 
-    public static double[] ConvolveReal(IReadOnlyList<double> left, IReadOnlyList<double> right)
-    {
-        ArgumentNullException.ThrowIfNull(left);
-        ArgumentNullException.ThrowIfNull(right);
-        if (left.Count == 0 || right.Count == 0) return [];
-
-        var outputLength = left.Count + right.Count - 1;
-        var size = NextPowerOfTwo(outputLength);
-        var a = new Complex[size];
-        var b = new Complex[size];
-        for (var i = 0; i < left.Count; i++) a[i] = new Complex(left[i], 0.0);
-        for (var i = 0; i < right.Count; i++) b[i] = new Complex(right[i], 0.0);
-        a = Forward(a);
-        b = Forward(b);
-        for (var i = 0; i < size; i++) a[i] *= b[i];
-        var result = Inverse(a);
-        return result.Take(outputLength).Select(value => value.Real).ToArray();
-    }
-
-    public static double[] CrossCorrelateReal(IReadOnlyList<double> left, IReadOnlyList<double> right)
-    {
-        ArgumentNullException.ThrowIfNull(left);
-        ArgumentNullException.ThrowIfNull(right);
-        var reversed = right.Reverse().ToArray();
-        return ConvolveReal(left, reversed);
-    }
-
     private static Complex[] Transform(IReadOnlyList<Complex> input, bool inverse)
     {
         if (input.Count == 0) return [];
-        if (!IsPowerOfTwo(input.Count)) throw new ArgumentException("Radix-2 FFT requires a power-of-two input length.", nameof(input));
+        if (!IsPowerOfTwo(input.Count))
+        {
+            throw new ArgumentException("Radix-2 FFT requires a power-of-two input length.", nameof(input));
+        }
 
         var data = input.ToArray();
         BitReversePermutation(data);
@@ -168,6 +146,14 @@ public static class FastFourierTransform
                     w *= wLength;
                 }
             }
+
+            // Avoid an integer overflow in the loop increment for the largest representable
+            // power-of-two array length. Real-world allocations will normally be far smaller,
+            // but the guard keeps the control flow correct independently of machine memory.
+            if (length == data.Length)
+            {
+                break;
+            }
         }
 
         if (inverse)
@@ -178,15 +164,29 @@ public static class FastFourierTransform
         return data;
     }
 
-    private static void ValidateFiniteRealInput(IReadOnlyList<double> input)
+    private static void ValidateFiniteRealInput(IReadOnlyList<double> input, string parameterName)
     {
         for (var index = 0; index < input.Count; index++)
         {
             if (!double.IsFinite(input[index]))
             {
                 throw new ArgumentOutOfRangeException(
-                    nameof(input),
-                    $"Real FFT input sample at index {index} must be finite.");
+                    parameterName,
+                    $"Real-valued input sample at index {index} must be finite.");
+            }
+        }
+    }
+
+    private static void ValidateFiniteComplexInput(IReadOnlyList<Complex> input, string parameterName)
+    {
+        for (var index = 0; index < input.Count; index++)
+        {
+            var value = input[index];
+            if (!double.IsFinite(value.Real) || !double.IsFinite(value.Imaginary))
+            {
+                throw new ArgumentOutOfRangeException(
+                    parameterName,
+                    $"Complex input sample at index {index} must have finite real and imaginary parts.");
             }
         }
     }
@@ -211,8 +211,24 @@ public static class FastFourierTransform
 
     private static int NextPowerOfTwo(int value)
     {
+        if (value <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(value), "A positive transform length is required.");
+        }
+
         var result = 1;
-        while (result < value) result <<= 1;
+        while (result < value)
+        {
+            if (result >= (1 << 30))
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(value),
+                    "The required radix-2 transform length exceeds the supported Int32 array range.");
+            }
+
+            result <<= 1;
+        }
+
         return result;
     }
 }

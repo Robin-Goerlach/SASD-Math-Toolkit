@@ -12,7 +12,7 @@
 
 Implemented across the major domains: scalar and complex roots, reusable polynomial/Horner/deflation support, polynomial/spline interpolation, the complete historical V1 differentiation catalog, integration, dense linear algebra with reusable pivoted LU factorization, the complete historical V1 eigenvalue catalog, RK4/RKF45/Adams ODE integration, least squares and radix-2 FFT.
 
-The root-finding slice includes the complete historical V1 root catalog. Direct LU factorization is complete through `LuFactorization`. The eigenvalue slice is complete through power iteration, inverse power iteration, Wielandt deflation and cyclic Jacobi. Differentiation is complete for V1. The RK4 ODE convenience family covers scalar first-order, scalar second-order, scalar nth-order, coupled first-order and coupled second-order systems on the same shared system RK4 core. Adaptive scalar RKF45 and fourth-order Adams-Bashforth/Adams-Moulton predictor-corrector integration are also available. The historical V1 boundary-value slice covers both linear and nonlinear RK4-backed shooting for scalar second-order Dirichlet problems. The historical V1 least-squares model set is covered by the general linear-basis and polynomial engines plus named power-law, exponential, logarithmic and five-term Fourier models. The real FFT slice now exposes both the full spectrum and an immutable compact half-spectrum with round-trip reconstruction.
+The root-finding slice includes the complete historical V1 root catalog. Direct LU factorization is complete through `LuFactorization`. The eigenvalue slice is complete through power iteration, inverse power iteration, Wielandt deflation and cyclic Jacobi. Differentiation is complete for V1. The RK4 ODE convenience family covers scalar first-order, scalar second-order, scalar nth-order, coupled first-order and coupled second-order systems on the same shared system RK4 core. Adaptive scalar RKF45 and fourth-order Adams-Bashforth/Adams-Moulton predictor-corrector integration are also available. The historical V1 boundary-value slice covers both linear and nonlinear RK4-backed shooting for scalar second-order Dirichlet problems. The historical V1 least-squares model set is covered by the general linear-basis and polynomial engines plus named power-law, exponential, logarithmic and five-term Fourier models with explicit residual diagnostics. The historical transform slice is also numerically complete: complex and real FFT, compact real spectra, and real/complex convolution and cross-correlation all share the same radix-2 foundation.
 
 A C#/.NET user handbook under `docs/user-guide/` grows alongside stable implementation milestones rather than reusing the historical Pascal documentation.
 
@@ -20,7 +20,7 @@ The intent remains to validate architecture across the whole product before fill
 
 ## M2 — Complete V1 compatibility catalog
 
-Close every item marked `planned` in `BORLAND-V1-COMPATIBILITY.md`. The remaining numerical transform work is now concentrated on complex convolution and complex cross-correlation; demonstration/sample applications remain a separate V1 deliverable.
+The numerical algorithm catalog is now covered. The remaining historical compatibility item is the demonstration/graphics application layer. V1 work therefore shifts from adding core numerical methods toward samples, handbook completion, API consistency checks and the final compatibility audit.
 
 Quality gate for V1:
 

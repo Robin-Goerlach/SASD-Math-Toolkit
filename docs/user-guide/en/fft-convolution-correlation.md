@@ -62,12 +62,54 @@ The toolkit rebuilds the omitted conjugate half internally. Application code doe
 
 Do not confuse this chapter with `LeastSquares.FitFiveTermFourier`. The FFT analyzes frequency bins of a regularly sampled sequence. The five-term least-squares model fits a small periodic model at a caller-specified fundamental frequency and can work with irregular x coordinates. They solve different problems despite both using sine/cosine ideas.
 
-## Convolution and correlation
+## Linear convolution
 
-Real-valued helpers are currently available through `ConvolveReal` and `CrossCorrelateReal`. Complex-valued counterparts are still V1 work items and will be documented here when their API is stable.
+Convolution combines two finite sequences, for example a signal and an impulse response. Both real and complex overloads return the full linear convolution:
+
+```csharp
+using System.Numerics;
+using Sasd.Numerics.Transforms;
+
+double[] signal = [1.0, 2.0, 1.0];
+double[] kernel = [0.5, -0.5];
+var filtered = FastFourierTransform.ConvolveReal(signal, kernel);
+
+Complex[] complexSignal = [new(1, 1), new(2, -1)];
+Complex[] complexKernel = [new(3, 0), new(0, -1)];
+var complexFiltered = FastFourierTransform.ConvolveComplex(complexSignal, complexKernel);
+```
+
+For non-empty inputs the result contains `left.Count + right.Count - 1` samples. You do not need to pad inputs to powers of two yourself; the helper chooses an internal FFT length and removes the padding afterwards.
+
+## Cross-correlation and lag ordering
+
+Cross-correlation measures similarity while one sequence is shifted relative to another. Use `CrossCorrelateReal` or `CrossCorrelateComplex`.
+
+For complex samples the toolkit uses conjugation:
+
+`r[l] = sum_k left[k] * conjugate(right[k-l])`.
+
+The returned array is ordered from lag `-(right.Count - 1)` through `left.Count - 1`. If `i` is a result index, convert it to lag with
+
+```csharp
+var lag = i - (right.Count - 1);
+```
+
+The zero-lag value is therefore found at index `right.Count - 1`. For complex data it is the overlapping complex inner product.
+
+```csharp
+var correlation = FastFourierTransform.CrossCorrelateComplex(complexSignal, complexKernel);
+var zeroLag = correlation[complexKernel.Length - 1];
+```
+
+Correlation conventions differ between libraries, so keep this index-to-lag rule with application code that interprets peak positions.
+
+## Empty and invalid inputs
+
+Convolution or correlation with an empty sequence returns an empty result. Real and complex transform helpers reject NaN and infinity. For direct FFT calls, non-empty input lengths must still be powers of two.
 
 ## Practical limits
 
-The current implementation prioritizes clarity and testability rather than maximum FFT throughput. It allocates intermediate arrays and the compact real API currently computes a full FFT before discarding the redundant half. Later optimized or native backends can improve this while preserving the public API.
+The current implementation prioritizes clarity and testability rather than maximum FFT throughput. It allocates intermediate arrays; compact real FFT currently computes a full transform before dropping the redundant half, and convolution always uses the FFT even when a tiny direct convolution might be faster. Later optimized or native backends can improve these details while preserving the public API.
 
 Always be explicit about sample rate, windowing, scaling and spectral leakage when interpreting a spectrum. The FFT computes the transform of the samples you provide; it does not automatically apply a window or infer a physical sampling interval.
