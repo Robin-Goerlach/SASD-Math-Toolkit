@@ -2,24 +2,15 @@ using Sasd.Numerics.Common;
 
 namespace Sasd.Numerics.LinearAlgebra;
 
-/// <summary>
-/// Classical direct and iterative solvers for small dense linear systems.
-/// </summary>
+/// <summary>Classical direct and iterative solvers for small dense linear systems.</summary>
 /// <remarks>
-/// The implementation favors explicit textbook steps and diagnostic behavior over premature
-/// optimization. For repeated solves with the same coefficient matrix, prefer
-/// <see cref="FactorizeLu(DenseMatrix, double)"/> so the elimination work is performed once.
+/// Public behavior remains textbook-oriented and diagnostic, while the dense hot loops use
+/// validated row spans so repeated indexer checks do not dominate O(n^3) elimination work.
+/// For repeated solves with one matrix, prefer <see cref="FactorizeLu(DenseMatrix, double)"/>.
 /// </remarks>
 public static class LinearSystemSolvers
 {
-    /// <summary>
-    /// Computes the determinant of a square matrix by Gaussian elimination with partial pivoting.
-    /// </summary>
-    /// <remarks>
-    /// A pivot whose magnitude does not exceed <paramref name="pivotTolerance"/> is treated as
-    /// numerically zero, in which case the method returns zero. The tolerance is a practical
-    /// singularity threshold; it is not a condition-number estimate.
-    /// </remarks>
+    /// <summary>Computes the determinant by Gaussian elimination with partial pivoting.</summary>
     public static double Determinant(
         DenseMatrix matrix,
         double pivotTolerance = NumericConstants.NearlyZero)
@@ -34,7 +25,7 @@ public static class LinearSystemSolvers
         for (var pivot = 0; pivot < work.Rows; pivot++)
         {
             var best = FindPivotRow(work, pivot);
-            if (System.Math.Abs(work[best, pivot]) <= pivotTolerance)
+            if (System.Math.Abs(work.GetRowSpan(best)[pivot]) <= pivotTolerance)
             {
                 return 0.0;
             }
@@ -45,20 +36,24 @@ public static class LinearSystemSolvers
                 sign = -sign;
             }
 
-            var pivotValue = work[pivot, pivot];
+            var pivotRow = work.GetRowSpan(pivot);
+            var pivotValue = pivotRow[pivot];
             determinant *= pivotValue;
             EnsureFiniteComputation(determinant, "Determinant computation overflowed.");
 
             for (var row = pivot + 1; row < work.Rows; row++)
             {
-                var factor = work[row, pivot] / pivotValue;
+                var rowValues = work.GetMutableRowSpan(row);
+                var factor = rowValues[pivot] / pivotValue;
                 EnsureFiniteComputation(factor, "Determinant elimination produced a non-finite multiplier.");
 
+                // The eliminated pivot-column entry is not needed again for determinant-only
+                // elimination. Updating only the trailing row keeps the inner loop contiguous.
                 for (var column = pivot + 1; column < work.Columns; column++)
                 {
-                    var updated = work[row, column] - (factor * work[pivot, column]);
+                    var updated = rowValues[column] - (factor * pivotRow[column]);
                     EnsureFiniteComputation(updated, "Determinant elimination produced a non-finite matrix entry.");
-                    work[row, column] = updated;
+                    rowValues[column] = updated;
                 }
             }
         }
@@ -68,18 +63,11 @@ public static class LinearSystemSolvers
         return result;
     }
 
-    /// <summary>
-    /// Solves <c>A*x=b</c> with classical Gaussian elimination and back substitution.
-    /// </summary>
-    /// <param name="matrix">Square coefficient matrix. It is not modified.</param>
-    /// <param name="rightHandSide">Finite right-hand-side vector.</param>
-    /// <param name="partialPivoting">Whether to choose the largest available pivot magnitude in each column.</param>
-    /// <param name="pivotTolerance">Absolute pivot magnitude treated as numerically zero.</param>
-    /// <returns>The solution vector.</returns>
+    /// <summary>Solves <c>A*x=b</c> with Gaussian elimination and back substitution.</summary>
     /// <remarks>
-    /// Partial pivoting should normally remain enabled. The unpivoted mode is retained because it
-    /// belongs to the historical/educational algorithm catalog, but it can fail on a nonsingular
-    /// matrix whose current diagonal entry is zero or too small.
+    /// Partial pivoting should normally remain enabled. The unpivoted mode is retained for the
+    /// historical/educational catalog. The implementation clones the matrix and RHS, so caller
+    /// inputs are never modified.
     /// </remarks>
     public static double[] SolveGaussian(
         DenseMatrix matrix,
@@ -90,44 +78,44 @@ public static class LinearSystemSolvers
         EnsureSquare(matrix);
         ArgumentNullException.ThrowIfNull(rightHandSide);
         NumericGuard.Positive(pivotTolerance, nameof(pivotTolerance));
-
         if (rightHandSide.Count != matrix.Rows)
         {
             throw new ArgumentException("Right-hand side length must match matrix size.", nameof(rightHandSide));
         }
 
         ValidateFiniteVector(rightHandSide, nameof(rightHandSide));
-
         var work = matrix.Clone();
         var rhs = rightHandSide.ToArray();
         var n = work.Rows;
 
         for (var pivot = 0; pivot < n; pivot++)
         {
-            var pivotRow = partialPivoting ? FindPivotRow(work, pivot) : pivot;
-            if (System.Math.Abs(work[pivotRow, pivot]) <= pivotTolerance)
+            var pivotRowIndex = partialPivoting ? FindPivotRow(work, pivot) : pivot;
+            if (System.Math.Abs(work.GetRowSpan(pivotRowIndex)[pivot]) <= pivotTolerance)
             {
                 throw new ArithmeticException("Matrix is singular, numerically singular, or requires pivoting that was disabled.");
             }
 
-            if (pivotRow != pivot)
+            if (pivotRowIndex != pivot)
             {
-                work.SwapRows(pivotRow, pivot);
-                (rhs[pivotRow], rhs[pivot]) = (rhs[pivot], rhs[pivotRow]);
+                work.SwapRows(pivotRowIndex, pivot);
+                (rhs[pivotRowIndex], rhs[pivot]) = (rhs[pivot], rhs[pivotRowIndex]);
             }
 
-            var pivotValue = work[pivot, pivot];
+            var pivotRow = work.GetRowSpan(pivot);
+            var pivotValue = pivotRow[pivot];
             for (var row = pivot + 1; row < n; row++)
             {
-                var factor = work[row, pivot] / pivotValue;
+                var rowValues = work.GetMutableRowSpan(row);
+                var factor = rowValues[pivot] / pivotValue;
                 EnsureFiniteComputation(factor, "Gaussian elimination produced a non-finite multiplier.");
-                work[row, pivot] = 0.0;
+                rowValues[pivot] = 0.0;
 
                 for (var column = pivot + 1; column < n; column++)
                 {
-                    var updated = work[row, column] - (factor * work[pivot, column]);
+                    var updated = rowValues[column] - (factor * pivotRow[column]);
                     EnsureFiniteComputation(updated, "Gaussian elimination produced a non-finite matrix entry.");
-                    work[row, column] = updated;
+                    rowValues[column] = updated;
                 }
 
                 rhs[row] -= factor * rhs[pivot];
@@ -138,40 +126,29 @@ public static class LinearSystemSolvers
         var solution = new double[n];
         for (var row = n - 1; row >= 0; row--)
         {
+            var rowValues = work.GetRowSpan(row);
             var sum = rhs[row];
             for (var column = row + 1; column < n; column++)
             {
-                sum -= work[row, column] * solution[column];
+                sum -= rowValues[column] * solution[column];
                 EnsureFiniteComputation(sum, "Back substitution produced a non-finite intermediate value.");
             }
 
-            solution[row] = sum / work[row, row];
+            solution[row] = sum / rowValues[row];
             EnsureFiniteComputation(solution[row], "Back substitution produced a non-finite solution value.");
         }
 
         return solution;
     }
 
-    /// <summary>
-    /// Creates a reusable LU factorization with partial pivoting.
-    /// </summary>
-    /// <remarks>
-    /// Use this API when several systems share the same coefficient matrix. The decomposition is
-    /// performed once and each subsequent solve only performs triangular substitutions.
-    /// </remarks>
+    /// <summary>Creates a reusable LU factorization with partial pivoting.</summary>
     public static LuFactorization FactorizeLu(
         DenseMatrix matrix,
         double pivotTolerance = NumericConstants.NearlyZero) =>
         LuFactorization.Decompose(matrix, pivotTolerance);
 
-    /// <summary>
-    /// Computes the inverse of a square matrix using one reusable LU factorization.
-    /// </summary>
-    /// <remarks>
-    /// If the actual goal is to solve <c>A*x=b</c>, solving the system directly is normally better
-    /// than constructing <c>A^-1</c>. The inverse API is provided for algorithms that genuinely need
-    /// the matrix itself and for compatibility with the historical toolbox scope.
-    /// </remarks>
+    /// <summary>Computes the inverse using one reusable LU factorization.</summary>
+    /// <remarks>Prefer solving <c>A*x=b</c> directly when the inverse matrix itself is not required.</remarks>
     public static DenseMatrix Inverse(
         DenseMatrix matrix,
         double pivotTolerance = NumericConstants.NearlyZero)
@@ -181,14 +158,11 @@ public static class LinearSystemSolvers
         return FactorizeLu(matrix, pivotTolerance).Inverse();
     }
 
-    /// <summary>
-    /// Solves a square system iteratively with the Gauss-Seidel method.
-    /// </summary>
+    /// <summary>Solves a square system iteratively with Gauss-Seidel.</summary>
     /// <remarks>
-    /// Convergence is not guaranteed for arbitrary matrices. The method reports convergence only
-    /// when both the largest component update and the infinity norm of the residual are within the
-    /// requested tolerance. Numerical divergence/overflow is returned as
-    /// <see cref="IterationStatus.NumericalBreakdown"/> rather than disguised as convergence.
+    /// Convergence is reported only when both the largest component update and infinity residual
+    /// satisfy the tolerance. Row spans remove checked matrix indexing from the repeated iteration
+    /// without changing the method's convergence semantics.
     /// </remarks>
     public static IterativeResult<double[]> GaussSeidel(
         DenseMatrix matrix,
@@ -219,31 +193,27 @@ public static class LinearSystemSolvers
             ValidateFiniteVector(initialGuess, nameof(initialGuess));
         }
 
+        var rhs = rightHandSide as double[] ?? rightHandSide.ToArray();
         var x = initialGuess?.ToArray() ?? new double[n];
         for (var iteration = 1; iteration <= maximumIterations; iteration++)
         {
             var maxChange = 0.0;
             for (var row = 0; row < n; row++)
             {
-                var diagonal = matrix[row, row];
+                var matrixRow = matrix.GetRowSpan(row);
+                var diagonal = matrixRow[row];
                 if (System.Math.Abs(diagonal) <= NumericConstants.NearlyZero)
                 {
-                    return new IterativeResult<double[]>(
-                        x,
-                        iteration - 1,
-                        IterationStatus.NumericalBreakdown,
+                    return new IterativeResult<double[]>(x, iteration - 1, IterationStatus.NumericalBreakdown,
                         Message: "Zero or near-zero diagonal encountered.");
                 }
 
-                var sum = rightHandSide[row];
+                var sum = rhs[row];
                 for (var column = 0; column < n; column++)
                 {
-                    if (column == row)
-                    {
-                        continue;
-                    }
+                    if (column == row) continue;
 
-                    var product = matrix[row, column] * x[column];
+                    var product = matrixRow[column] * x[column];
                     if (!double.IsFinite(product))
                     {
                         return NumericalBreakdown(x, iteration, "Gauss-Seidel multiplication overflowed.");
@@ -272,7 +242,7 @@ public static class LinearSystemSolvers
                 x[row] = next;
             }
 
-            if (!TryResidualInfinityNorm(matrix, x, rightHandSide, out var residual))
+            if (!TryResidualInfinityNorm(matrix, x, rhs, out var residual))
             {
                 return NumericalBreakdown(x, iteration, "Gauss-Seidel residual computation became non-finite.");
             }
@@ -283,31 +253,21 @@ public static class LinearSystemSolvers
             }
         }
 
-        if (!TryResidualInfinityNorm(matrix, x, rightHandSide, out var finalResidual))
+        if (!TryResidualInfinityNorm(matrix, x, rhs, out var finalResidual))
         {
             return NumericalBreakdown(x, maximumIterations, "Final Gauss-Seidel residual computation became non-finite.");
         }
 
-        return new IterativeResult<double[]>(
-            x,
-            maximumIterations,
-            IterationStatus.MaximumIterationsReached,
-            finalResidual,
-            "Maximum number of iterations reached.");
+        return new IterativeResult<double[]>(x, maximumIterations, IterationStatus.MaximumIterationsReached,
+            finalResidual, "Maximum number of iterations reached.");
     }
 
-    /// <summary>
-    /// Computes <c>||A*x-b||_infinity</c>.
-    /// </summary>
-    public static double ResidualInfinityNorm(
-        DenseMatrix matrix,
-        IReadOnlyList<double> x,
-        IReadOnlyList<double> b)
+    /// <summary>Computes <c>||A*x-b||_infinity</c>.</summary>
+    public static double ResidualInfinityNorm(DenseMatrix matrix, IReadOnlyList<double> x, IReadOnlyList<double> b)
     {
         ArgumentNullException.ThrowIfNull(matrix);
         ArgumentNullException.ThrowIfNull(x);
         ArgumentNullException.ThrowIfNull(b);
-
         if (x.Count != matrix.Columns)
         {
             throw new ArgumentException("Solution vector length must match matrix column count.", nameof(x));
@@ -320,7 +280,6 @@ public static class LinearSystemSolvers
 
         ValidateFiniteVector(x, nameof(x));
         ValidateFiniteVector(b, nameof(b));
-
         if (!TryResidualInfinityNorm(matrix, x, b, out var residual))
         {
             throw new ArithmeticException("Residual computation produced a non-finite value.");
@@ -329,10 +288,7 @@ public static class LinearSystemSolvers
         return residual;
     }
 
-    private static IterativeResult<double[]> NumericalBreakdown(
-        double[] current,
-        int iteration,
-        string message) =>
+    private static IterativeResult<double[]> NumericalBreakdown(double[] current, int iteration, string message) =>
         new(current, iteration, IterationStatus.NumericalBreakdown, Message: message);
 
     private static bool TryResidualInfinityNorm(
@@ -342,31 +298,20 @@ public static class LinearSystemSolvers
         out double residual)
     {
         residual = 0.0;
-
         for (var row = 0; row < matrix.Rows; row++)
         {
+            var matrixRow = matrix.GetRowSpan(row);
             var sum = 0.0;
             for (var column = 0; column < matrix.Columns; column++)
             {
-                var product = matrix[row, column] * x[column];
-                if (!double.IsFinite(product))
-                {
-                    return false;
-                }
-
+                var product = matrixRow[column] * x[column];
+                if (!double.IsFinite(product)) return false;
                 sum += product;
-                if (!double.IsFinite(sum))
-                {
-                    return false;
-                }
+                if (!double.IsFinite(sum)) return false;
             }
 
             var difference = sum - b[row];
-            if (!double.IsFinite(difference))
-            {
-                return false;
-            }
-
+            if (!double.IsFinite(difference)) return false;
             residual = System.Math.Max(residual, System.Math.Abs(difference));
         }
 
@@ -376,10 +321,10 @@ public static class LinearSystemSolvers
     private static int FindPivotRow(DenseMatrix matrix, int pivotColumn)
     {
         var best = pivotColumn;
-        var bestValue = System.Math.Abs(matrix[pivotColumn, pivotColumn]);
+        var bestValue = System.Math.Abs(matrix.GetRowSpan(pivotColumn)[pivotColumn]);
         for (var row = pivotColumn + 1; row < matrix.Rows; row++)
         {
-            var candidate = System.Math.Abs(matrix[row, pivotColumn]);
+            var candidate = System.Math.Abs(matrix.GetRowSpan(row)[pivotColumn]);
             if (candidate > bestValue)
             {
                 best = row;

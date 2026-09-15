@@ -10,19 +10,15 @@
 
 ## M1 — Broad numerical foundation (done for the historical numerical catalog)
 
-Implemented across the major domains: scalar and complex roots, reusable polynomial/Horner/deflation support, polynomial/spline interpolation, the complete historical V1 differentiation catalog, integration, dense linear algebra with reusable pivoted LU factorization, the complete historical V1 eigenvalue catalog, RK4/RKF45/Adams ODE integration, least squares and radix-2 FFT.
-
-The RK4 ODE convenience family covers scalar first-order, scalar second-order, scalar nth-order, coupled first-order and coupled second-order systems on the same shared system RK4 core. Adaptive scalar RKF45 and fourth-order Adams-Bashforth/Adams-Moulton predictor-corrector integration are also available. The historical boundary-value slice covers both linear and nonlinear RK4-backed shooting. The least-squares model set includes general linear-basis and polynomial fitting plus named power-law, exponential, logarithmic and five-term Fourier models. The transform slice includes complex and real FFT, compact real spectra, and real/complex convolution and cross-correlation.
+Implemented across the major domains: scalar and complex roots, polynomial/Horner/deflation support, interpolation/splines, differentiation, integration, dense linear algebra/eigenvalues, RK4/RKF45/Adams ODE integration, least squares, radix-2 FFT, convolution/correlation and the demonstration layer.
 
 ## M2 — V1 publication quality (final audit remaining)
 
-The historical compatibility catalog, including the graphical demonstration layer, is implemented. Publication-quality handbook/API audits have been completed for root finding, interpolation, numerical integration, matrices/linear systems and eigenvalues/eigenvectors.
+The historical compatibility catalog and all eleven planned user-handbook chapters are complete. Publication-quality API/test audits and cross-cutting diagnostic documentation are also complete.
 
-The cross-cutting diagnostics milestone is also complete. The handbook now documents exception-vs-status semantics, residuals versus forward errors, error estimates, tolerance scaling, numerical breakdowns, conditioning, independent verification and reproducibility. The common `IterativeResult<T>` contract now explicitly exposes `HasFiniteResidual`, while `IterationStatus` and `NumericConstants` document their intended semantics in the public API comments.
+Before the final audit, a pragmatic performance pass was completed. It removes repeated checked matrix indexing from dense hot loops, batches multi-RHS LU substitution, caches least-squares design values, specializes polynomial basis generation, and removes redundant full-length FFT/convolution copies while preserving public defensive-copy semantics. See [`PERFORMANCE.md`](PERFORMANCE.md). The round intentionally stops short of unsafe/SIMD/parallel/native-backend tuning until representative benchmarks exist.
 
-All eleven planned V1 user-handbook chapters are now present in English and German.
-
-The remaining V1 milestone is a **final repository-wide release audit**. It should verify public API consistency, XML comments, examples, handbook links, technical notes, compatibility claims, absence of public placeholders, package/release metadata, deterministic sample behavior and CI coverage before assigning a V1 release tag.
+The remaining V1 milestone is the **final repository-wide release audit**. It should verify public API consistency, XML comments, examples, handbook links, technical notes, compatibility claims, absence of public placeholders, package/release metadata, deterministic sample behavior and CI coverage before assigning a V1 release tag.
 
 Quality gate for V1:
 
@@ -33,6 +29,7 @@ Quality gate for V1:
 - User-handbook chapters for the stable V1 areas, with C# examples and numerical interpretation guidance.
 - No `NotImplementedException` in public numerical APIs.
 - Cross-cutting diagnostic conventions documented and reflected in result APIs.
+- Pragmatic pre-release performance pass completed without weakening validation or ownership contracts.
 - Final release audit completed before the V1 tag.
 
 ## M3 — SASD core mathematics
