@@ -1,6 +1,6 @@
 # SASD Math Toolkit Benutzerhandbuch — C#/.NET
 
-Dies ist der Beginn des anwenderorientierten Benutzerhandbuchs für das SASD Math Toolkit. Es wird speziell für die aktuelle C#/.NET-API geschrieben und wächst parallel zur V1-Implementierung.
+Dies ist das anwenderorientierte Benutzerhandbuch für das SASD Math Toolkit. Es wird speziell für die aktuelle C#/.NET-API geschrieben und wächst parallel zur Qualitätsarbeit an V1.
 
 Das Handbuch ist **keine** Abschrift, Übersetzung oder Neuverpackung des historischen Borland-Pascal-Handbuchs. Das historische Produkt dient für V1 nur als funktionaler Meilenstein. Erklärungen, Beispiele, API-Namen, Hinweise und Arbeitsabläufe dieses Handbuchs werden für das SASD Math Toolkit neu erstellt.
 
@@ -8,10 +8,10 @@ Das Handbuch ist **keine** Abschrift, Übersetzung oder Neuverpackung des histor
 
 Das Benutzerhandbuch richtet sich an Anwendungsentwickler, Lernende und technisch orientierte Nutzer, die die numerischen Routinen einsetzen möchten, ohne zuerst den Implementierungsquelltext lesen zu müssen. Jedes Kapitel soll vier praktische Fragen beantworten: Welches Problem löst das Verfahren? Wann ist es sinnvoll? Wie wird es in C# aufgerufen? Welche numerischen Grenzen sind zu beachten?
 
-## Geplante Kapitelstruktur
+## Kapitelstruktur
 
 1. [Erste Schritte](erste-schritte.md)
-2. Nullstellen von Gleichungen
+2. [Nullstellen von Gleichungen](nullstellen.md)
 3. Interpolation
 4. [Numerische Differentiation](differentiation.md)
 5. Numerische Integration

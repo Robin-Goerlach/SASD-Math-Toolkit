@@ -4,27 +4,19 @@
 
 Repository-Struktur, .NET-10-Projekt, Tests, Sample, CI, englische/deutsche Dokumentation und Clean-Room-Regeln.
 
-## M1 – Breiter numerischer Vertikalschnitt (historischer V1-Algorithmuskatalog erledigt)
+## M1 – Breite numerische Grundlage (historischer Algorithmuskatalog erledigt)
 
-Der historische numerische Methodenkatalog ist in den Bereichen reelle/komplexe Nullstellensuche, Interpolation/Splines, Differentiation, Integration, dichte lineare Algebra, Eigenwerte, RK4/RKF45/Adams, Randwert-Shooting, Least Squares, FFT, Faltung und Korrelation abgedeckt.
+Implementiert sind reelle und komplexe Nullstellensuche, wiederverwendbare Polynom-/Horner-/Deflationsfunktionen, Interpolation/Splines, der historische V1-Differentiationsbereich, Integration, lineare Algebra mit LU-Faktorisierung, der historische Eigenwertbereich, RK4/RKF45/Adams-Verfahren, Least Squares und FFT.
 
-Die Implementierung teilt bewusst gemeinsame Grundlagen, statt Formeln für Komfort-APIs zu duplizieren: LU-Faktorisierung ist wiederverwendbar, höhere RK4-Varianten werden auf den gemeinsamen Systemintegrator zurückgeführt, transformierte Least-Squares-Modelle nutzen den allgemeinen Basissolver und Faltung/Korrelation bauen auf dem gemeinsamen komplexen FFT-Kern auf.
+Die RK4-Komfortfamilie deckt skalare Gleichungen erster, zweiter und n-ter Ordnung sowie gekoppelte Systeme erster und zweiter Ordnung über einen gemeinsamen System-RK4-Kern ab. Hinzu kommen adaptives RKF45, Adams-Bashforth/Adams-Moulton, lineares und nichtlineares Shooting, die vollständige historische Least-Squares-Modellgruppe sowie komplexe/reelle FFT, kompaktes Realspektrum, Faltung und Kreuzkorrelation.
 
-Unter `docs/user-guide/` wächst parallel ein eigenes C#/.NET-Benutzerhandbuch. Es begleitet stabile Implementierungsmeilensteine und verwendet nicht das historische Pascal-Handbuch wieder.
+## M2 – Veröffentlichungsqualität für V1 (in Arbeit)
 
-## M2 – V1 vollständig (Funktionskatalog erledigt; Release-Härtung läuft)
+Der historische Kompatibilitätskatalog einschließlich grafischer Demo-Ebene ist implementiert. Die Arbeit konzentriert sich deshalb jetzt auf die Qualität einer veröffentlichbaren V1 statt auf weitere historische Algorithmen.
 
-Die historische Demo-/Grafikrolle wird nun durch die plattformunabhängige Anwendung `Sasd.Math.Toolkit.Sample` abgedeckt. Sie erzeugt einen deterministischen eigenständigen HTML-/SVG-Numerikbericht, ohne UI-Abhängigkeiten in die wiederverwendbare Bibliothek einzubauen.
+Das eigenständige C#/.NET-Benutzerhandbuch unter `docs/user-guide/` wird Fachbereich für Fachbereich vervollständigt. Das Kapitel zur Nullstellensuche ist fertig und behandelt Bisektion, Newton-Raphson, Sekante, Newton-Horner, Muller, Laguerre und den All-Roots-/Deflationsablauf. Als Nächstes folgen Interpolation, Integration, Matrizen/lineare Gleichungssysteme und Eigenwerte; anschließend das fachübergreifende Diagnosekapitel und das abschließende V1-Audit.
 
-Damit sind alle Zeilen der `BORLAND-V1-COMPATIBILITY.md` funktional abgedeckt. Die verbleibende V1-Arbeit besteht nicht mehr aus historischen Algorithmen, sondern aus Release-Härtung:
-
-- fehlende Kapitel des Benutzerhandbuchs für stabile V1-Bereiche vervollständigen;
-- API-Konsistenz und öffentliche Oberfläche systematisch prüfen;
-- XML-Dokumentation und Fehlersemantik aller öffentlichen Algorithmen prüfen;
-- ausführbare Beispiele dort ergänzen, wo sie das Handbuch verbessern;
-- abschließendes Kompatibilitäts-/Test-Audit sowie Release Notes und Versionierung vorbereiten.
-
-V1 ist erst fertig, wenn jeder öffentliche Algorithmus getestet und dokumentiert ist, die stabilen V1-Bereiche im Benutzerhandbuch beschrieben sind und keine öffentlichen Platzhalter mit `NotImplementedException` existieren.
+V1 ist erst fertig, wenn jeder öffentliche Algorithmus getestet und dokumentiert ist, wichtige Fehler-/Abbruchzustände regressionstestet sind, die stabilen V1-Bereiche im Benutzerhandbuch beschrieben sind und keine öffentlichen Platzhalter mit `NotImplementedException` existieren.
 
 ## M3 – SASD-eigene Erweiterungen
 

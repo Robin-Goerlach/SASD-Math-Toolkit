@@ -5,8 +5,30 @@ namespace Sasd.Numerics.RootFinding;
 /// <summary>
 /// Scalar root-finding algorithms implemented independently from historical source code.
 /// </summary>
+/// <remarks>
+/// Invalid programming input is reported through exceptions. Expected iterative outcomes
+/// such as a missing bracket, a nearly singular step or an exhausted iteration budget are
+/// represented by <see cref="RootResult.Status"/> so callers can distinguish numerical
+/// behavior from malformed input.
+/// </remarks>
 public static class RootSolvers
 {
+    /// <summary>
+    /// Finds a real root inside an interval whose endpoint function values have opposite signs.
+    /// </summary>
+    /// <param name="function">Scalar function whose zero is sought.</param>
+    /// <param name="left">Finite left endpoint of the initial bracket.</param>
+    /// <param name="right">Finite right endpoint of the initial bracket.</param>
+    /// <param name="options">Optional convergence settings.</param>
+    /// <returns>
+    /// A result containing the best estimate and termination status. If the endpoints do not
+    /// bracket a sign change, the result status is <see cref="IterationStatus.NotBracketed"/>.
+    /// </returns>
+    /// <remarks>
+    /// The method keeps a valid sign-changing bracket throughout the iteration. This makes it
+    /// a useful robust reference method when a bracket is known, although its linear
+    /// convergence is normally slower than a well-started Newton iteration.
+    /// </remarks>
     public static RootResult Bisection(
         Func<double, double> function,
         double left,
@@ -78,6 +100,19 @@ public static class RootSolvers
             IterationStatus.MaximumIterationsReached, "Maximum number of iterations reached.");
     }
 
+    /// <summary>
+    /// Finds a real root with Newton-Raphson iteration from one initial guess.
+    /// </summary>
+    /// <param name="function">Scalar function whose zero is sought.</param>
+    /// <param name="derivative">Derivative of <paramref name="function"/>.</param>
+    /// <param name="initialGuess">Finite starting estimate.</param>
+    /// <param name="options">Optional convergence settings.</param>
+    /// <returns>A result containing the best estimate and termination status.</returns>
+    /// <remarks>
+    /// Newton-Raphson is usually fast near a simple root, but it is a local method. If the
+    /// derivative is too close to zero for a stable step, the method returns
+    /// <see cref="IterationStatus.NumericalBreakdown"/> rather than performing the division.
+    /// </remarks>
     public static RootResult NewtonRaphson(
         Func<double, double> function,
         Func<double, double> derivative,
@@ -111,6 +146,8 @@ public static class RootSolvers
             }
 
             var next = x - (fx / dfx);
+            EnsureFiniteIterate(next, "Newton-Raphson");
+
             var fNext = function(next);
             EnsureFiniteFunctionValue(fNext);
 
@@ -127,6 +164,19 @@ public static class RootSolvers
             IterationStatus.MaximumIterationsReached, "Maximum number of iterations reached.");
     }
 
+    /// <summary>
+    /// Finds a real root with the derivative-free secant iteration.
+    /// </summary>
+    /// <param name="function">Scalar function whose zero is sought.</param>
+    /// <param name="firstGuess">First finite starting estimate.</param>
+    /// <param name="secondGuess">Second finite starting estimate.</param>
+    /// <param name="options">Optional convergence settings.</param>
+    /// <returns>A result containing the best estimate and termination status.</returns>
+    /// <remarks>
+    /// The secant method estimates a local slope from two successive function values. It
+    /// does not preserve a sign-changing bracket. When that slope becomes numerically flat,
+    /// the method reports <see cref="IterationStatus.NumericalBreakdown"/>.
+    /// </remarks>
     public static RootResult Secant(
         Func<double, double> function,
         double firstGuess,
@@ -166,6 +216,8 @@ public static class RootSolvers
             }
 
             var x2 = x1 - (f1 * (x1 - x0) / denominator);
+            EnsureFiniteIterate(x2, "Secant");
+
             var f2 = function(x2);
             EnsureFiniteFunctionValue(f2);
 
@@ -199,7 +251,15 @@ public static class RootSolvers
     {
         if (!double.IsFinite(value))
         {
-            throw new ArithmeticException("The supplied function returned a non-finite value.");
+            throw new ArithmeticException("The supplied function or derivative returned a non-finite value.");
+        }
+    }
+
+    private static void EnsureFiniteIterate(double value, string algorithmName)
+    {
+        if (!double.IsFinite(value))
+        {
+            throw new ArithmeticException($"{algorithmName} produced a non-finite iterate.");
         }
     }
 }

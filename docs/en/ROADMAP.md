@@ -8,30 +8,22 @@
 - Clean-room policy
 - Common iteration status/result conventions
 
-## M1 — Broad numerical foundation (done for the historical V1 algorithm catalog)
+## M1 — Broad numerical foundation (done for the historical numerical catalog)
 
-The historical numerical method catalog is covered across scalar and complex roots, interpolation/splines, differentiation, integration, dense linear algebra, eigenvalues, RK4/RKF45/Adams ODE integration, boundary-value shooting, least-squares approximation, FFT, convolution and correlation.
+Implemented across the major domains: scalar and complex roots, reusable polynomial/Horner/deflation support, polynomial/spline interpolation, the complete historical V1 differentiation catalog, integration, dense linear algebra with reusable pivoted LU factorization, the complete historical V1 eigenvalue catalog, RK4/RKF45/Adams ODE integration, least squares and radix-2 FFT.
 
-The implementation deliberately shares foundations instead of cloning formulas across convenience APIs: LU factorization is reusable, higher-order RK4 variants reduce to the common system integrator, transformed least-squares models reuse the general basis solver, and convolution/correlation build on the shared complex FFT core.
+The RK4 ODE convenience family covers scalar first-order, scalar second-order, scalar nth-order, coupled first-order and coupled second-order systems on the same shared system RK4 core. Adaptive scalar RKF45 and fourth-order Adams-Bashforth/Adams-Moulton predictor-corrector integration are also available. The historical boundary-value slice covers both linear and nonlinear RK4-backed shooting. The least-squares model set includes general linear-basis and polynomial fitting plus named power-law, exponential, logarithmic and five-term Fourier models. The transform slice includes complex and real FFT, compact real spectra, and real/complex convolution and cross-correlation.
 
-A C#/.NET user handbook under `docs/user-guide/` grows alongside stable implementation milestones rather than reusing the historical Pascal documentation.
+## M2 — V1 publication quality (in progress)
 
-## M2 — Complete V1 compatibility catalog (functional catalog done; release hardening in progress)
+The historical compatibility catalog, including the graphical demonstration layer, is now implemented. Work therefore focuses on the quality required for a release rather than on adding more historical algorithms.
 
-The historical demonstration/graphics role is now covered by the cross-platform `Sasd.Math.Toolkit.Sample` application, which generates a deterministic self-contained HTML/SVG numerical report without introducing UI dependencies into the reusable library.
-
-All rows in `BORLAND-V1-COMPATIBILITY.md` are therefore functionally covered. Remaining V1 work is release hardening rather than additional historical algorithms:
-
-- complete the remaining user-handbook chapters for stable V1 areas;
-- perform an API consistency and public-surface audit;
-- verify XML documentation and error semantics across all public algorithms;
-- expand executable examples where a handbook chapter benefits from them;
-- perform the final compatibility/test audit and prepare release notes/versioning.
+The independent C#/.NET user handbook under `docs/user-guide/` is being completed domain by domain. The root-finding chapter is complete and covers bisection, Newton-Raphson, secant, Newton-Horner, Muller, Laguerre and all-roots deflation workflows. The next handbook areas are interpolation, integration, matrices/linear systems and eigenvalues before a cross-cutting diagnostics chapter and final V1 audit.
 
 Quality gate for V1:
 
 - All catalog items implemented or intentionally documented as superseded by an equivalent API.
-- Unit/regression tests for every public algorithm.
+- Unit/regression tests for every public algorithm and important failure status.
 - Numerical examples compared against independent analytical/reference results.
 - API and usage documentation in English; German user/developer overview synchronized.
 - User-handbook chapters for the stable V1 areas, with C# examples and numerical interpretation guidance.

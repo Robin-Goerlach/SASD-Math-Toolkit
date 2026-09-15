@@ -1,6 +1,6 @@
 # SASD Math Toolkit User Handbook — C#/.NET
 
-This is the beginning of the user-facing handbook for the SASD Math Toolkit. It is written specifically for the current C#/.NET API and will grow in parallel with the V1 implementation.
+This is the user-facing handbook for the SASD Math Toolkit. It is written specifically for the current C#/.NET API and grows in parallel with V1 quality work.
 
 The handbook is **not** a transcription, translation or repackaging of the historical Borland Pascal handbook. The historical product is used only as a functional milestone for V1. Explanations, examples, API names, warnings and workflows in this handbook are newly written for SASD Math Toolkit.
 
@@ -8,10 +8,10 @@ The handbook is **not** a transcription, translation or repackaging of the histo
 
 The handbook is for application developers, students and technically oriented users who want to apply the numerical routines without first reading the implementation source. Each chapter should answer four practical questions: what problem does the method solve, when should it be used, how is it called from C#, and what numerical limitations should be expected?
 
-## Planned chapter structure
+## Chapter structure
 
 1. [Getting started](getting-started.md)
-2. Roots of equations
+2. [Roots of equations](root-finding.md)
 3. Interpolation
 4. [Numerical differentiation](differentiation.md)
 5. Numerical integration
