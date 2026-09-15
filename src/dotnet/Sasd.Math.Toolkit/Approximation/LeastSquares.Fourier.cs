@@ -19,11 +19,11 @@ public static partial class LeastSquares
     /// </param>
     /// <remarks>
     /// The angular frequency is treated as known. For a fixed frequency the model is linear in
-    /// its five coefficients, so the implementation delegates coefficient estimation to
-    /// <see cref="FitBasis"/> rather than introducing a separate Fourier-specific solver.
-    /// At least five samples are required, and the sample locations must provide a full-rank
-    /// basis matrix. Degenerate phase selections are reported by the shared linear solver as a
-    /// numerically singular system.
+    /// its five coefficients, so coefficient estimation uses the shared basis-design machinery.
+    /// Unlike the fully general <see cref="FitBasis"/> API, this named model deliberately requires
+    /// full column rank because five named Fourier coefficients should be individually identifiable.
+    /// Degenerate phase selections therefore remain an error instead of silently returning one of
+    /// infinitely many minimum-norm coefficient vectors.
     /// </remarks>
     public static FiveTermFourierFitResult FitFiveTermFourier(
         IReadOnlyList<double> x,
@@ -49,9 +49,9 @@ public static partial class LeastSquares
                 "The angular frequency must allow a finite second harmonic and a finite period.");
         }
 
-        // Validate phase products before assembling normal equations. Math.Sin/Math.Cos return
-        // NaN for infinite arguments; reporting the problematic input directly is clearer than
-        // allowing that NaN to surface later as a generic basis-function failure.
+        // Validate phase products before evaluating trigonometric basis functions. Math.Sin/Math.Cos
+        // return NaN for infinite arguments; reporting the problematic sample directly is clearer
+        // than allowing that NaN to surface later as a generic basis-function failure.
         for (var i = 0; i < x.Count; i++)
         {
             if (!double.IsFinite(x[i]) || !double.IsFinite(y[i]))
@@ -71,7 +71,7 @@ public static partial class LeastSquares
             }
         }
 
-        var coefficients = FitBasis(
+        var coefficients = FitBasisRequiringFullColumnRank(
             x,
             y,
             [
