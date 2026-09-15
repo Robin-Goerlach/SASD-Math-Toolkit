@@ -40,7 +40,7 @@ Implemented now:
 - Polynomial foundation: immutable complex-capable coefficients, Horner evaluation, first/second derivative evaluation, formal derivative and synthetic deflation
 - Interpolation: Lagrange, Newton divided differences, natural cubic spline and clamped cubic spline
 - Numerical differentiation: function derivatives with Richardson/five-point formulas, tabular two/three/five-point methods on uniform or non-uniform grids, and first/second derivatives of cubic splines
-- Numerical integration: composite trapezoid, composite Simpson, adaptive Simpson, Romberg, 5-point Gauss-Legendre and adaptive Gauss-Legendre
+- Numerical integration: composite trapezoid, composite Simpson, adaptive Simpson with diagnostic results, Romberg with convergence diagnostics, five-point Gauss-Legendre and adaptive Gauss-Legendre
 - Linear algebra: determinant, Gaussian elimination, partial pivoting, reusable LU factorization/solve, inverse and Gauss-Seidel iteration
 - Eigenvalues: power method, LU-backed inverse power method, Wielandt deflation/second eigenpair and cyclic Jacobi complete symmetric eigensystems
 - Differential equations: fixed-step RK4 for scalar first-order, scalar second-order, scalar nth-order, coupled first-order and coupled second-order systems; adaptive RKF45; fourth-order Adams-Bashforth/Adams-Moulton predictor-corrector; linear and nonlinear shooting for scalar second-order Dirichlet boundary-value problems
@@ -63,7 +63,7 @@ Target framework: **.NET 10**.
 
 - Numerical algorithms are deterministic and independent from UI, files and console I/O.
 - Input validation is explicit.
-- Iterative algorithms return termination status, iteration count and residual information where useful.
+- Iterative/adaptive algorithms expose termination status, iteration/refinement counts and residual/error information where useful.
 - Public APIs use ordinary .NET data types and `System.Numerics.Complex` where appropriate.
 - Algorithms stay understandable and well documented before micro-optimization begins.
 - Large-scale/high-performance workloads may later use optional BLAS/LAPACK or other mature backends behind SASD abstractions.
@@ -71,7 +71,7 @@ Target framework: **.NET 10**.
 
 ## Documentation
 
-Technical documentation includes architecture/roadmap material and focused notes for stable numerical domains. Root finding is documented in [`docs/en/ROOT-FINDING.md`](docs/en/ROOT-FINDING.md) / [`docs/de/NULLSTELLENSUCHE.md`](docs/de/NULLSTELLENSUCHE.md), and interpolation in [`docs/en/INTERPOLATION.md`](docs/en/INTERPOLATION.md) / [`docs/de/INTERPOLATION.md`](docs/de/INTERPOLATION.md). Existing domain notes cover polynomial roots, differentiation, LU/eigenvalues, ODE methods, least-squares models, real FFT, convolution/correlation and the graphical demo.
+Technical documentation includes architecture/roadmap material and focused notes for stable numerical domains. Publication-quality notes currently include root finding, interpolation and numerical integration in both English and German, in addition to the existing domain notes for polynomial roots, differentiation, LU/eigenvalues, ODE methods, least-squares models, real FFT, convolution/correlation and the graphical demo.
 
 Clean-room policy: [`docs/en/CLEAN-ROOM.md`](docs/en/CLEAN-ROOM.md).
 

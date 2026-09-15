@@ -1,3 +1,4 @@
+using Sasd.Numerics.Common;
 using Sasd.Numerics.Differentiation;
 using Sasd.Numerics.Integration;
 
@@ -74,8 +75,6 @@ public sealed class CalculusTests
         var y = x.Select(Cubic).ToArray();
         const double point = 1.2;
 
-        // f(x)=x^3-2x^2+x+1 has f'(0)=1 and f'(2)=5. A clamped cubic
-        // spline with exact endpoint derivatives reproduces the cubic itself.
         var first = SplineDifferentiation.ClampedFirstDerivative(x, y, 1.0, 5.0, point);
         var second = SplineDifferentiation.ClampedSecondDerivative(x, y, 1.0, 5.0, point);
 
@@ -87,20 +86,120 @@ public sealed class CalculusTests
     }
 
     [Fact]
-    public void Simpson_IntegratesSin()
+    public void CompositeRules_IntegrateReferencePolynomialsAndValidatePanelCounts()
     {
-        // Composite Simpson converges with fourth order for smooth functions.
-        // 200 intervals keep this test strict without demanding more accuracy
-        // than the selected discretization can mathematically provide.
-        var integral = NumericalIntegration.CompositeSimpson(System.Math.Sin, 0.0, System.Math.PI, 200);
-        Assert.InRange(integral, 2.0 - 1e-9, 2.0 + 1e-9);
+        var trapezoid = NumericalIntegration.CompositeTrapezoid(x => (3.0 * x) + 2.0, 0.0, 2.0, 8);
+        var simpson = NumericalIntegration.CompositeSimpson(x => x * x * x, 0.0, 2.0, 10);
+
+        Assert.Equal(10.0, trapezoid, 12);
+        Assert.Equal(4.0, simpson, 12);
+        Assert.Throws<ArgumentException>(() =>
+            NumericalIntegration.CompositeSimpson(System.Math.Sin, 0.0, 1.0, 3));
     }
 
     [Fact]
-    public void Romberg_IntegratesPolynomial()
+    public void AdaptiveSimpsonDetailed_IntegratesSinAndReportsDiagnostics()
     {
-        var integral = NumericalIntegration.Romberg(x => x * x, 0.0, 1.0);
-        Assert.InRange(integral, (1.0 / 3.0) - 1e-10, (1.0 / 3.0) + 1e-10);
+        var result = NumericalIntegration.AdaptiveSimpsonDetailed(
+            System.Math.Sin,
+            0.0,
+            System.Math.PI,
+            tolerance: 1e-11,
+            maximumDepth: 20);
+
+        Assert.True(result.Converged);
+        Assert.Equal(AdaptiveIntegrationStatus.Converged, result.Status);
+        Assert.InRange(result.Value, 2.0 - 1e-11, 2.0 + 1e-11);
+        Assert.InRange(result.EstimatedError, 0.0, 1e-11);
+        Assert.True(result.FunctionEvaluations >= 5);
+        Assert.True(result.AcceptedPanels >= 2);
+        Assert.Equal(result.Value, NumericalIntegration.AdaptiveSimpson(System.Math.Sin, 0.0, System.Math.PI, 1e-11, 20), 12);
+    }
+
+    [Fact]
+    public void AdaptiveSimpsonDetailed_ReportsDepthLimitInsteadOfPretendingConvergence()
+    {
+        var result = NumericalIntegration.AdaptiveSimpsonDetailed(
+            System.Math.Exp,
+            0.0,
+            1.0,
+            tolerance: 1e-30,
+            maximumDepth: 1);
+
+        Assert.False(result.Converged);
+        Assert.Equal(AdaptiveIntegrationStatus.MaximumDepthReached, result.Status);
+        Assert.True(double.IsFinite(result.Value));
+        Assert.True(result.EstimatedError > 0.0);
+    }
+
+    [Fact]
+    public void RombergDetailed_IntegratesPolynomialAndReportsLevelLimit()
+    {
+        var result = NumericalIntegration.RombergDetailed(x => x * x, 0.0, 1.0, 1e-12, 12);
+
+        Assert.True(result.Converged);
+        Assert.Equal(IterationStatus.Converged, result.Status);
+        Assert.InRange(result.Value, (1.0 / 3.0) - 1e-12, (1.0 / 3.0) + 1e-12);
+        Assert.NotNull(result.EstimatedError);
+        Assert.True(result.FunctionEvaluations >= 3);
+
+        var limited = NumericalIntegration.RombergDetailed(x => x * x, 0.0, 1.0, 1e-30, 1);
+        Assert.False(limited.Converged);
+        Assert.Equal(IterationStatus.MaximumIterationsReached, limited.Status);
+        Assert.Null(limited.EstimatedError);
+        Assert.Equal(1, limited.Levels);
+    }
+
+    [Fact]
+    public void GaussLegendre5_IsExactForDegreeEightPolynomialWithinFloatingPointRoundoff()
+    {
+        var integral = NumericalIntegration.GaussLegendre5(x => System.Math.Pow(x, 8), -1.0, 1.0);
+        Assert.InRange(integral, (2.0 / 9.0) - 1e-14, (2.0 / 9.0) + 1e-14);
+    }
+
+    [Fact]
+    public void AdaptiveGaussLegendreDetailed_IntegratesExponentialAndReportsDiagnostics()
+    {
+        var result = NumericalIntegration.AdaptiveGaussLegendre5Detailed(
+            System.Math.Exp,
+            0.0,
+            1.0,
+            tolerance: 1e-12,
+            maximumDepth: 12);
+
+        var expected = System.Math.E - 1.0;
+        Assert.True(result.Converged);
+        Assert.InRange(result.Value, expected - 1e-12, expected + 1e-12);
+        Assert.InRange(result.EstimatedError, 0.0, 1e-12);
+        Assert.True(result.FunctionEvaluations >= 15);
+        Assert.True(result.AcceptedPanels >= 2);
+        Assert.Equal(result.Value, NumericalIntegration.AdaptiveGaussLegendre5(System.Math.Exp, 0.0, 1.0, 1e-12, 12), 12);
+    }
+
+    [Fact]
+    public void Integration_RejectsNonFiniteIntegrandResultsAcrossAlgorithmFamilies()
+    {
+        static double Invalid(double _) => double.NaN;
+
+        Assert.Throws<ArithmeticException>(() => NumericalIntegration.CompositeTrapezoid(Invalid, 0.0, 1.0, 4));
+        Assert.Throws<ArithmeticException>(() => NumericalIntegration.CompositeSimpson(Invalid, 0.0, 1.0, 4));
+        Assert.Throws<ArithmeticException>(() => NumericalIntegration.AdaptiveSimpson(Invalid, 0.0, 1.0));
+        Assert.Throws<ArithmeticException>(() => NumericalIntegration.Romberg(Invalid, 0.0, 1.0));
+        Assert.Throws<ArithmeticException>(() => NumericalIntegration.GaussLegendre5(Invalid, 0.0, 1.0));
+        Assert.Throws<ArithmeticException>(() => NumericalIntegration.AdaptiveGaussLegendre5(Invalid, 0.0, 1.0));
+    }
+
+    [Fact]
+    public void Integration_RejectsInvalidOrUnrepresentableIntervalsAndUnsafeRombergDepth()
+    {
+        Assert.Throws<ArgumentException>(() =>
+            NumericalIntegration.CompositeTrapezoid(System.Math.Sin, 1.0, 1.0, 4));
+        Assert.Throws<ArgumentException>(() =>
+            NumericalIntegration.CompositeTrapezoid(System.Math.Sin, 2.0, 1.0, 4));
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            NumericalIntegration.CompositeTrapezoid(System.Math.Sin, -double.MaxValue, double.MaxValue, 4));
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            NumericalIntegration.Romberg(System.Math.Sin, 0.0, 1.0, maximumLevels: 31));
     }
 
     private static double Quartic(double x) =>

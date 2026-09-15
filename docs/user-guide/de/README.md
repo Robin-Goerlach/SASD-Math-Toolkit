@@ -14,7 +14,7 @@ Das Benutzerhandbuch richtet sich an Anwendungsentwickler, Lernende und technisc
 2. [Nullstellen von Gleichungen](nullstellen.md)
 3. [Interpolation](interpolation.md)
 4. [Numerische Differentiation](differentiation.md)
-5. Numerische Integration
+5. [Numerische Integration](integration.md)
 6. Matrizen und lineare Gleichungssysteme
 7. Eigenwerte und Eigenvektoren
 8. [Gewöhnliche Differentialgleichungen und Randwertprobleme](differentialgleichungen.md)
