@@ -114,7 +114,11 @@
   columns=fullflexible,
   keepspaces=true,
   tabsize=4,
-  captionpos=b
+  captionpos=b,
+  % listings does not natively understand every Unicode math symbol. Keep
+  % mathematical infinity readable in Markdown inline-code spans such as
+  % ||A*x-b||∞ without weakening the source text.
+  literate={∞}{{$\infty$}}1
 }
 
 \newtcolorbox{sasdnote}[1]{
