@@ -8,7 +8,7 @@ The library is intended to become a common base for projects such as the **SASD 
 
 The historical Borland-inspired feature-transfer phase is functionally complete. It remains a compatibility/reference baseline, **not** a source-code port and no longer the boundary of future development. Historical source code is neither required nor copied.
 
-Modernization is now in progress. The first step adds Householder QR factorization and migrates general/polynomial least squares away from normal equations. The broader plan is documented in [`docs/en/MODERNIZATION-2026.md`](docs/en/MODERNIZATION-2026.md).
+Modernization is now in progress. Householder QR is the default robust dense least-squares foundation, and Cholesky factorization now provides the specialized path for symmetric positive-definite systems. The broader plan is documented in [`docs/en/MODERNIZATION-2026.md`](docs/en/MODERNIZATION-2026.md).
 
 A final repository-wide release audit is still required before a public 1.0 tag; it will be run against the actual release candidate so modern APIs are included too.
 
@@ -28,7 +28,7 @@ SASD-Math-Toolkit/
 ├── docs/
 │   ├── en/                     # primary technical documentation
 │   ├── de/                     # German technical documentation
-│   └── user-guide/             # C#/.NET user handbook (English and German)
+│   └── user-guide/             # Markdown handbook + LaTeX/PDF editions
 └── .github/workflows/          # build and test automation
 ```
 
@@ -43,10 +43,10 @@ Implemented now:
 - Interpolation: Lagrange, Newton divided differences, natural and clamped cubic splines
 - Numerical differentiation: function, tabular and spline differentiation
 - Numerical integration: composite/adaptive rules, Romberg and Gauss-Legendre with diagnostics
-- Linear algebra: row-major dense matrices, determinant, Gaussian elimination, reusable pivoted LU, **Householder QR**, inverse, residual diagnostics and Gauss-Seidel
+- Linear algebra: row-major dense matrices, determinant, Gaussian elimination, reusable pivoted LU, **Householder QR**, **Cholesky**, inverse, residual diagnostics and Gauss-Seidel
 - Eigenvalues: immutable eigenpairs, residual diagnostics, power/inverse-power, Wielandt deflation and cyclic Jacobi
 - Differential equations: RK4 convenience family, adaptive RKF45, Adams predictor-corrector and linear/nonlinear shooting
-- Least squares: polynomial/general-basis fits now use **Householder QR**; named power-law, exponential, logarithmic and five-term Fourier models remain available
+- Least squares: polynomial/general-basis fits use **Householder QR**; named power-law, exponential, logarithmic and five-term Fourier models remain available
 - FFT/transforms: radix-2 complex/real FFT, compact real spectra, real/complex convolution and cross-correlation
 - Graphical demo: deterministic self-contained HTML/SVG report
 - Geometry seed: immutable `Vector2D`
@@ -78,13 +78,14 @@ Target framework: **.NET 10**.
 ## Documentation
 
 - 2026 modernization plan: [`docs/en/MODERNIZATION-2026.md`](docs/en/MODERNIZATION-2026.md)
+- Cholesky design note: [`docs/en/CHOLESKY-FACTORIZATION.md`](docs/en/CHOLESKY-FACTORIZATION.md)
 - Performance policy: [`docs/en/PERFORMANCE.md`](docs/en/PERFORMANCE.md)
 - Diagnostic conventions: [`docs/en/NUMERICAL-DIAGNOSTICS.md`](docs/en/NUMERICAL-DIAGNOSTICS.md)
 - Clean-room policy: [`docs/en/CLEAN-ROOM.md`](docs/en/CLEAN-ROOM.md)
 - English user handbook: [`docs/user-guide/en/README.md`](docs/user-guide/en/README.md)
 - Deutsches Benutzerhandbuch: [`docs/user-guide/de/README.md`](docs/user-guide/de/README.md)
 
-The handbook is written for the SASD C#/.NET API and is not a redistribution of the historical Pascal handbook.
+The handbook is written for the SASD C#/.NET API and is not a redistribution of the historical Pascal handbook. The committed V1.0 PDFs remain a stable classical edition while modernization continues; they will be regenerated from the Markdown/LaTeX pipeline at the next release-candidate boundary.
 
 ## License
 
