@@ -24,19 +24,22 @@ The final repository-wide release audit is still required before a public 1.0 ta
 
 The project now evolves beyond the 1980s feature catalog. The detailed plan is in [`MODERNIZATION-2026.md`](MODERNIZATION-2026.md).
 
-### M3.1 — Modern dense linear algebra and regression (advanced)
+### M3.1 — Modern dense linear algebra and regression (foundation complete)
 
 - Householder QR factorization: **implemented**
 - General/polynomial least squares migrated from normal equations: **implemented**
 - Cholesky factorization, reusable solves and log-determinant: **implemented**
 - One-sided Jacobi SVD for arbitrary dense matrix shapes: **implemented**
 - Numerical rank, pseudoinverse, minimum-norm least squares and 2-norm condition diagnostics: **implemented**
-- Matrix norms and decomposition convenience utilities: next cleanup slice
+- Matrix 1-, infinity-, Frobenius- and spectral norms: **implemented**
+- Combined rank, left/right nullity and conditioning report: **implemented**
 - Optional mature BLAS/LAPACK-class backend: later, benchmark driven
 
-### M3.2 — Sparse linear algebra
+Additional dense utilities remain possible, but the managed reference foundation is now complete enough to stop delaying sparse work.
 
-CSR/CSC storage, sparse matvec, CG, GMRES, BiCGSTAB and preconditioning.
+### M3.2 — Sparse linear algebra (next)
+
+CSR/CSC storage, sparse matvec, CG, GMRES, BiCGSTAB and preconditioning. The first slice will establish CSR construction, validation and matrix-vector arithmetic before iterative solvers are added.
 
 ### M3.3 — Optimization and nonlinear systems
 
