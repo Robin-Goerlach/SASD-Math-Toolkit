@@ -33,7 +33,7 @@ Das Projekt entwickelt sich bewusst über den Funktionskatalog der 1980er-Jahre 
 
 Weitere dichte Hilfen bleiben möglich, aber das Managed-Referenzfundament ist vollständig genug, um Sparse-Arbeit nicht weiter aufzuschieben.
 
-### M3.2 – Dünnbesetzte lineare Algebra (in Arbeit)
+### M3.2 – Dünnbesetzte lineare Algebra (Solver-Fundament abgeschlossen; Konsolidierung in Arbeit)
 
 - Kanonische unveränderliche CSR-Speicherung und Validierung: **implementiert**
 - Koordinaten-/Dense-/Raw-CSR-Aufbau mit expliziter Duplikatregel: **implementiert**
@@ -46,8 +46,8 @@ Weitere dichte Hilfen bleiben möglich, aber das Managed-Referenzfundament ist v
 - Preconditioned Conjugate Gradient mit Prüfung des SPD-Rekurrenzvertrags: **implementiert**
 - Restarted GMRES für allgemeine nichtsymmetrische Systeme: **implementiert**
 - Right-preconditioned GMRES mit Modified-Gram-Schmidt-/Arnoldi- und Givens-Aktualisierung: **implementiert**
-- BiCGSTAB: **als Nächstes**
-- Konsolidierung der Sparse-Architektur und Referenzfälle: nach BiCGSTAB
+- BiCGSTAB mit Right Preconditioning, begrenztem Vektorspeicher und expliziter Rekurrenz-Breakdown-Diagnostik: **implementiert**
+- Konsolidierung der Sparse-Architektur und Referenzfälle: **als Nächstes**
 - eigenes CSC und stärkere Incomplete-Factorization-Preconditioner: später bei konkretem Bedarf
 
 ### M3.3 – Optimierung und nichtlineare Systeme

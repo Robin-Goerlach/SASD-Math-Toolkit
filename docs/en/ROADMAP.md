@@ -37,7 +37,7 @@ The project now evolves beyond the 1980s feature catalog. The detailed plan is i
 
 Additional dense utilities remain possible, but the managed reference foundation is complete enough to stop delaying sparse work.
 
-### M3.2 — Sparse linear algebra (in progress)
+### M3.2 — Sparse linear algebra (solver foundation complete; consolidation in progress)
 
 - Canonical immutable CSR storage and validation: **implemented**
 - Coordinate/dense/raw-CSR construction with explicit duplicate policy: **implemented**
@@ -50,8 +50,8 @@ Additional dense utilities remain possible, but the managed reference foundation
 - Preconditioned Conjugate Gradient with SPD recurrence validation: **implemented**
 - Restarted GMRES for general nonsymmetric systems: **implemented**
 - Right-preconditioned GMRES with modified Gram-Schmidt/Arnoldi and Givens updates: **implemented**
-- BiCGSTAB: **next**
-- Sparse architecture/reference-case consolidation: after BiCGSTAB
+- BiCGSTAB with right preconditioning, bounded vector memory and explicit recurrence-breakdown diagnostics: **implemented**
+- Sparse architecture/reference-case consolidation: **next**
 - Dedicated CSC and stronger incomplete-factorization preconditioners: later when concrete workloads justify them
 
 ### M3.3 — Optimization and nonlinear systems

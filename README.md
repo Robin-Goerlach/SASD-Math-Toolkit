@@ -8,7 +8,7 @@ The library is intended to become a common base for projects such as the **SASD 
 
 The historical Borland-inspired feature-transfer phase is functionally complete. It remains a compatibility/reference baseline, **not** a source-code port and no longer the boundary of future development. Historical source code is neither required nor copied.
 
-Modernization is now in progress. The modern dense numerical foundation includes **Householder QR**, **Cholesky**, a **one-sided Jacobi singular value decomposition**, stable matrix norms and shared rank/nullity/conditioning diagnostics. General/polynomial least squares no longer rely on normal equations; the general basis API can use SVD for rank-deficient or underdetermined minimum-norm problems. Sparse linear algebra now includes immutable canonical **CSR**, sparse arithmetic/norms, **Conjugate Gradient**, a solver-neutral preconditioner abstraction, **Jacobi preconditioning**, **Preconditioned Conjugate Gradient (PCG)** and **restarted GMRES** with right preconditioning, true-residual verification and explicit breakdown diagnostics. The next sparse solver target is BiCGSTAB. The broader plan is documented in [`docs/en/MODERNIZATION-2026.md`](docs/en/MODERNIZATION-2026.md).
+Modernization is now in progress. The modern dense numerical foundation includes **Householder QR**, **Cholesky**, a **one-sided Jacobi singular value decomposition**, stable matrix norms and shared rank/nullity/conditioning diagnostics. General/polynomial least squares no longer rely on normal equations; the general basis API can use SVD for rank-deficient or underdetermined minimum-norm problems. Sparse linear algebra now includes immutable canonical **CSR**, sparse arithmetic/norms, **Conjugate Gradient**, a solver-neutral preconditioner abstraction, **Jacobi preconditioning**, **Preconditioned Conjugate Gradient (PCG)**, **restarted GMRES** and **BiCGSTAB** with right preconditioning, true-residual verification and explicit numerical-breakdown diagnostics. The next step is a sparse architecture/reference-case consolidation round before the release-candidate audit. The broader plan is documented in [`docs/en/MODERNIZATION-2026.md`](docs/en/MODERNIZATION-2026.md).
 
 A final repository-wide release audit is still required before a public 1.0 tag; it will be run against the actual release candidate so modern APIs are included too.
 
@@ -44,7 +44,7 @@ Implemented now:
 - Numerical differentiation: function, tabular and spline differentiation
 - Numerical integration: composite/adaptive rules, Romberg and Gauss-Legendre with diagnostics
 - Dense linear algebra: row-major dense matrices, determinant, Gaussian elimination, reusable pivoted LU, **Householder QR**, **Cholesky**, **SVD with numerical rank, 2-norm condition diagnostics and pseudoinverse**, stable 1-/infinity-/Frobenius-/spectral norms, shared nullity/conditioning reports, inverse, residual diagnostics and Gauss-Seidel
-- Sparse linear algebra: immutable canonical **CSR** storage, coordinate/dense/raw-CSR construction, duplicate aggregation, sparse matrix-vector multiplication with reusable span buffers, transpose/dense conversion, sparse 1-/infinity-/Frobenius norms, structural symmetry diagnostics, **CG**, solver-neutral `ISparsePreconditioner`, **Jacobi preconditioning**, **PCG**, and **restarted GMRES** for general square systems with right preconditioning and Arnoldi/Givens residual minimization
+- Sparse linear algebra: immutable canonical **CSR** storage, coordinate/dense/raw-CSR construction, duplicate aggregation, sparse matrix-vector multiplication with reusable span buffers, transpose/dense conversion, sparse 1-/infinity-/Frobenius norms, structural symmetry diagnostics, **CG**, solver-neutral `ISparsePreconditioner`, **Jacobi preconditioning**, **PCG**, **restarted GMRES** and **BiCGSTAB** for general square systems
 - Eigenvalues: immutable eigenpairs, residual diagnostics, power/inverse-power, Wielandt deflation and cyclic Jacobi
 - Differential equations: RK4 convenience family, adaptive RKF45, Adams predictor-corrector and linear/nonlinear shooting
 - Least squares: polynomial/general-basis fits prefer **Householder QR**; general-basis fitting falls back to SVD for rank-deficient/underdetermined minimum-norm problems; named power-law, exponential, logarithmic and five-term Fourier models retain their domain/identifiability contracts
@@ -75,7 +75,7 @@ Target framework: **.NET 10**.
 - Sparse representations are canonical and immutable after construction; iterative sparse algorithms reuse work buffers instead of converting to dense storage.
 - Sparse iterative solvers share one absolute/relative **true-residual** stopping rule and the toolkit-wide `IterationStatus` vocabulary.
 - Preconditioners expose an approximate-inverse operation rather than an explicit inverse matrix; solver-specific mathematical requirements stay at the solver boundary.
-- GMRES uses right preconditioning so reported convergence remains defined by the original residual `b-A*x`.
+- GMRES and BiCGSTAB use right preconditioning so reported convergence remains defined by the original residual `b-A*x`.
 - Aggressive unsafe/SIMD/parallel/native tuning is benchmark-driven rather than speculative.
 - Large-scale workloads may later use optional BLAS/LAPACK or other mature backends behind SASD abstractions.
 - Historical algorithm names are mathematical references, not dependencies on historical source code.
@@ -91,6 +91,7 @@ Target framework: **.NET 10**.
 - Sparse CG/PCG: [`docs/en/SPARSE-CONJUGATE-GRADIENT.md`](docs/en/SPARSE-CONJUGATE-GRADIENT.md)
 - Sparse preconditioning: [`docs/en/SPARSE-PRECONDITIONING.md`](docs/en/SPARSE-PRECONDITIONING.md)
 - Restarted GMRES: [`docs/en/SPARSE-GMRES.md`](docs/en/SPARSE-GMRES.md)
+- BiCGSTAB: [`docs/en/SPARSE-BICGSTAB.md`](docs/en/SPARSE-BICGSTAB.md)
 - Performance policy: [`docs/en/PERFORMANCE.md`](docs/en/PERFORMANCE.md)
 - Diagnostic conventions: [`docs/en/NUMERICAL-DIAGNOSTICS.md`](docs/en/NUMERICAL-DIAGNOSTICS.md)
 - Clean-room policy: [`docs/en/CLEAN-ROOM.md`](docs/en/CLEAN-ROOM.md)

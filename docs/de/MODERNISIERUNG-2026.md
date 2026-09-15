@@ -20,9 +20,9 @@ Die aktuelle Managed-SVD ist bewusst eine nachvollziehbare einseitige Jacobi-Ref
 
 Die dichte Referenzbasis ist breit genug, um in die nächste Modernisierungsschicht zu wechseln, ohne vorzugeben, bereits ein Hersteller-BLAS/LAPACK zu ersetzen. Weitere dichte Hilfen können bei konkretem Bedarf ergänzt werden.
 
-## M3.2 — Dünnbesetzte lineare Algebra — in Arbeit
+## M3.2 — Dünnbesetzte lineare Algebra — Solver-Fundament abgeschlossen, Konsolidierung in Arbeit
 
-Das Speicher-/Arithmetikfundament, der SPD-Krylov-Pfad, die wiederverwendbare Preconditioning-Schicht und der erste allgemeine nichtsymmetrische Krylov-Solver sind jetzt implementiert:
+Die Managed-Sparse-Solverfamilie deckt jetzt sowohl SPD- als auch allgemeine nichtsymmetrische quadratische Systeme ab:
 
 - **kanonische unveränderliche CSR-Speicherung — implementiert**;
 - **Koordinatenaufbau mit expliziter Aggregation doppelter Einträge — implementiert**;
@@ -38,15 +38,16 @@ Das Speicher-/Arithmetikfundament, der SPD-Krylov-Pfad, die wiederverwendbare Pr
 - **Jacobi-/Diagonal-Preconditioner mit expliziter Diagonalschwelle — implementiert**;
 - **Preconditioned Conjugate Gradient mit Prüfung von `r^T M^-1 r` und Suchrichtungskrümmung — implementiert**;
 - **restarted GMRES für allgemeine quadratische/nichtsymmetrische Sparse-Systeme — implementiert**;
-- **Right-preconditioned GMRES, sodass Konvergenz weiterhin über das ursprüngliche Residuum `b-A*x` definiert bleibt — implementiert**;
-- **zweifacher Modified-Gram-Schmidt-Arnoldi-Prozess und inkrementelle Givens-Least-Squares-Aktualisierung — implementiert**;
-- BiCGSTAB — **als Nächstes**;
-- Konsolidierung von Sparse-Architektur und Referenzfällen — nach BiCGSTAB;
+- **Right-preconditioned GMRES mit zweifachem Modified-Gram-Schmidt-Arnoldi-Prozess und inkrementellen Givens-Aktualisierungen — implementiert**;
+- **BiCGSTAB mit kurzer Rekurrenz, festem Vektorspeicher, Right Preconditioning und expliziter Breakdown-Diagnostik — implementiert**;
+- Konsolidierung von Sparse-Architektur und Referenzfällen — **als Nächstes**;
 - CSC und stärkere Incomplete-Factorization-Preconditioner erst bei dauerhaft begründetem Bedarf.
 
-Sparse-Solver verwenden das toolkitweite `IterationStatus`-Vokabular und die Abbruchregel `||b-A*x||2 <= max(absTol, relTol*||b||2)`. CG/PCG verifiziert behauptete Konvergenz gegen das explizit neu berechnete echte Residuum. GMRES verwendet sein projiziertes Residuum nur als günstigen Auslöser und verlangt ebenfalls das explizit neu berechnete echte Residuum, bevor `Converged` gemeldet wird.
+Alle iterativen Sparse-Solver verwenden das toolkitweite `IterationStatus`-Vokabular und die Abbruchregel `||b-A*x||2 <= max(absTol, relTol*||b||2)`. CG/PCG, GMRES und BiCGSTAB verlangen alle ein explizit neu berechnetes echtes Residuum, bevor `Converged` gemeldet wird; günstige rekursive oder projizierte Residuen dienen nur als Auslöser.
 
-Die Preconditioner-Abstraktion bleibt bewusst solverneutral. PCG stellt den stärkeren SPD-Vertrag an den Preconditioner. Right-preconditioned GMRES kann eine breitere Klasse fester linearer angenäherter Inversoperationen verwenden und behält trotzdem die Residualsemantik des ursprünglichen Systems bei.
+Die Preconditioner-Abstraktion bleibt bewusst solverneutral. PCG stellt den stärkeren SPD-Vertrag an den Preconditioner. GMRES und BiCGSTAB akzeptieren eine breitere Klasse fester linearer angenäherter Inversoperationen und verwenden Right Preconditioning, sodass Konvergenz weiterhin über das Residuum des ursprünglichen physikalischen Systems definiert ist.
+
+Der nächste Sparse-Meilenstein ist bewusst kein weiterer Solver. Es folgt eine Konsolidierungsrunde: gemeinsames numerisches Hilfsverhalten, repräsentative größere Referenzsysteme, Solver-Auswahlhilfe, Allocation-/Performance-Baselines und eine explizite Entscheidung darüber, was in spätere Releases verschoben bleibt.
 
 ## M3.3 — Optimierung und nichtlineare Systeme
 

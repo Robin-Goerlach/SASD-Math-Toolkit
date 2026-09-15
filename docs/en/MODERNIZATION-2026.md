@@ -20,9 +20,9 @@ The current managed SVD is intentionally a readable one-sided Jacobi reference i
 
 The dense reference foundation is now broad enough to support the next modernization layer without pretending to be a vendor BLAS/LAPACK replacement. Additional dense utilities can be added when concrete consumers require them.
 
-## M3.2 — Sparse linear algebra — in progress
+## M3.2 — Sparse linear algebra — solver foundation complete, consolidation in progress
 
-The storage/arithmetic foundation, SPD Krylov path, reusable preconditioning layer and first general nonsymmetric Krylov solver are now implemented:
+The managed sparse solver family is now broad enough to cover both SPD and general nonsymmetric square systems:
 
 - **canonical immutable CSR storage — implemented**;
 - **coordinate assembly with explicit duplicate aggregation — implemented**;
@@ -38,15 +38,16 @@ The storage/arithmetic foundation, SPD Krylov path, reusable preconditioning lay
 - **Jacobi/diagonal preconditioner with explicit diagonal-threshold semantics — implemented**;
 - **Preconditioned Conjugate Gradient with `r^T M^-1 r` and curvature validation — implemented**;
 - **restarted GMRES for general square/nonsymmetric sparse systems — implemented**;
-- **right-preconditioned GMRES so convergence remains defined by the original residual `b-A*x` — implemented**;
-- **two-pass modified Gram-Schmidt Arnoldi basis and incremental Givens least-squares updates — implemented**;
-- BiCGSTAB — **next**;
-- sparse architecture/reference-case consolidation — after BiCGSTAB;
+- **right-preconditioned GMRES with two-pass modified Gram-Schmidt Arnoldi and incremental Givens updates — implemented**;
+- **BiCGSTAB with fixed-vector-memory short recurrence, right preconditioning and explicit breakdown diagnostics — implemented**;
+- sparse architecture/reference-case consolidation — **next**;
 - CSC and stronger incomplete-factorization preconditioners only when sustained workloads justify them.
 
-Sparse solvers reuse the toolkit-wide `IterationStatus` vocabulary and the stopping rule `||b-A*x||2 <= max(absTol, relTol*||b||2)`. CG/PCG verifies claimed convergence against the explicitly recomputed true residual. GMRES uses its projected residual only as a cheap trigger and likewise requires an explicitly recomputed true residual before returning `Converged`.
+All sparse iterative solvers reuse the toolkit-wide `IterationStatus` vocabulary and the stopping rule `||b-A*x||2 <= max(absTol, relTol*||b||2)`. CG/PCG, GMRES and BiCGSTAB all require an explicitly recomputed true residual before returning `Converged`; inexpensive recursive or projected residuals are only triggers.
 
-The preconditioner abstraction is deliberately solver-neutral. PCG imposes the stronger SPD preconditioner contract. Right-preconditioned GMRES can accept a broader fixed linear approximate inverse while preserving residual semantics in the original system.
+The preconditioner abstraction remains deliberately solver-neutral. PCG imposes the stronger SPD preconditioner contract. GMRES and BiCGSTAB accept a broader fixed linear approximate inverse and use right preconditioning so convergence remains defined by the residual of the original physical system.
+
+The next sparse milestone is not another solver. It is a consolidation round: shared numerical helper behavior, representative larger reference systems, solver-selection guidance, allocation/performance baselines and an explicit decision on what remains deferred to later releases.
 
 ## M3.3 — Optimization and nonlinear systems
 
