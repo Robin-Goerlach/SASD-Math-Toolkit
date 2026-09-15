@@ -18,11 +18,9 @@ QR bleibt für dichtes Least Squares mit vollem Spaltenrang der bevorzugte Weg, 
 
 Die aktuelle Managed-SVD ist bewusst eine nachvollziehbare einseitige Jacobi-Referenzimplementierung. Sie vermeidet `A^T*A`, verwendet skalierungsbewusste Spaltenorthogonalisierung und hält die Rangabschneidung explizit. Die Matrixdiagnostik verwendet dieselbe SVD gemeinsam für Spektralnorm, Rang, Nullität und Kondition, statt mehrfach identische Zerlegungen auszuführen.
 
-Die dichte Referenzbasis ist breit genug, um in die nächste Modernisierungsschicht zu wechseln, ohne vorzugeben, bereits ein Hersteller-BLAS/LAPACK zu ersetzen. Weitere dichte Hilfen können bei konkretem Bedarf ergänzt werden.
+## M3.2 — Dünnbesetzte lineare Algebra — Fundament abgeschlossen
 
-## M3.2 — Dünnbesetzte lineare Algebra — Solver-Fundament abgeschlossen, Konsolidierung in Arbeit
-
-Die Managed-Sparse-Solverfamilie deckt jetzt sowohl SPD- als auch allgemeine nichtsymmetrische quadratische Systeme ab:
+Die Managed-Sparse-Schicht deckt die für diese Release-Grenze geplanten SPD- und allgemeinen nichtsymmetrischen quadratischen Systeme ab:
 
 - **kanonische unveränderliche CSR-Speicherung — implementiert**;
 - **Koordinatenaufbau mit expliziter Aggregation doppelter Einträge — implementiert**;
@@ -40,14 +38,21 @@ Die Managed-Sparse-Solverfamilie deckt jetzt sowohl SPD- als auch allgemeine nic
 - **restarted GMRES für allgemeine quadratische/nichtsymmetrische Sparse-Systeme — implementiert**;
 - **Right-preconditioned GMRES mit zweifachem Modified-Gram-Schmidt-Arnoldi-Prozess und inkrementellen Givens-Aktualisierungen — implementiert**;
 - **BiCGSTAB mit kurzer Rekurrenz, festem Vektorspeicher, Right Preconditioning und expliziter Breakdown-Diagnostik — implementiert**;
-- Konsolidierung von Sparse-Architektur und Referenzfällen — **als Nächstes**;
+- **strukturierte solverübergreifende Release-Referenzfälle — implementiert**;
+- **unabhängige öffentliche True-Residual-Diagnostik — implementiert**;
+- **release-nahes Sparse-Smoke-Beispiel — implementiert**;
+- **Konsolidierung von öffentlicher Benennung/XML-Dokumentation und Allokationsmodell — abgeschlossen**;
 - CSC und stärkere Incomplete-Factorization-Preconditioner erst bei dauerhaft begründetem Bedarf.
 
 Alle iterativen Sparse-Solver verwenden das toolkitweite `IterationStatus`-Vokabular und die Abbruchregel `||b-A*x||2 <= max(absTol, relTol*||b||2)`. CG/PCG, GMRES und BiCGSTAB verlangen alle ein explizit neu berechnetes echtes Residuum, bevor `Converged` gemeldet wird; günstige rekursive oder projizierte Residuen dienen nur als Auslöser.
 
+`SparseMatrixDiagnostics.ResidualEuclideanNorm` stellt dieselbe physikalische Residualgröße jetzt unabhängig von einem konkreten Solver öffentlich bereit. Anwendungen und Release-Tests besitzen damit einen solverneutralen Post-Solve-Prüfpfad.
+
 Die Preconditioner-Abstraktion bleibt bewusst solverneutral. PCG stellt den stärkeren SPD-Vertrag an den Preconditioner. GMRES und BiCGSTAB akzeptieren eine breitere Klasse fester linearer angenäherter Inversoperationen und verwenden Right Preconditioning, sodass Konvergenz weiterhin über das Residuum des ursprünglichen physikalischen Systems definiert ist.
 
-Der nächste Sparse-Meilenstein ist bewusst kein weiterer Solver. Es folgt eine Konsolidierungsrunde: gemeinsames numerisches Hilfsverhalten, repräsentative größere Referenzsysteme, Solver-Auswahlhilfe, Allocation-/Performance-Baselines und eine explizite Entscheidung darüber, was in spätere Releases verschoben bleibt.
+Die Konsolidierungsprüfung lässt solver-spezifische Low-Level-Prüfungen bewusst nahe an der jeweiligen Rekurrenz, wenn sich ihre Breakdown-Semantik unterscheidet. Das für Aufrufer gemeinsame Verhalten ist dagegen in Options-, Ergebnis-, Preconditioner- und Residualverträgen zentralisiert. Ohne dedizierte Benchmark-Suite werden keine Geschwindigkeits- oder Allokationsprozente behauptet.
+
+Der nächste Repository-Schritt ist das **repositoryweite Release-Candidate-Audit** und nicht noch ein weiterer Sparse-Solver.
 
 ## M3.3 — Optimierung und nichtlineare Systeme
 

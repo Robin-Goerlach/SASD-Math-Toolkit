@@ -52,4 +52,17 @@ public sealed class DemoApplicationTests
             CultureInfo.CurrentUICulture = originalUiCulture;
         }
     }
+
+    [Fact]
+    public void SparseLinearAlgebraExample_ExercisesGeneralKrylovSolversAgainstKnownSolution()
+    {
+        var summary = SparseLinearAlgebraExample.Run();
+
+        Assert.Equal(24, summary.Size);
+        Assert.True(summary.GmresIterations > 0);
+        Assert.True(summary.BiCgStabIterations > 0);
+        Assert.InRange(summary.WorstResidualNorm, 0.0, 1e-7);
+        Assert.InRange(summary.MaximumSolutionError, 0.0, 1e-7);
+        Assert.InRange(summary.MaximumSolverDisagreement, 0.0, 1e-7);
+    }
 }

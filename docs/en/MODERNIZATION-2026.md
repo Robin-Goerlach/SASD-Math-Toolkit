@@ -18,11 +18,9 @@ QR remains the preferred full-column-rank dense least-squares path because it is
 
 The current managed SVD is intentionally a readable one-sided Jacobi reference implementation. It avoids `A^T*A`, uses scale-aware column orthogonalization, and keeps rank truncation explicit. The matrix-diagnostic layer reuses that SVD for spectral norm, rank, nullity and condition reporting instead of repeating decompositions.
 
-The dense reference foundation is now broad enough to support the next modernization layer without pretending to be a vendor BLAS/LAPACK replacement. Additional dense utilities can be added when concrete consumers require them.
+## M3.2 — Sparse linear algebra — foundation complete
 
-## M3.2 — Sparse linear algebra — solver foundation complete, consolidation in progress
-
-The managed sparse solver family is now broad enough to cover both SPD and general nonsymmetric square systems:
+The managed sparse layer now covers the intended release boundary for both SPD and general nonsymmetric square systems:
 
 - **canonical immutable CSR storage — implemented**;
 - **coordinate assembly with explicit duplicate aggregation — implemented**;
@@ -40,14 +38,21 @@ The managed sparse solver family is now broad enough to cover both SPD and gener
 - **restarted GMRES for general square/nonsymmetric sparse systems — implemented**;
 - **right-preconditioned GMRES with two-pass modified Gram-Schmidt Arnoldi and incremental Givens updates — implemented**;
 - **BiCGSTAB with fixed-vector-memory short recurrence, right preconditioning and explicit breakdown diagnostics — implemented**;
-- sparse architecture/reference-case consolidation — **next**;
+- **structured cross-solver release-reference cases — implemented**;
+- **independent public true-residual diagnostic — implemented**;
+- **release-facing sparse smoke example — implemented**;
+- **public naming/XML/allocation consolidation — complete**;
 - CSC and stronger incomplete-factorization preconditioners only when sustained workloads justify them.
 
 All sparse iterative solvers reuse the toolkit-wide `IterationStatus` vocabulary and the stopping rule `||b-A*x||2 <= max(absTol, relTol*||b||2)`. CG/PCG, GMRES and BiCGSTAB all require an explicitly recomputed true residual before returning `Converged`; inexpensive recursive or projected residuals are only triggers.
 
+`SparseMatrixDiagnostics.ResidualEuclideanNorm` now exposes the same physical residual independently of the iterative methods. That gives applications and release tests a solver-neutral post-solve verification path.
+
 The preconditioner abstraction remains deliberately solver-neutral. PCG imposes the stronger SPD preconditioner contract. GMRES and BiCGSTAB accept a broader fixed linear approximate inverse and use right preconditioning so convergence remains defined by the residual of the original physical system.
 
-The next sparse milestone is not another solver. It is a consolidation round: shared numerical helper behavior, representative larger reference systems, solver-selection guidance, allocation/performance baselines and an explicit decision on what remains deferred to later releases.
+The consolidation review deliberately keeps solver-specific low-level numerical checks close to each recurrence where their breakdown semantics differ. Common caller-facing behavior is centralized in the options/result/preconditioner/residual contracts. No benchmark speed or allocation percentage is claimed without a dedicated benchmark suite.
+
+The next repository step is the **repository-wide release-candidate audit**, not another sparse solver.
 
 ## M3.3 — Optimization and nonlinear systems
 

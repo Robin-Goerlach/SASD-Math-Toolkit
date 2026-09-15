@@ -35,9 +35,9 @@ The project now evolves beyond the 1980s feature catalog. The detailed plan is i
 - Combined rank, left/right nullity and conditioning report: **implemented**
 - Optional mature BLAS/LAPACK-class backend: later, benchmark driven
 
-Additional dense utilities remain possible, but the managed reference foundation is complete enough to stop delaying sparse work.
+Additional dense utilities remain possible, but the managed reference foundation is complete enough to support the next layers without pretending to replace vendor BLAS/LAPACK implementations.
 
-### M3.2 — Sparse linear algebra (solver foundation complete; consolidation in progress)
+### M3.2 — Sparse linear algebra (foundation complete)
 
 - Canonical immutable CSR storage and validation: **implemented**
 - Coordinate/dense/raw-CSR construction with explicit duplicate policy: **implemented**
@@ -51,8 +51,13 @@ Additional dense utilities remain possible, but the managed reference foundation
 - Restarted GMRES for general nonsymmetric systems: **implemented**
 - Right-preconditioned GMRES with modified Gram-Schmidt/Arnoldi and Givens updates: **implemented**
 - BiCGSTAB with right preconditioning, bounded vector memory and explicit recurrence-breakdown diagnostics: **implemented**
-- Sparse architecture/reference-case consolidation: **next**
+- Structured cross-solver release-reference cases: **implemented**
+- Public independent true-residual diagnostic: **implemented**
+- Release-facing sparse sample exercising GMRES/BiCGSTAB and residual verification: **implemented**
+- Sparse public-API/XML/allocation consolidation: **completed**
 - Dedicated CSC and stronger incomplete-factorization preconditioners: later when concrete workloads justify them
+
+The next repository step is the **repository-wide release-candidate audit**. No additional sparse solver is required for this release boundary.
 
 ### M3.3 — Optimization and nonlinear systems
 

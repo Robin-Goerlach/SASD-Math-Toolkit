@@ -1,6 +1,6 @@
-# Sparse-Solver-Auswahl und Referenzfälle
+# Sparse-Solver-Auswahl und Release-Referenzfälle
 
-Die Sparse-Schicht 2026 enthält inzwischen mehrere Krylov-Verfahren mit bewusst unterschiedlichen mathematischen Verträgen. Dieses Dokument ordnet sie ein und definiert die strukturierten Regressionsfälle vor dem nächsten Release Candidate.
+Die Sparse-Schicht 2026 enthält mehrere Krylov-Verfahren mit bewusst unterschiedlichen mathematischen Verträgen. Dieses Dokument ordnet sie ein, beschreibt die Release-Referenzfälle der Managed-Implementierung und hält die Architekturentscheidungen der M3.2-Konsolidierungsrunde fest.
 
 ## Mit der Matrixstruktur beginnen
 
@@ -25,7 +25,9 @@ Alle iterativen Sparse-Solver verwenden dieselbe öffentliche Abbruchregel:
 
 Das Ergebnismodell meldet Anfangsresiduum, Endresiduum, Norm der rechten Seite, effektive Schwelle, Iterationszahl und Abbruchstatus. Ein Solver darf nicht allein deshalb `Converged` zurückgeben, weil ein günstiges rekursives oder projiziertes Residuum klein geworden ist. Vor einer Erfolgsmeldung wird das physikalische Residuum explizit neu berechnet.
 
-Dieser gemeinsame Vertrag ist für Anwendungscode wichtiger als der Versuch, alle Solver intern in dieselbe Rekurrenz zu pressen. CG/PCG, Arnoldi-/Givens-GMRES und BiCGSTAB besitzen tatsächlich unterschiedliche numerische Zustände und sollen als eigenständige Algorithmen lesbar bleiben.
+`SparseMatrixDiagnostics.ResidualEuclideanNorm` stellt dieselbe physikalische Größe unabhängig von einem konkreten Solver öffentlich bereit. Anwendungen und Release-Tests können damit eine zurückgegebene Lösung durch direkte Neuberechnung von `||b-A*x||2` prüfen. Die Diagnose unterstützt auch rechteckige Matrizen und verwendet skalierte Akkumulation, damit große endliche Residualkomponenten nicht durch vermeidbaren Zwischenüberlauf verloren gehen.
+
+Dieser gemeinsame öffentliche Vertrag ist wichtiger als der Versuch, alle Solver intern in dieselbe Rekurrenz zu pressen. CG/PCG, Arnoldi-/Givens-GMRES und BiCGSTAB besitzen tatsächlich unterschiedliche numerische Zustände und bleiben als eigenständige Algorithmen lesbar.
 
 ## Preconditioning-Vertrag
 
@@ -39,27 +41,43 @@ Stärkere Incomplete-Factorization-Preconditioner bleiben aufgeschoben, bis real
 
 ## Strukturierte Release-Referenzfälle
 
-Kleine Unit-Tests bleiben für exakte Randfälle wichtig. Ein Release Candidate benötigt aber zusätzlich deterministische Systeme, die groß genug sind, um wiederholte Krylov-Schritte sowie Restart- und Preconditioning-Pfade auszuüben. `SparseSolverReferenceTests` ergänzt deshalb drei solverübergreifende Regressionsszenarien:
+Kleine Unit-Tests bleiben für exakte Randfälle wichtig. Ein Release Candidate benötigt aber zusätzlich deterministische Systeme, die groß genug sind, um wiederholte Krylov-Schritte sowie Restart- und Preconditioning-Pfade auszuüben. `SparseSolverReferenceTests` enthält deshalb drei solverübergreifende Regressionsszenarien:
 
 1. Ein symmetrisch positiv definites tridiagonales 64x64-System mit bekannter nichttrivialer Lösung. CG, PCG, restarted GMRES und BiCGSTAB müssen dieselbe Lösung rekonstruieren und denselben True-Residual-Vertrag erfüllen.
 2. Ein diagonal dominantes nichtsymmetrisches tridiagonales 48x48-System. Right-preconditioned GMRES und BiCGSTAB starten bewusst mit unterschiedlichen Anfangswerten und müssen zur selben bekannten Lösung konvergieren.
 3. Ein separates nichtsymmetrisches 40x40-System berechnet nach GMRES und BiCGSTAB unabhängig `b-A*x` neu und prüft damit, dass `SparseLinearSolveResult.ResidualNorm` das physikalische Residuum und nicht nur eine interne Rekurrenzschätzung beschreibt.
 
+`SparseDiagnosticsTests` prüft zusätzlich rechteckige Residuen, große endliche Residualnormen sowie Validierungs- und Arithmetikgrenzen der öffentlichen Residualdiagnose.
+
 Das sind Regressions-/Referenzfälle, **keine Benchmarks**. Sie enthalten keine Geschwindigkeitsbehauptung und verlangen bewusst nicht, dass ein Krylov-Verfahren weniger Iterationen benötigt als ein anderes.
 
-## Speichermodell
+## Release-nahes Beispiel
+
+`SparseLinearAlgebraExample` im .NET-Sample-Projekt ergänzt einen kompakten Release-Smoke-Test. Ein deterministisches nichtsymmetrisches tridiagonales 24x24-System wird sowohl mit right-preconditioned restarted GMRES als auch mit BiCGSTAB gelöst. Beide Ergebnisse werden gegen die bekannte Lösung verglichen und das physikalische Residuum wird unabhängig neu berechnet.
+
+Das normale Sample-Programm führt diesen Fall nach der Erzeugung des HTML-/SVG-Berichts aus und gibt Iterations- und Residualdiagnosen auf der Konsole aus. Damit übt ein gewöhnlicher Sample-Lauf neben den klassischen grafischen Beispielen auch die moderne Sparse-API aus.
+
+## Speicher- und Allokationsmodell
 
 Die Managed-Referenzimplementierung hält Sparse-Daten in kanonischem CSR und materialisiert innerhalb iterativer Lösungen keine dichten Matrizen.
 
 - CG/PCG verwenden eine feste Anzahl von O(n)-Vektoren.
 - BiCGSTAB verwendet ebenfalls eine feste Anzahl von O(n)-Vektoren.
 - Restarted GMRES speichert eine Arnoldi-Basis, deren Speicherbedarf mit `restartLength` wächst; Restarting setzt diesem Wachstum eine explizite Grenze.
+- `CsrMatrix.Multiply(ReadOnlySpan<double>, Span<double>)` erlaubt die Wiederverwendung von Solver-Arbeitspuffern, statt für jedes Matrix-Vektor-Produkt ein neues Ergebnisarray anzulegen.
+- Öffentliche Post-Solve-Diagnosen dürfen aus Gründen der Klarheit einen temporären Vektor anlegen; sie liegen nicht im Solver-Hot-Loop.
 
-Deshalb ist die Restart-Länge ein öffentlicher Parameter und kein verborgener Implementierungswert.
+Hier werden keine Throughput- oder Allokationsprozente behauptet. Dedizierte Benchmark-Arbeit bleibt Teil des späteren Performance-Backend-Meilensteins.
 
-## M3.2-Release-Grenze
+## Konsolidierungsentscheidung zu gemeinsamen Hilfsfunktionen
 
-Das aktuelle M3.2-Fundament besteht aus:
+Die Konsolidierungsprüfung hat wiederholte Low-Level-Operationen in den Krylov-Implementierungen gefunden, etwa skalierte Vektornormen, kompensierte Skalarprodukte, Preconditioner-Anwendung und True-Residual-Neuberechnung. Sie werden an dieser Release-Grenze bewusst **nicht** vollständig in eine große interne Utility-Klasse verschoben.
+
+Der Grund ist architektonisch und nicht nur historisch gewachsene Duplikation: Jeder Solver verbindet mit diesen Operationen andere Breakdown-Semantik und anderen diagnostischen Kontext. Die Prüfungen nahe an der jeweiligen mathematischen Rekurrenz zu halten, macht die Algorithmen derzeit leichter auditierbar. Das für Aufrufer wichtige gemeinsame Verhalten ist dagegen in öffentlichen Verträgen zentralisiert (`SparseIterativeSolverOptions`, `SparseLinearSolveResult`, `ISparsePreconditioner` und die Residualdiagnose). Ein kleiner interner Numerik-Kern kann später immer noch extrahiert werden, wenn Profiling oder Wartung einen konkreten Vorteil zeigen, ohne solver-spezifische Fehlerbehandlung zu verschleiern.
+
+## M3.2-Release-Grenze — Fundament abgeschlossen
+
+Das M3.2-Managed-Referenzfundament besteht jetzt aus:
 
 - kanonischem unveränderlichem CSR;
 - Sparse-Matvec, Transponieren und preiswerten Normen;
@@ -69,6 +87,10 @@ Das aktuelle M3.2-Fundament besteht aus:
 - CG und PCG für SPD-Systeme;
 - restarted right-preconditioned GMRES;
 - right-preconditioned BiCGSTAB;
-- strukturierten solverübergreifenden Regressionsfällen.
+- öffentlicher unabhängiger True-Residual-Diagnostik;
+- strukturierten solverübergreifenden Regressionsfällen;
+- einem release-nahen Sparse-Sample.
 
-Vor dem Release Candidate soll noch eine letzte Sparse-Konsolidierungsrunde öffentliche Benennung/XML-Dokumentation, duplizierte interne Numerik-Hilfen, Allokationsverhalten und release-nahe Beispiele prüfen. CSC, ILU/Incomplete Cholesky und zusätzliche Krylov-Verfahren liegen ausdrücklich außerhalb dieser Release-Grenze, sofern dieses Audit keinen konkreten Blocker aufdeckt.
+Öffentliche Benennung/XML-Oberfläche und Allokationsmodell wurden für diese Grenze geprüft. Eigenes CSC, ILU/Incomplete Cholesky, weitere Krylov-Verfahren und benchmarkgetriebenes Tuning bleiben ausdrücklich aufgeschoben, bis konkrete Workloads sie rechtfertigen.
+
+Der nächste Repository-Schritt ist das **repositoryweite Release-Candidate-Audit** und nicht noch ein weiterer Sparse-Solver.

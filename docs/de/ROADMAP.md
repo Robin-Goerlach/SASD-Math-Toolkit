@@ -31,9 +31,9 @@ Das Projekt entwickelt sich bewusst über den Funktionskatalog der 1980er-Jahre 
 - Gemeinsamer Bericht für Rang, linke/rechte Nullität und Kondition: **implementiert**
 - optionaler etablierter BLAS-/LAPACK-artiger Backend: später und benchmarkgetrieben
 
-Weitere dichte Hilfen bleiben möglich, aber das Managed-Referenzfundament ist vollständig genug, um Sparse-Arbeit nicht weiter aufzuschieben.
+Weitere dichte Hilfen bleiben möglich, aber das Managed-Referenzfundament ist vollständig genug, um die nächsten Schichten zu tragen, ohne vorzugeben, Hersteller-BLAS/LAPACK bereits zu ersetzen.
 
-### M3.2 – Dünnbesetzte lineare Algebra (Solver-Fundament abgeschlossen; Konsolidierung in Arbeit)
+### M3.2 – Dünnbesetzte lineare Algebra (Fundament abgeschlossen)
 
 - Kanonische unveränderliche CSR-Speicherung und Validierung: **implementiert**
 - Koordinaten-/Dense-/Raw-CSR-Aufbau mit expliziter Duplikatregel: **implementiert**
@@ -47,8 +47,13 @@ Weitere dichte Hilfen bleiben möglich, aber das Managed-Referenzfundament ist v
 - Restarted GMRES für allgemeine nichtsymmetrische Systeme: **implementiert**
 - Right-preconditioned GMRES mit Modified-Gram-Schmidt-/Arnoldi- und Givens-Aktualisierung: **implementiert**
 - BiCGSTAB mit Right Preconditioning, begrenztem Vektorspeicher und expliziter Rekurrenz-Breakdown-Diagnostik: **implementiert**
-- Konsolidierung der Sparse-Architektur und Referenzfälle: **als Nächstes**
+- Strukturierte solverübergreifende Release-Referenzfälle: **implementiert**
+- Öffentliche unabhängige True-Residual-Diagnostik: **implementiert**
+- Release-nahes Sparse-Sample mit GMRES/BiCGSTAB und Residualverifikation: **implementiert**
+- Konsolidierung von öffentlicher Sparse-API/XML-Dokumentation und Allokationsmodell: **abgeschlossen**
 - eigenes CSC und stärkere Incomplete-Factorization-Preconditioner: später bei konkretem Bedarf
+
+Der nächste Repository-Schritt ist das **repositoryweite Release-Candidate-Audit**. Für diese Release-Grenze ist kein weiterer Sparse-Solver erforderlich.
 
 ### M3.3 – Optimierung und nichtlineare Systeme
 
