@@ -1,9 +1,9 @@
 \documentclass[11pt,a4paper,twoside,openright]{book}
 \usepackage[ngerman]{babel}
-\newcommand{\HandbookPdfTitle}{SASD Math Toolkit - CSharp/.NET Handbuch Version 1.0}
-\newcommand{\HandbookFooter}{Handbuch Version 1.0 - Deutsch}
+\newcommand{\HandbookPdfTitle}{SASD Math Toolkit - CSharp/.NET Handbuch Version 1.0 RC1}
+\newcommand{\HandbookFooter}{Handbuch Version 1.0 RC1 - Deutsch}
 \newcommand{\HandbookSubtitle}{Numerical Methods - C\# / .NET}
-\newcommand{\HandbookVersionText}{Benutzer- und Entwicklerhandbuch - Version 1.0}
+\newcommand{\HandbookVersionText}{Benutzer- und Entwicklerhandbuch - Version 1.0 RC1}
 \newcommand{\HandbookTagline}{Numerische Verfahren für robuste, nachvollziehbare und wiederverwendbare C\#-Anwendungen.}
 \newcommand{\HandbookRepositoryRef}{Repository: \repo\quad |\quad C\#/.NET 10}
 
@@ -15,13 +15,14 @@
 
 \chapter*{Dokumentstatus}
 \addcontentsline{toc}{chapter}{Dokumentstatus}
-\begin{sasdnote}{Version 1.0 dieses Handbuchs}
-Dieses Dokument ist die deutschsprachige Handbuchausgabe 1.0 für die C\#/.NET-Implementierung des SASD Math Toolkit. Die Kapitelinhalte werden beim Build aus dem gepflegten Markdown-Handbuch unter \texttt{docs/user-guide/de/} erzeugt. Dadurch bleibt Markdown die redaktionelle Quelle, während LaTeX Satz, Navigation und PDF-Ausgabe übernimmt.
+\begin{sasdnote}{Handbuch Version 1.0 RC1}
+Dieses Dokument ist die deutschsprachige Release-Candidate-Ausgabe des SASD Math Toolkit zum Paketkandidaten \texttt{1.0.0-rc.1}. Die Kapitelinhalte werden beim Build aus dem gepflegten Markdown-Handbuch unter \texttt{docs/user-guide/de/} erzeugt. Markdown bleibt damit die redaktionelle Quelle, während LaTeX Satz, Navigation und PDF-Ausgabe übernimmt.
 \end{sasdnote}
 
 \begin{tabularx}{\textwidth}{@{}>{\bfseries}p{0.31\textwidth}X@{}}
 Dokument & SASD Math Toolkit - C\#/.NET Benutzer- und Entwicklerhandbuch\\
-Handbuchversion & 1.0\\
+Handbuchversion & 1.0 RC1\\
+Paketkandidat & \texttt{1.0.0-rc.1}\\
 Repository & \repo\\
 Zielplattform & .NET 10\\
 Assembly & \texttt{Sasd.Math.Toolkit}\\
@@ -32,9 +33,9 @@ Autor / Projekt & Robin Goerlach; SASD-GmbH\\
 
 \chapter*{Vorwort}
 \addcontentsline{toc}{chapter}{Vorwort}
-Das SASD Math Toolkit überträgt den funktionalen Kern einer klassischen Numerical-Methods-Toolbox in eine moderne, unabhängig entwickelte C\#/.NET-Bibliothek. Das historische Handbuch dient dabei als Orientierung für Problemklassen und Handbuchdramaturgie - nicht als Text- oder Quellcodevorlage.
+Das SASD Math Toolkit überträgt den funktionalen Kern einer klassischen Numerical-Methods-Toolbox in eine moderne, unabhängig entwickelte C\#/.NET-Bibliothek und erweitert diese Basis anschließend gezielt für Anforderungen des Jahres 2026. Das historische Handbuch dient als Orientierung für Problemklassen und Handbuchdramaturgie - nicht als Text- oder Quellcodevorlage.
 
-Die historische Ausgabe strukturierte numerische Verfahren konsequent nach Problem, Beschreibung, Eingaben, Ausgaben, Aufrufsyntax, Kommentaren und Beispiel. Die vorliegende Ausgabe übernimmt diesen anwenderorientierten Gedanken, formuliert ihn aber für moderne C\#-APIs mit Exceptions, Statusobjekten, Residuen und Tests neu.
+Die Kapitel 1--11 beschreiben die klassische numerische Grundlage. Die Kapitel 12 und 13 dokumentieren die moderne dichte und dünnbesetzte lineare Algebra der 2026-Modernisierung: Householder-QR, Cholesky, SVD, Konditionsdiagnostik, kanonisches CSR, Preconditioning, CG/PCG, restarted GMRES und BiCGSTAB.
 
 \begin{sasdtip}{Leitgedanke}
 Eine Zahl ist noch kein belastbares numerisches Ergebnis. Für wichtige Rechnungen gehören Methode, Toleranz, Terminierungsstatus und eine problemspezifische Qualitätsprüfung zusammen.
@@ -55,24 +56,27 @@ Eine Zahl ist noch kein belastbares numerisches Ergebnis. Für wichtige Rechnung
 \input{build/de/least-squares.tex}
 \input{build/de/fft-faltung-korrelation.tex}
 \input{build/de/diagnostik-fehlerfaelle.tex}
+\input{build/de/moderne-dichte-lineare-algebra.tex}
+\input{build/de/duennbesetzte-lineare-algebra.tex}
 
 \appendix
-\chapter{Historischer Kontext und V1-Abdeckung}
-Die Kapitelreihenfolge der C\#-Ausgabe folgt bewusst den großen numerischen Problemklassen der historischen Numerical Methods Toolbox. Die Umsetzung ist jedoch keine Quellcode-Portierung. Die öffentlichen APIs, Datentypen, Fehlerbehandlung, Beispiele und Diagnosen gehören zum SASD Math Toolkit.
+\chapter{Historischer Kontext und aktuelle V1-Abdeckung}
+Die C\#-Ausgabe folgt auf hoher Ebene bewusst den großen numerischen Problemklassen der historischen Numerical Methods Toolbox. Die Umsetzung ist jedoch keine Quellcode-Portierung. Öffentliche APIs, Datentypen, Fehlerbehandlung, Beispiele und Diagnosen gehören zum SASD Math Toolkit. Die Modernisierung 2026 geht dort über den historischen Katalog hinaus, wo heutige SASD-Anwendungen stärkere numerische Grundlagen benötigen.
 
 \begin{longtable}{@{}p{0.28\textwidth}p{0.62\textwidth}@{}}
 \toprule
-\textbf{Historischer Themenblock} & \textbf{C\#/.NET-Ausgabe}\\
+\textbf{Themenblock} & \textbf{C\#/.NET-Ausgabe}\\
 \midrule
 Nullstellen & Bisektion, Newton-Raphson, Sekante, Newton-Horner, Muller, Laguerre und Polynomdeflation\\
 Interpolation & Lagrange, dividierte Differenzen, natürliche und geklemmte kubische Splines\\
-Differentiation / Integration & Funktions-, Tabellen- und Spline-Differentiation; Newton-Cotes, adaptiv, Romberg, Gauß-Legendre\\
-Matrixverfahren & \texttt{DenseMatrix}, Gauß, pivotierte LU, Householder-QR, Inverse, Residuen und Gauss-Seidel\\
+Differentiation / Integration & Funktions-, Tabellen- und Spline-Differentiation; Newton-Cotes, adaptive Regeln, Romberg und Gauss-Legendre\\
+Dichte Matrixverfahren & \texttt{DenseMatrix}, Gauß, pivotierte LU, Householder-QR, Cholesky, SVD, Pseudoinverse, Normen, Kondition, Inverse, Residuen und Gauss-Seidel\\
+Sparse-Matrixverfahren & Kanonisches CSR, Sparse-Matvec/Normen, Jacobi-Preconditioning, CG/PCG, restarted GMRES, BiCGSTAB und unabhängige True-Residual-Diagnostik\\
 Eigenwertprobleme & Potenz-/inverse Potenzmethode, Wielandt-Deflation und zyklisches Jacobi-Verfahren\\
 Differentialgleichungen & RK4-Familie, RKF45, Adams-Prädiktor-Korrektor sowie lineares und nichtlineares Shooting\\
-Least Squares & Polynom- und Basisfits, benannte Modelle; modernisiert auf Householder-QR\\
+Least Squares & Polynom- und Basisfits sowie benannte Modelle; Householder-QR bei vollem Spaltenrang mit SVD-Fallback für rangdefiziente oder unterbestimmte Minimalnormprobleme\\
 FFT / Anwendungen & Komplexe und reelle FFT, kompaktes Realspektrum, Faltung und Kreuzkorrelation\\
-Grafische Demonstrationen & Plattformunabhängiges, deterministisches HTML/SVG-Sample statt Kopplung der Numerik an eine GUI-Technologie\\
+Demonstrationen & Plattformunabhängiger deterministischer HTML/SVG-Bericht plus moderner Sparse-Release-Smoke-Solve\\
 \bottomrule
 \end{longtable}
 
@@ -89,6 +93,6 @@ make all     # beide Ausgaben
 \backmatter
 \chapter*{Lizenz und Herkunft}
 \addcontentsline{toc}{chapter}{Lizenz und Herkunft}
-Das SASD Math Toolkit steht unter der MIT-Lizenz. Das historische Borland-Handbuch und die historischen Produktnamen bleiben Eigentum ihrer jeweiligen Rechteinhaber. Dieses Handbuch dokumentiert die unabhängig entwickelte SASD-C\#/.NET-Implementierung und reproduziert nicht den historischen Handbuchtext.
+Das SASD Math Toolkit steht unter der MIT-Lizenz. Historisches Borland-Material und historische Produktnamen bleiben Eigentum ihrer jeweiligen Rechteinhaber. Dieses Handbuch dokumentiert die unabhängig entwickelte SASD-C\#/.NET-Implementierung und reproduziert nicht den historischen Handbuchtext.
 
 \end{document}

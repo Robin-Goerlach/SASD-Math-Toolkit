@@ -3,28 +3,47 @@ name: Build handbook PDFs
 on:
   workflow_dispatch:
   push:
+    branches: [ main ]
     paths:
       - '.github/workflows/handbook-pdf.yml'
+      - 'docs/user-guide/de/**/*.md'
+      - 'docs/user-guide/en/**/*.md'
+      - 'docs/user-guide/LaTeX/**'
 
 permissions:
   contents: write
 
+concurrency:
+  group: handbook-pdf-main
+  cancel-in-progress: true
+
 jobs:
   build-handbooks:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Install handbook toolchain
         run: |
           sudo apt-get update
           # German Babel support is needed by the DE handbook entry point.
-          sudo apt-get install -y pandoc latexmk texlive-luatex texlive-latex-extra texlive-fonts-recommended texlive-lang-german fonts-dejavu
+          sudo apt-get install -y pandoc latexmk texlive-luatex texlive-latex-extra texlive-fonts-recommended texlive-lang-german fonts-dejavu poppler-utils
 
       - name: Build German and English handbooks
         working-directory: docs/user-guide/LaTeX
         run: make all
+
+      - name: Validate generated PDFs
+        shell: bash
+        run: |
+          set -euo pipefail
+          de_pdf='docs/user-guide/LaTeX/SASD-Math-Toolkit-Handbuch-V1.0-DE.pdf'
+          en_pdf='docs/user-guide/LaTeX/SASD-Math-Toolkit-Handbook-V1.0-EN.pdf'
+          test -s "$de_pdf"
+          test -s "$en_pdf"
+          pdfinfo "$de_pdf" | grep -q '^Pages:'
+          pdfinfo "$en_pdf" | grep -q '^Pages:'
 
       - name: Publish PDFs in user-guide root
         run: |
@@ -39,6 +58,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "PDF handbooks are already up to date."
           else
-            git commit -m "Publish German and English V1.0 PDF handbooks"
+            git commit -m "Publish German and English V1.0 RC1 PDF handbooks"
             git push
           fi
