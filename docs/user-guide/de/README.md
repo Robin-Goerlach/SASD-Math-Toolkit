@@ -27,3 +27,7 @@ Das geplante V1-Benutzerhandbuch ist damit in allen Kapiteln vorhanden. Für V1 
 ## Dokumentationsebenen
 
 Das Benutzerhandbuch konzentriert sich auf Anwendung und Einordnung. Technische Designnotizen liegen weiterhin unter `docs/de/` bzw. `docs/en/`; zusätzlich enthält der Quellcode API-Kommentare. Die Kompatibilitätsmatrix in `docs/en/BORLAND-V1-COMPATIBILITY.md` verfolgt die historische V1-Abdeckung getrennt vom Fortschritt des Benutzerhandbuchs.
+
+## LaTeX-/PDF-Ausgabe
+
+Eine gesetzte deutsch- und englischsprachige PDF-Ausgabe wird aus diesen Markdown-Kapiteln erzeugt. Layout und Build-Pipeline liegen unter [`../LaTeX/`](../LaTeX/). Dadurch bleibt Markdown die redaktionelle Quelle, während LaTeX für Buchsatz, Inhaltsverzeichnis, Kapitelgestaltung und PDF-Ausgabe verwendet wird.
