@@ -12,7 +12,7 @@ Modernization is now in progress. The modern dense numerical foundation includes
 
 The current **M3.2 sparse foundation is complete for the next release boundary**: immutable canonical CSR, sparse arithmetic/norms, **Conjugate Gradient**, a solver-neutral preconditioner abstraction, **Jacobi preconditioning**, **Preconditioned Conjugate Gradient (PCG)**, **restarted GMRES** and **BiCGSTAB** with right preconditioning, true-residual verification and explicit numerical-breakdown diagnostics. Structured cross-solver release cases, a public independent residual diagnostic and a release-facing sparse smoke example are also in place.
 
-The repository-wide release-candidate audit is now in progress. Package/release engineering uses the explicit **`1.0.0-rc.1`** candidate identity. The documentation/PDF gate is complete; the final independent Windows acceptance remains open. There is no public final `1.0.0` release yet.
+The repository-wide release-candidate audit has completed its candidate gates. Package/release engineering uses the explicit **`1.0.0-rc.1`** candidate identity. The documentation/PDF gate and the independent Windows acceptance are complete, with no release-blocking finding. There is no public final `1.0.0` release yet; promotion remains an explicit release decision.
 
 See [`docs/en/BORLAND-V1-COMPATIBILITY.md`](docs/en/BORLAND-V1-COMPATIBILITY.md) for the classical implementation matrix, [`docs/en/MODERNIZATION-2026.md`](docs/en/MODERNIZATION-2026.md) for the modern roadmap and [`docs/en/RELEASE-AUDIT.md`](docs/en/RELEASE-AUDIT.md) for the release gates.
 

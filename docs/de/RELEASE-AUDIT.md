@@ -6,7 +6,7 @@ Dieses Dokument hält das repositoryweite Audit für die erste öffentliche 1.0-
 
 Der Kandidat enthält das abgeschlossene klassische Numerical-Methods-Fundament sowie die modernen Grundlagen M3.1 für dichte und M3.2 für dünnbesetzte lineare Algebra. M3.3 und spätere Modernisierungsschritte bleiben nachgelagerter Umfang, sofern das Audit keinen eng begrenzten notwendigen Fix aufdeckt.
 
-Der Paketbezeichner des Audit-Kandidaten lautet `1.0.0-rc.1`. Ein endgültiges `1.0.0`-Tag/Release wird bewusst erst nach einem unabhängigen Windows-Abnahmelauf erzeugt.
+Der Paketbezeichner des Audit-Kandidaten lautet `1.0.0-rc.1`. Der unabhängige Windows-Abnahmelauf wurde erfolgreich abgeschlossen. Ein endgültiges `1.0.0`-Paket/Tag/Release wird bewusst erst nach ausdrücklicher Release-Freigabe erzeugt.
 
 ## In Audit-Phase 1 adressierte Findings
 
@@ -29,6 +29,19 @@ Der Paketbezeichner des Audit-Kandidaten lautet `1.0.0-rc.1`. Ein endgültiges `
 - **Visuelle Prüfung:** Das RC1-Artefakt wurde seitenweise gerendert. Die englische Ausgabe besitzt 81 PDF-Seiten, die deutsche Ausgabe 79 PDF-Seiten. Die Kontaktbogenprüfung sämtlicher gerenderter Seiten sowie die Vollbildprüfung releasekritischer Seiten ergaben keine abgeschnittenen Texte, Überlagerungen, schwarzen Kästchen, defekten Glyphen oder fehlenden Kapitelinhalte. Titelseiten, Inhaltsverzeichnisse, Kapitel 12/13, Anhänge und Herkunftsseiten werden korrekt dargestellt.
 - **Eingecheckte Ausgaben:** Die neu erzeugten deutschen und englischen RC1-PDFs sind mit dem aktuellen Markdown-/LaTeX-Stand des Release Candidates synchronisiert.
 
+## In Audit-Phase 3 adressierte Findings — Windows-Abnahme
+
+Die unabhängige Windows-Abnahme wurde am 16.09.2026 gegen den exakten Commit `29deb0922e6384c7ff0592e9156d2250b698cfd7` durchgeführt.
+
+- **Umgebung:** Windows x64, .NET SDK `10.0.303`, .NET Runtime `10.0.11`. Das ergänzt die CI-Abdeckung auf Ubuntu 24.04 mit SDK `10.0.401` und Runtime `10.0.12`.
+- **Restore/Build:** `dotnet restore` und der Release-Build wurden erfolgreich abgeschlossen.
+- **Tests:** `178/178` Tests bestanden; 0 fehlgeschlagen, 0 übersprungen.
+- **Ausführbare Demo:** Der deterministische HTML-/SVG-Report wurde erfolgreich erzeugt. Der moderne Sparse-Referenzlauf schloss mit GMRES nach 17 Iterationen, BiCGSTAB nach 10 Iterationen und einem Residuum von `1.40225E-09` ab.
+- **Paketerzeugung:** `dotnet pack --no-build` erzeugte unter Windows erfolgreich sowohl `Sasd.Math.Toolkit.1.0.0-rc.1.nupkg` als auch `Sasd.Math.Toolkit.1.0.0-rc.1.snupkg`.
+- **Repository-Sauberkeit:** `git status --short` war nach der Abnahme leer.
+
+Aus dem Windows-Abnahmelauf ergab sich kein releaseblockierendes Finding.
+
 ## Explizit nicht blockierende technische Schulden
 
 Eine vollständige CS1591-Erzwingung wird für diesen Release Candidate noch nicht aktiviert. Die modernen öffentlichen APIs der Modernisierungsrunde sind dokumentiert; Teile der älteren öffentlichen Oberfläche stützen sich weiterhin auf Handbuch und technische Dokumentation statt auf lückenlose XML-Kommentare. Die Unterdrückung bleibt deshalb sichtbar im Projekt, statt vollständige Abdeckung vorzutäuschen.
@@ -37,10 +50,11 @@ CSC-Speicherung, Incomplete-Cholesky-/ILU-artige Preconditioner, zusätzliche Kr
 
 ## Noch offene Release-Gates
 
-1. Den abschließenden Windows-Abnahmelauf gegen den exakten Release-Candidate-Commit nach allen Audit-Fixes durchführen.
-2. Findings aus dieser Abnahme beheben.
-3. Erst nach ausdrücklicher Release-Freigabe: `-rc.1` entfernen, finales Tag/Release erzeugen und entscheiden, ob/wo das NuGet-Paket veröffentlicht wird.
+1. Ausdrückliche Release-Freigabe für den Übergang auf `1.0.0` erteilen.
+2. `-rc.1` entfernen und gegen den resultierenden Commit noch einmal Release-Build/Test/Package/Sample sowie die Handbuch-Gates ausführen.
+3. Erst nach vollständig grüner finaler CI das `1.0.0`-Tag und GitHub-Release erzeugen.
+4. Separat entscheiden, ob und wo das NuGet-Paket veröffentlicht wird.
 
 ## Release-Prinzip
 
-Ein grüner Build allein ist kein Release-Kriterium. Der Kandidat benötigt eine grüne Release-Build/Test/Package/Sample-Pipeline, synchronisierte Dokumentation, geprüfte PDFs und eine erfolgreiche Abnahme auf einem unabhängigen Windows-Entwicklungsrechner.
+Ein grüner Build allein ist kein Release-Kriterium. Der Kandidat benötigt eine grüne Release-Build/Test/Package/Sample-Pipeline, synchronisierte Dokumentation, geprüfte PDFs und eine erfolgreiche Abnahme auf einem unabhängigen Windows-Entwicklungsrechner. RC1 hat diese Kandidaten-Gates jetzt bestanden; die Hochstufung auf `1.0.0` bleibt eine ausdrückliche Release-Entscheidung.
