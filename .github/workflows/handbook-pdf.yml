@@ -10,11 +10,8 @@ on:
       - 'docs/user-guide/en/**/*.md'
       - 'docs/user-guide/LaTeX/**'
 
-# Final V1.0 promotion temporarily needs write access so the explicitly reviewed
-# release snapshots can be committed. This is reverted to read-only immediately
-# after the final PDFs have been generated and inspected.
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: handbook-pdf-main
@@ -48,7 +45,7 @@ jobs:
           pdfinfo "$de_pdf" | grep -q '^Pages:'
           pdfinfo "$en_pdf" | grep -q '^Pages:'
 
-      - name: Upload final V1.0 handbook PDFs for release inspection
+      - name: Upload V1.0 handbook PDFs for inspection
         uses: actions/upload-artifact@v7
         with:
           name: sasd-math-toolkit-handbooks-v1.0.0
@@ -58,18 +55,7 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish final V1.0 PDF snapshots
-        shell: bash
-        run: |
-          set -euo pipefail
-          cp docs/user-guide/LaTeX/SASD-Math-Toolkit-Handbuch-V1.0-DE.pdf docs/user-guide/SASD-Math-Toolkit-Handbuch-V1.0-DE.pdf
-          cp docs/user-guide/LaTeX/SASD-Math-Toolkit-Handbook-V1.0-EN.pdf docs/user-guide/SASD-Math-Toolkit-Handbook-V1.0-EN.pdf
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/user-guide/SASD-Math-Toolkit-Handbuch-V1.0-DE.pdf docs/user-guide/SASD-Math-Toolkit-Handbook-V1.0-EN.pdf
-          if git diff --cached --quiet; then
-            echo "Final V1.0 PDF snapshots are already up to date."
-          else
-            git commit -m "Publish final V1.0 handbook PDFs"
-            git push
-          fi
+      # Deliberately do not commit generated PDFs from ordinary CI. PDF producer
+      # metadata can change binary bytes between otherwise equivalent builds.
+      # Committed PDF snapshots are updated explicitly at RC/release boundaries
+      # after inspection; normal handbook CI remains read-only.
