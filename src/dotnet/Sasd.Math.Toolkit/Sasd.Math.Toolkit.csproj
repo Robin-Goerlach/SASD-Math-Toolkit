@@ -8,7 +8,6 @@
     <PackageId>Sasd.Math.Toolkit</PackageId>
     <Title>SASD Math Toolkit</Title>
     <VersionPrefix>1.0.0</VersionPrefix>
-    <VersionSuffix>rc.1</VersionSuffix>
     <Description>Reusable numerical methods and applied mathematics foundation for SASD projects, including modern dense and sparse linear algebra, calculus, ODE solvers, approximation and transforms.</Description>
     <Authors>Robin Goerlach; SASD-GmbH</Authors>
     <Copyright>Copyright (c) 2026 Robin Goerlach (SASD-GmbH)</Copyright>

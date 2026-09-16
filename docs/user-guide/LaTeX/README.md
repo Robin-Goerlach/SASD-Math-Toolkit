@@ -10,15 +10,15 @@ The interior design deliberately recalls a few visual ideas from the historical 
 
 ## Current publication status
 
-The two PDFs currently committed one directory above are the stable **V1.0 classical handbook editions**. Active 2026 modernization chapters are written and reviewed in Markdown first and may intentionally be newer than those PDFs while development is moving quickly.
+The two PDFs committed one directory above are the stable **V1.0 handbook editions**. They contain the classical chapters plus the modern dense and sparse linear-algebra chapters included in the 1.0 release boundary.
 
-At the next release-candidate boundary, the workflow is:
+The publication workflow is:
 
-1. finish and audit the current Markdown chapters in both languages;
-2. synchronize the German and English LaTeX chapter order/front matter;
+1. maintain and audit the Markdown chapters in both languages;
+2. synchronize the German and English LaTeX chapter order/front matter at a publication boundary;
 3. rebuild both PDFs from the same Markdown sources;
-4. visually inspect the generated books and their table of contents, code blocks, tables and cross references;
-5. commit the refreshed PDFs together with the corresponding LaTeX source changes.
+4. structurally validate and visually inspect the generated books;
+5. commit the refreshed PDF snapshots deliberately at the RC/release boundary.
 
 This keeps the checked-in PDFs meaningful release artifacts instead of regenerating large binary files after every numerical-development commit.
 
@@ -39,12 +39,12 @@ make en
 make all
 ```
 
-The current V1.0 Makefile outputs are:
+The V1.0 Makefile outputs are:
 
 - `SASD-Math-Toolkit-Handbuch-V1.0-DE.pdf`
 - `SASD-Math-Toolkit-Handbook-V1.0-EN.pdf`
 
-Release-candidate version/name changes should be made deliberately in the LaTeX/front-matter/build configuration as part of the publication milestone rather than ad hoc during feature development.
+Release-candidate or release version/name changes are made deliberately in the LaTeX/front-matter/build configuration as part of a publication milestone rather than ad hoc during feature development.
 
 Temporary Pandoc/LaTeX artifacts are written below `build/` and can be removed with:
 

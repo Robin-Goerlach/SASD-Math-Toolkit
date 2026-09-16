@@ -2,7 +2,17 @@
 
 All notable release-facing changes to SASD Math Toolkit are recorded here.
 
-The project uses semantic versioning for package/release identifiers. The current `1.0.0-rc.1` line is a release candidate and is not a declaration that the final `1.0.0` release has been published.
+The project uses semantic versioning for package/release identifiers.
+
+## 1.0.0 — 2026-09-16
+
+### First stable release
+
+- Promoted the audited `1.0.0-rc.1` code line to the first stable `1.0.0` package after successful Linux CI and independent Windows acceptance.
+- Preserved the completed classical numerical-methods foundation together with the M3.1 modern dense and M3.2 sparse foundations.
+- Finalized NuGet package identity as `Sasd.Math.Toolkit` version `1.0.0` and retained symbol-package generation, package-content verification and executable smoke testing.
+- Finalized the German and English V1.0 handbook front matter and regenerated both release PDF snapshots from the maintained Markdown sources.
+- No algorithmic behavior was changed as part of the RC1-to-1.0.0 promotion; the promotion records the completed audit and release decision.
 
 ## 1.0.0-rc.1 — 2026-09-15
 

@@ -27,22 +27,33 @@ jobs:
       - name: Test
         run: dotnet test Sasd.Math.Toolkit.slnx --configuration Release --no-build --verbosity normal
 
-      - name: Pack release candidate
+      - name: Pack release
         run: dotnet pack src/dotnet/Sasd.Math.Toolkit/Sasd.Math.Toolkit.csproj --configuration Release --no-build --output artifacts/packages
 
       - name: Verify package contents
         shell: bash
         run: |
           set -euo pipefail
-          package="$(find artifacts/packages -maxdepth 1 -name 'Sasd.Math.Toolkit.1.0.0-rc.1.nupkg' -print -quit)"
-          symbols="$(find artifacts/packages -maxdepth 1 -name 'Sasd.Math.Toolkit.1.0.0-rc.1.snupkg' -print -quit)"
+          package="$(find artifacts/packages -maxdepth 1 -name 'Sasd.Math.Toolkit.1.0.0.nupkg' -print -quit)"
+          symbols="$(find artifacts/packages -maxdepth 1 -name 'Sasd.Math.Toolkit.1.0.0.snupkg' -print -quit)"
           test -n "$package"
           test -n "$symbols"
           unzip -l "$package" | grep -q 'lib/net10.0/Sasd.Math.Toolkit.dll'
           unzip -l "$package" | grep -q 'lib/net10.0/Sasd.Math.Toolkit.xml'
           unzip -l "$package" | grep -Eq '[[:space:]]README.md$'
           unzip -p "$package" 'Sasd.Math.Toolkit.nuspec' | grep -q '<id>Sasd.Math.Toolkit</id>'
+          unzip -p "$package" 'Sasd.Math.Toolkit.nuspec' | grep -Eq '<version>1.0.0</version>'
           unzip -p "$package" 'Sasd.Math.Toolkit.nuspec' | grep -Eq '<license[^>]*>MIT</license>'
+
+      - name: Upload release packages
+        uses: actions/upload-artifact@v7
+        with:
+          name: sasd-math-toolkit-1.0.0-packages
+          path: |
+            artifacts/packages/Sasd.Math.Toolkit.1.0.0.nupkg
+            artifacts/packages/Sasd.Math.Toolkit.1.0.0.snupkg
+          if-no-files-found: error
+          retention-days: 30
 
       - name: Run sample smoke test
         shell: bash
