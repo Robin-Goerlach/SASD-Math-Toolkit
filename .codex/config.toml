@@ -1,0 +1,10 @@
+# Project-local Codex defaults. Codex loads this layer only for trusted projects.
+# The model is intentionally not pinned here; the user's ~/.codex/config.toml controls it.
+
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+web_search = "live"
+
+[sandbox_workspace_write]
+# Needed for dotnet restore and current documentation/research when the task requires it.
+network_access = true
