@@ -4,13 +4,13 @@ This directory contains the typesetting layer for the **SASD Math Toolkit C#/.NE
 
 ## Design goal
 
-The editorial source remains the existing Markdown handbook in `../de/` and `../en/`. Pandoc converts those chapters into temporary LaTeX fragments under `build/`; LuaLaTeX then applies the shared SASD book design. This avoids two independent copies of the same technical text.
+The editorial source remains the .NET Markdown handbook in `../../dotnet/de/` and `../../dotnet/en/`. Pandoc converts those chapters into temporary LaTeX fragments under `build/`; LuaLaTeX then applies the SASD book design. This avoids two independent copies of the same .NET text.
 
 The interior design deliberately recalls a few visual ideas from the historical 1987 *Turbo Pascal Numerical Methods Toolbox* manual - especially the restrained chapter opener with a large chapter number, horizontal rules and an italic chapter title - while all text, examples, APIs and diagnostics document the independently implemented SASD C#/.NET library.
 
 ## Current publication status
 
-The two PDFs committed one directory above are the stable **V1.0 handbook editions**. They contain the classical chapters plus the modern dense and sparse linear-algebra chapters included in the 1.0 release boundary.
+The two PDFs committed under `docs/user-guide/dotnet/` are the stable **V1.0 handbook editions**. They contain the classical chapters plus the modern dense and sparse linear-algebra chapters included in the 1.0 release boundary.
 
 The publication workflow is:
 
@@ -32,7 +32,7 @@ This keeps the checked-in PDFs meaningful release artifacts instead of regenerat
 ## Build
 
 ```bash
-cd docs/user-guide/LaTeX
+cd docs/user-guide/LaTeX/dotnet
 make de
 make en
 # or

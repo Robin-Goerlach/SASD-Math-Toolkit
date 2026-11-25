@@ -14,7 +14,7 @@ The **M3.2 sparse foundation is complete for the 1.0 release boundary**: immutab
 
 **Version `1.0.0` is the stable release baseline.** The repository-wide audit, German/English handbook and PDF gate, independent Windows acceptance and final Linux Release build/test/package/sample validation have completed without a release-blocking finding. The release contents are finalized on `main`; the Git tag/GitHub Release is the publication marker for this audited baseline.
 
-See [`docs/en/BORLAND-V1-COMPATIBILITY.md`](docs/en/BORLAND-V1-COMPATIBILITY.md) for the classical implementation matrix, [`docs/en/MODERNIZATION-2026.md`](docs/en/MODERNIZATION-2026.md) for the modern roadmap, [`docs/en/RELEASE-AUDIT.md`](docs/en/RELEASE-AUDIT.md) for the release gates and [`docs/en/RELEASE-NOTES-1.0.0.md`](docs/en/RELEASE-NOTES-1.0.0.md) for the V1.0 release summary.
+See [`docs/dotnet/en/BORLAND-V1-COMPATIBILITY.md`](docs/dotnet/en/BORLAND-V1-COMPATIBILITY.md) for the classical implementation matrix, [`docs/dotnet/en/MODERNIZATION-2026.md`](docs/dotnet/en/MODERNIZATION-2026.md) for the modern roadmap, [`docs/dotnet/en/RELEASE-AUDIT.md`](docs/dotnet/en/RELEASE-AUDIT.md) for the release gates and [`docs/dotnet/en/RELEASE-NOTES-1.0.0.md`](docs/dotnet/en/RELEASE-NOTES-1.0.0.md) for the V1.0 release summary.
 
 ## Repository architecture
 
@@ -32,7 +32,7 @@ SASD-Math-Toolkit/
 ├── spec/                       # language-neutral contracts and algorithm catalog
 ├── conformance/                # shared reference cases and golden vectors
 ├── docs/
-│   ├── en/, de/                # stable C#/.NET technical documentation
+│   ├── dotnet/en/, dotnet/de/  # stable C#/.NET technical documentation
 │   ├── cpp/en/, cpp/de/        # independent C++ technical documentation
 │   └── user-guide/             # language-specific Markdown/LaTeX handbooks
 └── .github/workflows/          # build, test, package and publication validation
@@ -48,13 +48,12 @@ follow only after the C++ contract and conformance work are mature.
 
 ## Current C++ foundation
 
-The independent C++ edition is at foundation version **0.1.0**. It currently
-provides the C++20/CMake project, the `sasd::numerics::common` termination and
-result vocabulary, a portable CPU execution policy, tests, installation
-metadata, a sample and separate German and English documentation. Automatic
-execution can use multiple CPU cores for algorithms with sufficiently large
-independent workloads; callers can cap or disable that parallelism. The C++
-edition does **not** yet claim the numerical feature
+The independent C++ edition is at CPP-M1 version **0.2.0**. It provides the
+C++20/CMake foundation, common termination/result vocabulary, a portable CPU
+execution policy and robust descriptive statistics (mean, median and
+population/sample variance). Mean and variance can use deterministic chunks on
+multiple CPU cores for sufficiently large inputs; callers can cap or disable
+that parallelism. The C++ edition does **not** yet claim the numerical feature
 coverage of the stable C#/.NET 1.0.0 edition.
 
 ```bash
@@ -116,25 +115,26 @@ Target framework: **.NET 10**. The normal GitHub Actions gate performs Release r
 
 ## Documentation
 
-- Release audit: [`docs/en/RELEASE-AUDIT.md`](docs/en/RELEASE-AUDIT.md) / [`docs/de/RELEASE-AUDIT.md`](docs/de/RELEASE-AUDIT.md)
-- V1.0 release notes: [`docs/en/RELEASE-NOTES-1.0.0.md`](docs/en/RELEASE-NOTES-1.0.0.md)
+- Documentation map: [`docs/README.md`](docs/README.md)
+- Release audit: [`docs/dotnet/en/RELEASE-AUDIT.md`](docs/dotnet/en/RELEASE-AUDIT.md) / [`docs/dotnet/de/RELEASE-AUDIT.md`](docs/dotnet/de/RELEASE-AUDIT.md)
+- V1.0 release notes: [`docs/dotnet/en/RELEASE-NOTES-1.0.0.md`](docs/dotnet/en/RELEASE-NOTES-1.0.0.md)
 - Changelog: [`CHANGELOG.md`](CHANGELOG.md)
-- 2026 modernization plan: [`docs/en/MODERNIZATION-2026.md`](docs/en/MODERNIZATION-2026.md)
-- QR design note: [`docs/en/QR-FACTORIZATION.md`](docs/en/QR-FACTORIZATION.md)
-- Cholesky design note: [`docs/en/CHOLESKY-FACTORIZATION.md`](docs/en/CHOLESKY-FACTORIZATION.md)
-- SVD design note: [`docs/en/SINGULAR-VALUE-DECOMPOSITION.md`](docs/en/SINGULAR-VALUE-DECOMPOSITION.md)
-- Matrix norms and conditioning: [`docs/en/MATRIX-NORMS-CONDITIONING.md`](docs/en/MATRIX-NORMS-CONDITIONING.md)
-- Sparse CSR foundation: [`docs/en/SPARSE-CSR.md`](docs/en/SPARSE-CSR.md)
-- Sparse CG/PCG: [`docs/en/SPARSE-CONJUGATE-GRADIENT.md`](docs/en/SPARSE-CONJUGATE-GRADIENT.md)
-- Sparse preconditioning: [`docs/en/SPARSE-PRECONDITIONING.md`](docs/en/SPARSE-PRECONDITIONING.md)
-- Restarted GMRES: [`docs/en/SPARSE-GMRES.md`](docs/en/SPARSE-GMRES.md)
-- BiCGSTAB: [`docs/en/SPARSE-BICGSTAB.md`](docs/en/SPARSE-BICGSTAB.md)
-- Sparse solver selection/release cases: [`docs/en/SPARSE-SOLVER-SELECTION.md`](docs/en/SPARSE-SOLVER-SELECTION.md)
-- Performance policy: [`docs/en/PERFORMANCE.md`](docs/en/PERFORMANCE.md)
-- Diagnostic conventions: [`docs/en/NUMERICAL-DIAGNOSTICS.md`](docs/en/NUMERICAL-DIAGNOSTICS.md)
-- Clean-room policy: [`docs/en/CLEAN-ROOM.md`](docs/en/CLEAN-ROOM.md)
-- English user handbook: [`docs/user-guide/en/README.md`](docs/user-guide/en/README.md)
-- Deutsches Benutzerhandbuch: [`docs/user-guide/de/README.md`](docs/user-guide/de/README.md)
+- 2026 modernization plan: [`docs/dotnet/en/MODERNIZATION-2026.md`](docs/dotnet/en/MODERNIZATION-2026.md)
+- QR design note: [`docs/dotnet/en/QR-FACTORIZATION.md`](docs/dotnet/en/QR-FACTORIZATION.md)
+- Cholesky design note: [`docs/dotnet/en/CHOLESKY-FACTORIZATION.md`](docs/dotnet/en/CHOLESKY-FACTORIZATION.md)
+- SVD design note: [`docs/dotnet/en/SINGULAR-VALUE-DECOMPOSITION.md`](docs/dotnet/en/SINGULAR-VALUE-DECOMPOSITION.md)
+- Matrix norms and conditioning: [`docs/dotnet/en/MATRIX-NORMS-CONDITIONING.md`](docs/dotnet/en/MATRIX-NORMS-CONDITIONING.md)
+- Sparse CSR foundation: [`docs/dotnet/en/SPARSE-CSR.md`](docs/dotnet/en/SPARSE-CSR.md)
+- Sparse CG/PCG: [`docs/dotnet/en/SPARSE-CONJUGATE-GRADIENT.md`](docs/dotnet/en/SPARSE-CONJUGATE-GRADIENT.md)
+- Sparse preconditioning: [`docs/dotnet/en/SPARSE-PRECONDITIONING.md`](docs/dotnet/en/SPARSE-PRECONDITIONING.md)
+- Restarted GMRES: [`docs/dotnet/en/SPARSE-GMRES.md`](docs/dotnet/en/SPARSE-GMRES.md)
+- BiCGSTAB: [`docs/dotnet/en/SPARSE-BICGSTAB.md`](docs/dotnet/en/SPARSE-BICGSTAB.md)
+- Sparse solver selection/release cases: [`docs/dotnet/en/SPARSE-SOLVER-SELECTION.md`](docs/dotnet/en/SPARSE-SOLVER-SELECTION.md)
+- Performance policy: [`docs/dotnet/en/PERFORMANCE.md`](docs/dotnet/en/PERFORMANCE.md)
+- Diagnostic conventions: [`docs/dotnet/en/NUMERICAL-DIAGNOSTICS.md`](docs/dotnet/en/NUMERICAL-DIAGNOSTICS.md)
+- Clean-room policy: [`docs/dotnet/en/CLEAN-ROOM.md`](docs/dotnet/en/CLEAN-ROOM.md)
+- English .NET user handbook: [`docs/user-guide/dotnet/en/README.md`](docs/user-guide/dotnet/en/README.md)
+- Deutsches .NET-Benutzerhandbuch: [`docs/user-guide/dotnet/de/README.md`](docs/user-guide/dotnet/de/README.md)
 - C++ documentation: [`docs/cpp/en/README.md`](docs/cpp/en/README.md) / [`docs/cpp/de/README.md`](docs/cpp/de/README.md)
 - C++ user handbook: [`docs/user-guide/cpp/en/README.md`](docs/user-guide/cpp/en/README.md) / [`docs/user-guide/cpp/de/README.md`](docs/user-guide/cpp/de/README.md)
 

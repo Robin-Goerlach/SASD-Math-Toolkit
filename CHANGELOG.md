@@ -6,6 +6,14 @@ The project uses semantic versioning for package/release identifiers.
 
 ## Unreleased
 
+### C++ 0.2.0 / CPP-M1
+
+- Added finite-input descriptive statistics: compensated scaled mean, overflow-safe median and scaled population/sample variance.
+- Added deterministic automatic/sequential/parallel reductions for mean and variance, with caller-controlled CPU limits.
+- Added numerical boundary, validation, parallel consistency and installed-package tests.
+- Separated .NET and C++ technical documentation, handbook sources and LaTeX publication projects into explicit language trees.
+- Recorded the semantic migration plan for relevant `sasd-toolbox-dotnet` functionality without duplicating the existing root-finding implementation.
+
 ### C++ 0.1.0 foundation
 
 - Added the independently versioned C++20 project under `src/cpp/`, with CMake build and install-package support.

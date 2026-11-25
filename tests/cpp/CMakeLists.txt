@@ -14,3 +14,17 @@ sasd_math_toolkit_enable_warnings(sasd_math_toolkit_common_tests)
 add_test(
     NAME cpp.common_result
     COMMAND sasd_math_toolkit_common_tests)
+
+add_executable(
+    sasd_math_toolkit_statistics_tests
+    statistics_tests.cpp)
+
+target_link_libraries(
+    sasd_math_toolkit_statistics_tests
+    PRIVATE SASD::MathToolkit)
+target_compile_features(sasd_math_toolkit_statistics_tests PRIVATE cxx_std_20)
+sasd_math_toolkit_enable_warnings(sasd_math_toolkit_statistics_tests)
+
+add_test(
+    NAME cpp.statistics
+    COMMAND sasd_math_toolkit_statistics_tests)

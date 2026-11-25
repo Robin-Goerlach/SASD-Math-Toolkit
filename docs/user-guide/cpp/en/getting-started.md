@@ -30,7 +30,7 @@ cmake --install build/cpp --prefix /chosen/prefix
 ```
 
 ```cmake
-find_package(SasdMathToolkit 0.1 CONFIG REQUIRED)
+find_package(SasdMathToolkit 0.2 CONFIG REQUIRED)
 target_link_libraries(my_program PRIVATE SASD::MathToolkit)
 ```
 

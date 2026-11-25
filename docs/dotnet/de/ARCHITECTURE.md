@@ -10,8 +10,8 @@ Das SASD Math Toolkit soll eine langfristig wiederverwendbare mathematische Grun
 - `src/dotnet/`: erste Implementierung in C#/.NET 10.
 - `tests/dotnet/`: automatisierte numerische Tests.
 - `samples/dotnet/`: Beispiele und Demonstrationsprogramme.
-- `docs/en/`: primäre technische Dokumentation.
-- `docs/de/`: deutsche Dokumentation.
+- `docs/dotnet/en/`: primäre technische .NET-Dokumentation.
+- `docs/dotnet/de/`: deutsche .NET-Dokumentation.
 
 Spätere Implementierungen kommen parallel hinzu, z. B. `src/cpp`, `src/fortran`, `src/java` und `src/javascript`. Dadurch bleibt kein Sprach-Frontend der architektonische Mittelpunkt des Gesamtprojekts.
 

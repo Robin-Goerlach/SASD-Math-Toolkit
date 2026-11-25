@@ -1,7 +1,7 @@
 \documentclass[11pt,a4paper,twoside,openright]{book}
 \usepackage[english]{babel}
-\newcommand{\HandbookPdfTitle}{SASD Math Toolkit - C++ Handbook Version 0.1}
-\newcommand{\HandbookFooter}{C++ Handbook Version 0.1 - English}
+\newcommand{\HandbookPdfTitle}{SASD Math Toolkit - C++ Handbook Version 0.2}
+\newcommand{\HandbookFooter}{C++ Handbook Version 0.2 - English}
 \usepackage{sasd-cpp-handbook}
 
 \begin{document}
@@ -17,7 +17,7 @@
 {\color{sasdTeal}\bfseries\fontsize{24}{29}\selectfont Modern C++\par}
 \vspace{1cm}
 {\Large User and Developer Handbook\par}
-{\large Version 0.1 / CPP-M0\par}
+{\large Version 0.2 / CPP-M1\par}
 \vfill
 {\large Portable numerics, explicit diagnostics and controlled multi-core execution.\par}
 \vspace{0.8cm}
@@ -28,15 +28,15 @@
 \chapter*{Document status}
 \addcontentsline{toc}{chapter}{Document status}
 
-This independent C++ handbook describes foundation version \texttt{0.1.0}.
+This independent C++ handbook describes CPP-M1 version \texttt{0.2.0}.
 Chapters are generated from the maintained Markdown sources under
 \texttt{docs/user-guide/cpp/en/}. It is neither a copy nor an appendix of the
 C\#/.NET handbook.
 
 \begin{tabularx}{\textwidth}{@{}>{\bfseries}p{0.32\textwidth}X@{}}
 Edition & Modern C++20\\
-Handbook version & 0.1\\
-Library version & \texttt{0.1.0}\\
+Handbook version & 0.2\\
+Library version & \texttt{0.2.0}\\
 Root namespace & \texttt{sasd::numerics}\\
 Build system & CMake 3.25 or newer\\
 License & MIT\\
@@ -50,6 +50,7 @@ Author / project & Robin Goerlach; SASD-GmbH\\
 \input{build/en/README.tex}
 \input{build/en/getting-started.tex}
 \input{build/en/parallel-execution.tex}
+\input{build/en/descriptive-statistics.tex}
 
 \backmatter
 \chapter*{License and provenance}

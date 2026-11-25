@@ -6,13 +6,9 @@ on:
     branches: [ main ]
     paths:
       - '.github/workflows/handbook-pdf.yml'
-      - 'docs/user-guide/de/**/*.md'
-      - 'docs/user-guide/en/**/*.md'
-      - 'docs/user-guide/LaTeX/Makefile'
-      - 'docs/user-guide/LaTeX/README.md'
-      - 'docs/user-guide/LaTeX/sasd-handbook.sty'
-      - 'docs/user-guide/LaTeX/de/**'
-      - 'docs/user-guide/LaTeX/en/**'
+      - 'docs/user-guide/dotnet/de/**/*.md'
+      - 'docs/user-guide/dotnet/en/**/*.md'
+      - 'docs/user-guide/LaTeX/dotnet/**'
 
 permissions:
   contents: read
@@ -35,15 +31,15 @@ jobs:
           sudo apt-get install -y pandoc latexmk texlive-luatex texlive-latex-extra texlive-fonts-recommended texlive-lang-german fonts-dejavu poppler-utils
 
       - name: Build German and English handbooks
-        working-directory: docs/user-guide/LaTeX
+        working-directory: docs/user-guide/LaTeX/dotnet
         run: make all
 
       - name: Validate generated PDFs
         shell: bash
         run: |
           set -euo pipefail
-          de_pdf='docs/user-guide/LaTeX/SASD-Math-Toolkit-Handbuch-V1.0-DE.pdf'
-          en_pdf='docs/user-guide/LaTeX/SASD-Math-Toolkit-Handbook-V1.0-EN.pdf'
+          de_pdf='docs/user-guide/LaTeX/dotnet/SASD-Math-Toolkit-Handbuch-V1.0-DE.pdf'
+          en_pdf='docs/user-guide/LaTeX/dotnet/SASD-Math-Toolkit-Handbook-V1.0-EN.pdf'
           test -s "$de_pdf"
           test -s "$en_pdf"
           pdfinfo "$de_pdf" | grep -q '^Pages:'
@@ -54,8 +50,8 @@ jobs:
         with:
           name: sasd-math-toolkit-handbooks-v1.0.0
           path: |
-            docs/user-guide/LaTeX/SASD-Math-Toolkit-Handbuch-V1.0-DE.pdf
-            docs/user-guide/LaTeX/SASD-Math-Toolkit-Handbook-V1.0-EN.pdf
+            docs/user-guide/LaTeX/dotnet/SASD-Math-Toolkit-Handbuch-V1.0-DE.pdf
+            docs/user-guide/LaTeX/dotnet/SASD-Math-Toolkit-Handbook-V1.0-EN.pdf
           if-no-files-found: error
           retention-days: 30
 

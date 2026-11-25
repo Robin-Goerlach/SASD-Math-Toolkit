@@ -42,7 +42,9 @@ multiple workers in automatic mode.
 ## Reproducibility
 
 Contiguous work partitioning is deterministic, but parallel floating-point
-reductions can change operation order and therefore the last few bits. The
-library will document such cases and test mathematical tolerances, residuals or
-reconstruction errors. Select `sequential` when investigating order-sensitive
-behavior or when the application already performs outer-level parallelism.
+reductions can change operation order and therefore the last few bits. CPP-M1
+statistics fixes the chunk layout and combines chunks in index order for a
+given execution configuration. The library tests mathematical tolerances,
+residuals or reconstruction errors. Select `sequential` when investigating
+order-sensitive behavior or when the application already performs outer-level
+parallelism.

@@ -38,8 +38,13 @@ nested worker sets from competing for the same cores.
 
 ## Internal worker behavior
 
-The CPP-M0 internal primitive partitions indices into stable contiguous chunks,
+The internal primitive partitions indices into stable contiguous chunks,
 bounds workers by both hardware and work size, joins all workers and rethrows
 the first worker exception on the calling thread. It does not expose a general
 thread-pool API and therefore leaves room for a measured persistent-pool or
 backend design later.
+
+CPP-M1 mean and variance are the first public algorithms to use this policy.
+Each worker calculates one stable contiguous partial result; partial results are
+combined in chunk-index order. Scheduling therefore does not affect the
+reduction order for a fixed execution configuration.

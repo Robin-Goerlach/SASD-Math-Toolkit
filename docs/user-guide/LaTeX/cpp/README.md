@@ -23,8 +23,8 @@ make all
 
 Development outputs are:
 
-- `SASD-Math-Toolkit-Cpp-Handbuch-V0.1-DE.pdf`
-- `SASD-Math-Toolkit-Cpp-Handbook-V0.1-EN.pdf`
+- `SASD-Math-Toolkit-Cpp-Handbuch-V0.2-DE.pdf`
+- `SASD-Math-Toolkit-Cpp-Handbook-V0.2-EN.pdf`
 
 Markdown remains the editorial source. Generated PDFs are inspected and
 committed only at deliberate release-candidate or release boundaries. Temporary

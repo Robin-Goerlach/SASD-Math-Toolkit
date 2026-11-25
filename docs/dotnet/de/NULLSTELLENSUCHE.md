@@ -1,6 +1,6 @@
 # Nullstellensuche
 
-Diese Notiz dokumentiert die Implementierungsverträge hinter den skalaren und komplexen Nullstellen-APIs. Anwenderorientierte Erklärungen und Beispiele stehen unter `docs/user-guide/de/nullstellen.md`.
+Diese Notiz dokumentiert die Implementierungsverträge hinter den skalaren und komplexen Nullstellen-APIs. Anwenderorientierte Erklärungen und Beispiele stehen unter `docs/user-guide/dotnet/de/nullstellen.md`.
 
 ## Entwurfsprinzipien
 

@@ -7,7 +7,7 @@
 - Threadbibliothek der Plattform;
 - optional Doxygen für die generierte API-Referenz.
 
-CPP-M0 erzeugt bewusst eine statische Referenzbibliothek. Symbolsichtbarkeit
+Die C++-Meilensteine vor 1.0 erzeugen bewusst eine statische Referenzbibliothek. Symbolsichtbarkeit
 und ABI-Regeln für Shared Libraries werden ausdrücklich entworfen, bevor ein
 dynamisches Target angeboten wird, statt zufällig `BUILD_SHARED_LIBS` zu erben.
 
@@ -58,7 +58,7 @@ cmake --build build/install-consumer
 Ein Consumer verwendet:
 
 ```cmake
-find_package(SasdMathToolkit 0.1 CONFIG REQUIRED)
+find_package(SasdMathToolkit 0.2 CONFIG REQUIRED)
 target_link_libraries(meine_anwendung PRIVATE SASD::MathToolkit)
 ```
 

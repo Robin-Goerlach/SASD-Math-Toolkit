@@ -7,7 +7,7 @@
 - the platform thread library;
 - optional Doxygen for the generated API reference.
 
-CPP-M0 deliberately builds a static reference library. Shared-library symbol
+The pre-1.0 C++ milestones deliberately build a static reference library. Shared-library symbol
 visibility and ABI policy will be designed explicitly before a dynamic target
 is offered, rather than inherited accidentally from `BUILD_SHARED_LIBS`.
 
@@ -58,7 +58,7 @@ cmake --build build/install-consumer
 Consumers use:
 
 ```cmake
-find_package(SasdMathToolkit 0.1 CONFIG REQUIRED)
+find_package(SasdMathToolkit 0.2 CONFIG REQUIRED)
 target_link_libraries(my_application PRIVATE SASD::MathToolkit)
 ```
 

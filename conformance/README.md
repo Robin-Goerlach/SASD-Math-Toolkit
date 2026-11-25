@@ -43,6 +43,8 @@ passes when it satisfies the documented mathematical contract and tolerance.
 No production implementation is allowed to generate its own expected values at
 test time.
 
-CPP-M0 establishes this location but deliberately adds no invented numerical
-golden vectors. The first vectors will accompany the polynomial/root-finding
-milestone, where both C# and C++ can execute the same meaningful cases.
+CPP-M0 established this location without invented numerical golden vectors.
+Shared vectors are introduced only when two implementations can execute the
+same meaningful cases; CPP-M1 statistics therefore defines its contract and
+C++ tests first, with cross-language vectors following during the planned .NET
+statistics implementation.

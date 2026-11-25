@@ -2,8 +2,8 @@ PANDOC ?= pandoc
 LATEXMK ?= latexmk
 
 BUILD_DIR := build
-DE_MD_DIR := ../de
-EN_MD_DIR := ../en
+DE_MD_DIR := ../../dotnet/de
+EN_MD_DIR := ../../dotnet/en
 
 DE_CHAPTERS := erste-schritte nullstellen interpolation differentiation integration matrizen-lineare-gleichungssysteme eigenwerte-eigenvektoren differentialgleichungen least-squares fft-faltung-korrelation diagnostik-fehlerfaelle moderne-dichte-lineare-algebra duennbesetzte-lineare-algebra
 EN_CHAPTERS := getting-started root-finding interpolation differentiation integration matrices-linear-systems eigenvalues-eigenvectors ordinary-differential-equations least-squares fft-convolution-correlation diagnostics-common-failure-modes modern-dense-linear-algebra sparse-linear-algebra

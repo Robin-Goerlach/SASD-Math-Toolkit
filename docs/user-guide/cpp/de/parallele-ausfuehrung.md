@@ -44,7 +44,8 @@ Batch kann im Automatikmodus mehrere Worker nutzen.
 
 Die Aufteilung zusammenhängender Arbeitsbereiche ist deterministisch. Parallele
 Fließkommareduktionen können jedoch die Reihenfolge der Operationen und damit
-letzte Bits verändern. Die Bibliothek dokumentiert solche Fälle und prüft
-mathematische Toleranzen, Residuen oder Rekonstruktionsfehler. `sequential` ist
+letzte Bits verändern. Die Statistik aus CPP-M1 legt die Bereichsaufteilung fest
+und kombiniert Bereiche bei gleicher Konfiguration in Indexreihenfolge. Die
+Bibliothek prüft mathematische Toleranzen, Residuen oder Rekonstruktionsfehler. `sequential` ist
 sinnvoll, wenn reihenfolgeabhängiges Verhalten untersucht wird oder die
 Anwendung bereits auf äußerer Ebene parallelisiert.

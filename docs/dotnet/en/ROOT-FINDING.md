@@ -1,6 +1,6 @@
 # Root finding
 
-This note documents the implementation contracts behind the scalar and complex root-finding APIs. The user-oriented explanation and examples live in `docs/user-guide/en/root-finding.md`.
+This note documents the implementation contracts behind the scalar and complex root-finding APIs. The user-oriented explanation and examples live in `docs/user-guide/dotnet/en/root-finding.md`.
 
 ## Design principles
 

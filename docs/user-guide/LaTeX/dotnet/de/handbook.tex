@@ -16,7 +16,7 @@
 \chapter*{Dokumentstatus}
 \addcontentsline{toc}{chapter}{Dokumentstatus}
 \begin{sasdnote}{Handbuch Version 1.0}
-Dieses Dokument ist die deutschsprachige Ausgabe des SASD Math Toolkit zur finalen Paketversion \texttt{1.0.0}. Die Kapitelinhalte werden beim Build aus dem gepflegten Markdown-Handbuch unter \texttt{docs/user-guide/de/} erzeugt. Markdown bleibt damit die redaktionelle Quelle, während LaTeX Satz, Navigation und PDF-Ausgabe übernimmt.
+Dieses Dokument ist die deutschsprachige .NET-Ausgabe des SASD Math Toolkit zur finalen Paketversion \texttt{1.0.0}. Die Kapitelinhalte werden beim Build aus dem gepflegten Markdown-Handbuch unter \texttt{docs/user-guide/dotnet/de/} erzeugt. Markdown bleibt damit die redaktionelle Quelle, während LaTeX Satz, Navigation und PDF-Ausgabe übernimmt.
 \end{sasdnote}
 
 \begin{tabularx}{\textwidth}{@{}>{\bfseries}p{0.31\textwidth}X@{}}
@@ -81,10 +81,10 @@ Demonstrationen & Plattformunabhängiger deterministischer HTML/SVG-Bericht plus
 \end{longtable}
 
 \chapter{Build und Pflege der LaTeX-Ausgabe}
-Die LaTeX-Ausgabe wird absichtlich aus den bestehenden Markdown-Kapiteln generiert. Änderungen an fachlichen Erläuterungen sollen daher zuerst in \texttt{docs/user-guide/de/} bzw. \texttt{docs/user-guide/en/} erfolgen. Das Verzeichnis \texttt{LaTeX/} enthält Layout, Buildlogik und sprachspezifische Front-/Back-Matter.
+Die LaTeX-Ausgabe wird absichtlich aus den bestehenden Markdown-Kapiteln generiert. Änderungen an .NET-spezifischen Erläuterungen sollen daher zuerst in \texttt{docs/user-guide/dotnet/de/} bzw. \texttt{docs/user-guide/dotnet/en/} erfolgen. Das Verzeichnis \texttt{LaTeX/dotnet/} enthält Layout, Buildlogik und sprachspezifische Front-/Back-Matter.
 
 \begin{lstlisting}
-cd docs/user-guide/LaTeX
+cd docs/user-guide/LaTeX/dotnet
 make de      # deutsches PDF
 make en      # English PDF
 make all     # beide Ausgaben

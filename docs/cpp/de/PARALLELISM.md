@@ -40,8 +40,14 @@ Kerne konkurrieren.
 
 ## Verhalten des internen Workers
 
-Der CPP-M0-Worker zerlegt Indizes in stabile zusammenhängende Bereiche, begrenzt
+Der interne Worker zerlegt Indizes in stabile zusammenhängende Bereiche, begrenzt
 die Workerzahl nach Hardware und Arbeitsmenge, wartet auf alle Worker und wirft
 die erste Worker-Exception im aufrufenden Thread erneut. Er veröffentlicht
 bewusst keine allgemeine Thread-Pool-API; eine spätere persistente Pool- oder
 Backend-Lösung bleibt damit nach echten Messungen möglich.
+
+Mittelwert und Varianz aus CPP-M1 sind die ersten öffentlichen Algorithmen mit
+dieser Richtlinie. Jeder Worker berechnet ein stabiles zusammenhängendes
+Teilergebnis; die Teilergebnisse werden anschließend in Bereichsreihenfolge
+zusammengeführt. Bei gleicher Ausführungskonfiguration beeinflusst die
+Threadplanung deshalb die Reduktionsreihenfolge nicht.

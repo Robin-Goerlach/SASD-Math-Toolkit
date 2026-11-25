@@ -11,6 +11,7 @@ cmake-build-*/
 CMakeUserPresets.json
 compile_commands.json
 docs/user-guide/LaTeX/cpp/SASD-Math-Toolkit-Cpp-*.pdf
+docs/user-guide/LaTeX/dotnet/SASD-Math-Toolkit-Hand*.pdf
 *.user
 *.suo
 *.nupkg

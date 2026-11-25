@@ -29,10 +29,10 @@ Do not copy or port historical source code. Do not reproduce substantial histori
 - `samples/cpp/` - C++ examples; no reusable library logic.
 - `spec/` - language-neutral contracts/reference data as they are introduced.
 - `conformance/` - language-neutral machine-readable reference cases.
-- `docs/en/`, `docs/de/` - technical documentation.
+- `docs/dotnet/en/`, `docs/dotnet/de/` - .NET technical documentation.
 - `docs/cpp/en/`, `docs/cpp/de/` - independent C++ technical documentation.
-- `docs/user-guide/en/`, `docs/user-guide/de/` - continuously maintained Markdown handbook sources.
-- `docs/user-guide/LaTeX/` - publication/typesetting layer; regenerate committed PDFs only at deliberate RC/release boundaries unless the task explicitly requests otherwise.
+- `docs/user-guide/dotnet/en/`, `docs/user-guide/dotnet/de/` - continuously maintained .NET Markdown handbook sources.
+- `docs/user-guide/LaTeX/<language>/` - language-specific publication/typesetting layers; regenerate committed PDFs only at deliberate RC/release boundaries unless the task explicitly requests otherwise.
 - `eng/codex-verify.sh` - canonical local verification entry point for Codex.
 - `eng/cpp-verify.sh` - focused C++ build/test/install verification entry point.
 
@@ -41,7 +41,7 @@ Do not copy or port historical source code. Do not reproduce substantial histori
 At the start of a development task:
 
 1. Inspect `git status -sb` and the current branch. Preserve all pre-existing user changes; never discard or overwrite unrelated work.
-2. Read the root `README.md` plus the relevant sections of `docs/en/ROADMAP.md`, `docs/en/MODERNIZATION-2026.md`, and `docs/en/ARCHITECTURE.md`.
+2. Read the root `README.md` plus the relevant sections of `docs/dotnet/en/ROADMAP.md`, `docs/dotnet/en/MODERNIZATION-2026.md`, and `docs/dotnet/en/ARCHITECTURE.md`.
 3. Inspect the relevant implementation, tests, and corresponding German/English documentation before designing the change.
 4. Search for existing abstractions and terminology before introducing new public types.
 5. Treat the current repository as truth when older prompts or notes disagree with it.

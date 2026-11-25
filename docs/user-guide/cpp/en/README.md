@@ -7,16 +7,17 @@ handbook.
 
 ## Edition status
 
-Handbook version `0.1` accompanies the CPP-M0 foundation. The stable .NET
+Handbook version `0.2` accompanies CPP-M1. The stable .NET
 edition already provides the broad numerical reference catalog, but the C++
-edition currently contains only its build/package foundation, common result
-vocabulary and CPU execution policy. Later chapters are added together with the
-corresponding tested C++ algorithms.
+edition contains its build/package foundation, common result vocabulary, CPU
+execution policy and descriptive statistics. Later chapters are added together
+with the corresponding tested C++ algorithms.
 
 ## Contents
 
 1. [Getting started](getting-started.md)
 2. [Diagnostics and parallel execution](parallel-execution.md)
+3. [Descriptive statistics](descriptive-statistics.md)
 
 Future chapters will cover polynomials and roots, interpolation, calculus,
 dense and sparse linear algebra, eigenvalue methods, ODE/BVP methods,

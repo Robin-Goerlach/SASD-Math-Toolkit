@@ -7,16 +7,17 @@ C#/.NET-Handbuch nicht voraus.
 
 ## Stand der Ausgabe
 
-Die Handbuchversion `0.1` begleitet das CPP-M0-Fundament. Die stabile
+Die Handbuchversion `0.2` begleitet CPP-M1. Die stabile
 .NET-Ausgabe besitzt bereits einen breiten numerischen Referenzkatalog. Die
-C++-Ausgabe enthält derzeit zunächst Build- und Paketgrundlage, gemeinsames
-Ergebnismodell und CPU-Ausführungsrichtlinie. Weitere Kapitel entstehen jeweils
+C++-Ausgabe enthält Build- und Paketgrundlage, gemeinsames Ergebnismodell,
+CPU-Ausführungsrichtlinie und deskriptive Statistik. Weitere Kapitel entstehen jeweils
 zusammen mit den zugehörigen getesteten C++-Algorithmen.
 
 ## Inhalt
 
 1. [Erste Schritte](erste-schritte.md)
 2. [Diagnostik und parallele Ausführung](parallele-ausfuehrung.md)
+3. [Deskriptive Statistik](deskriptive-statistik.md)
 
 Später folgen Polynome und Nullstellen, Interpolation, Analysis, dichte und
 dünnbesetzte lineare Algebra, Eigenwertmethoden, ODE/BVP, Approximation und

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.25)
 
 project(
     SasdMathToolkitCpp
-    VERSION 0.1.0
+    VERSION 0.2.0
     DESCRIPTION "Modern C++ implementation of SASD Math Toolkit"
     LANGUAGES CXX)
 
@@ -41,7 +41,8 @@ endfunction()
 add_library(
     sasd_math_toolkit STATIC
     src/common/iteration_status.cpp
-    src/execution/execution_options.cpp)
+    src/execution/execution_options.cpp
+    src/statistics/descriptive_statistics.cpp)
 add_library(SASD::MathToolkit ALIAS sasd_math_toolkit)
 
 set_target_properties(
@@ -58,7 +59,9 @@ target_include_directories(
     sasd_math_toolkit
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src)
 sasd_math_toolkit_enable_warnings(sasd_math_toolkit)
 
 if(SASD_MATH_TOOLKIT_BUILD_TESTS)
