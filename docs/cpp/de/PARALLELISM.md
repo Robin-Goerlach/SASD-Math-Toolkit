@@ -51,3 +51,9 @@ dieser Richtlinie. Jeder Worker berechnet ein stabiles zusammenhängendes
 Teilergebnis; die Teilergebnisse werden anschließend in Bereichsreihenfolge
 zusammengeführt. Bei gleicher Ausführungskonfiguration beeinflusst die
 Threadplanung deshalb die Reduktionsreihenfolge nicht.
+
+CPP-M3 ergänzt die Batch-Auswertung unabhängiger Punkte für Newton-Interpolanten
+und kubische Splines. Ein allgemeiner Umschaltpunkt wird nicht behauptet:
+Thread-Erzeugung, Prozessortopologie, umgebende Anwendungsparallelität und
+Rechenaufwand pro Punkt unterscheiden sich. Die Automatikschwelle bleibt eine
+von der Anwendung anpassbare Richtlinieneingabe.

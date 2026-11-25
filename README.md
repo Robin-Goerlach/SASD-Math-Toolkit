@@ -48,14 +48,17 @@ follow only after the C++ contract and conformance work are mature.
 
 ## Current C++ foundation
 
-The independent C++ edition is at CPP-M2 version **0.3.0**. It provides the
+The independent C++ edition is at CPP-M3 version **0.4.0**. It provides the
 C++20/CMake foundation, common termination/result vocabulary, a portable CPU
 execution policy and robust descriptive statistics (mean, median and
 population/sample variance). Mean and variance can use deterministic chunks on
 multiple CPU cores for sufficiently large inputs; callers can cap or disable
 that parallelism. CPP-M2 also adds immutable complex-capable polynomials,
 Horner evaluation/deflation, scalar bisection/Newton/secant solvers, complex
-Muller and polynomial Newton-Horner/Laguerre all-roots support. The C++ edition
+Muller and polynomial Newton-Horner/Laguerre all-roots support. CPP-M3 adds
+linear, Lagrange and reusable Newton interpolation, natural and clamped cubic
+splines, and caller-controlled parallel batch evaluation for independent
+target points. The C++ edition
 does **not** yet claim the numerical feature
 coverage of the stable C#/.NET 1.0.0 edition.
 

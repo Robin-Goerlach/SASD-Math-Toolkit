@@ -36,8 +36,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          de_pdf='docs/user-guide/LaTeX/cpp/SASD-Math-Toolkit-Cpp-Handbuch-V0.3-DE.pdf'
-          en_pdf='docs/user-guide/LaTeX/cpp/SASD-Math-Toolkit-Cpp-Handbook-V0.3-EN.pdf'
+          de_pdf='docs/user-guide/LaTeX/cpp/SASD-Math-Toolkit-Cpp-Handbuch-V0.4-DE.pdf'
+          en_pdf='docs/user-guide/LaTeX/cpp/SASD-Math-Toolkit-Cpp-Handbook-V0.4-EN.pdf'
           test -s "$de_pdf"
           test -s "$en_pdf"
           pdfinfo "$de_pdf" | grep -q '^Pages:'
@@ -46,10 +46,10 @@ jobs:
       - name: Upload C++ handbook PDFs for inspection
         uses: actions/upload-artifact@v7
         with:
-          name: sasd-math-toolkit-cpp-handbooks-v0.3
+          name: sasd-math-toolkit-cpp-handbooks-v0.4
           path: |
-            docs/user-guide/LaTeX/cpp/SASD-Math-Toolkit-Cpp-Handbuch-V0.3-DE.pdf
-            docs/user-guide/LaTeX/cpp/SASD-Math-Toolkit-Cpp-Handbook-V0.3-EN.pdf
+            docs/user-guide/LaTeX/cpp/SASD-Math-Toolkit-Cpp-Handbuch-V0.4-DE.pdf
+            docs/user-guide/LaTeX/cpp/SASD-Math-Toolkit-Cpp-Handbook-V0.4-EN.pdf
           if-no-files-found: error
           retention-days: 30
 

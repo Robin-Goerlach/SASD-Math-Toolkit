@@ -53,3 +53,8 @@ CPP-M2 adds `root-finding/scalar-reference.csv`. Its analytic scalar roots are
 consumed by the C++ test suite and correspond to problems already covered by
 the .NET reference implementation. Later implementations should consume the
 same cases rather than generating expected values from their own solver.
+
+CPP-M3 adds `interpolation/reference.csv`. It covers linear, Lagrange and
+Newton polynomial interpolation plus natural and clamped spline values and
+derivatives. The cases use analytic polynomials or exactly derived spline
+segments and are shared independently from any language-specific API.

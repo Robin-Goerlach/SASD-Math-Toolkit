@@ -9,7 +9,7 @@ nicht als Löschgrund.
 | --- | --- | --- | --- |
 | `Guard` | Keine allgemeine Utility-API veröffentlichen. Numerische Vorbedingungen werden sprachintern geprüft. | Nur interne Fundament-Prüfungen | Der vorhandene interne `NumericGuard` bleibt kanonisch |
 | Mittelwert, Median, Varianz | Mit robuster Überlaufbehandlung, endlichen Eingaben und expliziter Stichproben-/Grundgesamtheitssemantik migrieren. | CPP-M1 | Nach Stabilisierung des C++-Vertrags übertragen |
-| Lineare Zweipunktinterpolation | Ohne Duplikation der Lagrange-Interpolation in die Interpolationsdomäne aufnehmen. | Für den Interpolationsmeilenstein geplant | Nach C++ geplant |
+| Lineare Zweipunktinterpolation | Ohne Duplikation der Lagrange-Interpolation in die Interpolationsdomäne aufnehmen. | CPP-M3-Implementierung abgeschlossen | Nach C++ geplant |
 | Bisektionsverfahren | Die engere Toolbox-Implementierung nicht kopieren; der umfassendere statusbasierte Math-Toolkit-Vertrag gilt. | CPP-M2-Implementierung abgeschlossen | Vorhandene Implementierung ist kanonisch |
 | Demo und Repository-Gerüst | Nicht migrieren; sie sind keine wiederverwendbare Mathematik. | Entfällt | Entfällt |
 

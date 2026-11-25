@@ -7,11 +7,12 @@ handbook.
 
 ## Edition status
 
-Handbook version `0.3` accompanies CPP-M2. The stable .NET
+Handbook version `0.4` accompanies CPP-M3. The stable .NET
 edition already provides the broad numerical reference catalog, but the C++
 edition contains its build/package foundation, common result vocabulary, CPU
-execution policy, descriptive statistics, polynomials and root finding. Later
-chapters are added together with the corresponding tested C++ algorithms.
+execution policy, descriptive statistics, polynomials, root finding,
+interpolation and cubic splines. Later chapters are added together with the
+corresponding tested C++ algorithms.
 
 ## Contents
 
@@ -19,9 +20,10 @@ chapters are added together with the corresponding tested C++ algorithms.
 2. [Diagnostics and parallel execution](parallel-execution.md)
 3. [Descriptive statistics](descriptive-statistics.md)
 4. [Polynomials and root finding](polynomials-root-finding.md)
+5. [Interpolation and splines](interpolation-splines.md)
 
-Future chapters will cover interpolation, calculus, dense and sparse linear
-algebra, eigenvalue methods, ODE/BVP methods, approximation and transforms.
+Future chapters will cover calculus, dense and sparse linear algebra,
+eigenvalue methods, ODE/BVP methods, approximation and transforms.
 Every example in this handbook will compile as C++20.
 
 ## Guiding principle

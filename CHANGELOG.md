@@ -6,12 +6,20 @@ The project uses semantic versioning for package/release identifiers.
 
 ## Unreleased
 
+### C++ 0.4.0 / CPP-M3
+
+- Added finite-input linear, Lagrange and Newton divided-difference interpolation.
+- Added an immutable reusable Newton interpolant with caller-controlled sequential, automatic and parallel batch evaluation.
+- Added immutable natural and clamped cubic splines with value, first-derivative and second-derivative evaluation on their closed knot domain.
+- Added deterministic spline batch evaluation without claiming a universal parallel crossover size.
+- Added a language-neutral interpolation contract, shared analytic conformance cases, 64 focused C++ checks and independent German/English documentation.
+
 ### C++ 0.3.0 / CPP-M2
 
 - Added immutable complex-capable polynomials with Horner evaluation, combined derivative evaluation, formal derivatives and synthetic deflation.
 - Added status-bearing bisection, Newton-Raphson, secant, complex Muller, Newton-Horner and Laguerre root solvers.
 - Added deterministic all-roots Laguerre search with fallback starts, deflation and original-polynomial residual polishing.
-- Added a language-neutral root-finding contract, shared scalar conformance cases and 61 focused C++ checks.
+- Added a language-neutral root-finding contract, shared scalar conformance cases and 63 focused C++ checks.
 - Added independent German/English technical and handbook chapters and advanced the C++ handbook to version 0.3.
 
 ### C++ 0.2.0 / CPP-M1

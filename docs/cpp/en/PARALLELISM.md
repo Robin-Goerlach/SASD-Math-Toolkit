@@ -48,3 +48,8 @@ CPP-M1 mean and variance are the first public algorithms to use this policy.
 Each worker calculates one stable contiguous partial result; partial results are
 combined in chunk-index order. Scheduling therefore does not affect the
 reduction order for a fixed execution configuration.
+
+CPP-M3 adds independent-point batch evaluation for Newton interpolants and
+cubic splines. No universal crossover is claimed: thread-creation cost,
+processor topology, surrounding application parallelism and per-point work all
+vary. The automatic threshold remains an application-tunable policy input.

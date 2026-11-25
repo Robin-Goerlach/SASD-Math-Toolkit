@@ -7,7 +7,7 @@ ist aber keine Quellcodevorlage.
 
 ## Aktueller Stand
 
-CPP-M2 erweitert die Bibliothek auf Version `0.3.0`:
+CPP-M3 erweitert die Bibliothek auf Version `0.4.0`:
 
 - C++20- und CMake-Projektstruktur;
 - öffentlicher Root-Namespace `sasd::numerics`;
@@ -19,7 +19,9 @@ CPP-M2 erweitert die Bibliothek auf Version `0.3.0`:
 - deskriptive Statistik mit stabilem Mittelwert, Median und Populations-/Stichprobenvarianz;
 - deterministische Mehrkernreduktionen für ausreichend große Mittelwert-/Varianzeingaben;
 - unveränderliche komplexfähige Polynome mit Horner-Auswertung und Deflation;
-- skalare, komplexe und polynomspezifische Nullstellensolver mit Diagnostik.
+- skalare, komplexe und polynomspezifische Nullstellensolver mit Diagnostik;
+- lineare, Lagrange- und Newton-Interpolation sowie unveränderliche natürliche und eingespannte kubische Splines;
+- steuerbare parallele Batch-Auswertung für unabhängige Interpolationsziele.
 
 Ein vollständiger numerischer Funktionskatalog wird noch nicht behauptet. C++
 erreicht 1.0 erst nach Abschluss des definierten Funktionsumfangs und der
@@ -32,6 +34,7 @@ sprachübergreifenden Konformitätsprüfungen.
 - [Parallele Ausführung](PARALLELISM.md)
 - [Deskriptive Statistik](STATISTIK.md)
 - [Polynome und Nullstellensuche](NULLSTELLENSUCHE.md)
+- [Interpolation und kubische Splines](INTERPOLATION.md)
 - [Deutsches C++-Benutzerhandbuch](../../user-guide/cpp/de/README.md)
 - [Englische C++-Dokumentation](../en/README.md)
 

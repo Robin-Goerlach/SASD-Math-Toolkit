@@ -7,7 +7,7 @@ reference while C++ is under development; it is not a source-code template.
 
 ## Current status
 
-CPP-M2 advances the library to version `0.3.0`:
+CPP-M3 advances the library to version `0.4.0`:
 
 - C++20 and CMake project structure;
 - public namespace root `sasd::numerics`;
@@ -19,7 +19,9 @@ CPP-M2 advances the library to version `0.3.0`:
 - descriptive statistics with stable mean, median and population/sample variance;
 - deterministic multi-core reductions for sufficiently large mean/variance inputs;
 - immutable complex-capable polynomials with Horner evaluation and deflation;
-- scalar, complex and polynomial root solvers with explicit diagnostics.
+- scalar, complex and polynomial root solvers with explicit diagnostics;
+- linear, Lagrange and Newton interpolation plus immutable natural and clamped cubic splines;
+- caller-controlled parallel batch evaluation for independent interpolation targets.
 
 No numerical algorithm catalog is claimed yet. C++ reaches 1.0 only after the
 defined feature and cross-language conformance gates are complete.
@@ -31,6 +33,7 @@ defined feature and cross-language conformance gates are complete.
 - [Parallel execution](PARALLELISM.md)
 - [Descriptive statistics](STATISTICS.md)
 - [Polynomials and root finding](ROOT-FINDING.md)
+- [Interpolation and cubic splines](INTERPOLATION.md)
 - [English C++ user handbook](../../user-guide/cpp/en/README.md)
 - [German C++ documentation](../de/README.md)
 

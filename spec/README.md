@@ -26,3 +26,4 @@ that language's documentation, not here.
 Dedicated contracts introduced by the C++ implementation:
 
 - [Root finding and polynomials](root-finding.md)
+- [Interpolation](interpolation.md)

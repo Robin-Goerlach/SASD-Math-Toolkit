@@ -49,3 +49,21 @@ sasd_math_toolkit_enable_warnings(sasd_math_toolkit_root_finding_tests)
 add_test(
     NAME cpp.root_finding
     COMMAND sasd_math_toolkit_root_finding_tests)
+
+add_executable(
+    sasd_math_toolkit_interpolation_tests
+    interpolation_tests.cpp)
+
+target_link_libraries(
+    sasd_math_toolkit_interpolation_tests
+    PRIVATE SASD::MathToolkit)
+target_compile_definitions(
+    sasd_math_toolkit_interpolation_tests
+    PRIVATE
+        SASD_MATH_TOOLKIT_CONFORMANCE_DIR="${CMAKE_CURRENT_LIST_DIR}/../../conformance")
+target_compile_features(sasd_math_toolkit_interpolation_tests PRIVATE cxx_std_20)
+sasd_math_toolkit_enable_warnings(sasd_math_toolkit_interpolation_tests)
+
+add_test(
+    NAME cpp.interpolation
+    COMMAND sasd_math_toolkit_interpolation_tests)

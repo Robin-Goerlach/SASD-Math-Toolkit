@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.25)
 
 project(
     SasdMathToolkitCpp
-    VERSION 0.3.0
+    VERSION 0.4.0
     DESCRIPTION "Modern C++ implementation of SASD Math Toolkit"
     LANGUAGES CXX)
 
@@ -42,6 +42,9 @@ add_library(
     sasd_math_toolkit STATIC
     src/common/iteration_status.cpp
     src/execution/execution_options.cpp
+    src/interpolation/cubic_spline.cpp
+    src/interpolation/interpolation_algorithms.cpp
+    src/interpolation/newton_interpolant.cpp
     src/polynomials/polynomial.cpp
     src/root_finding/complex_root_solvers.cpp
     src/root_finding/polynomial_root_solvers.cpp
