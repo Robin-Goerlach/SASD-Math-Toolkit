@@ -22,3 +22,7 @@ The English C# compatibility matrix remains the human-readable source of truth
 for the V1 algorithm catalog until each subject has a dedicated neutral
 contract. Language-specific APIs, ownership rules and exception types belong in
 that language's documentation, not here.
+
+Dedicated contracts introduced by the C++ implementation:
+
+- [Root finding and polynomials](root-finding.md)

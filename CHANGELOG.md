@@ -6,6 +6,14 @@ The project uses semantic versioning for package/release identifiers.
 
 ## Unreleased
 
+### C++ 0.3.0 / CPP-M2
+
+- Added immutable complex-capable polynomials with Horner evaluation, combined derivative evaluation, formal derivatives and synthetic deflation.
+- Added status-bearing bisection, Newton-Raphson, secant, complex Muller, Newton-Horner and Laguerre root solvers.
+- Added deterministic all-roots Laguerre search with fallback starts, deflation and original-polynomial residual polishing.
+- Added a language-neutral root-finding contract, shared scalar conformance cases and 61 focused C++ checks.
+- Added independent German/English technical and handbook chapters and advanced the C++ handbook to version 0.3.
+
 ### C++ 0.2.0 / CPP-M1
 
 - Added finite-input descriptive statistics: compensated scaled mean, overflow-safe median and scaled population/sample variance.

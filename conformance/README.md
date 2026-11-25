@@ -48,3 +48,8 @@ Shared vectors are introduced only when two implementations can execute the
 same meaningful cases; CPP-M1 statistics therefore defines its contract and
 C++ tests first, with cross-language vectors following during the planned .NET
 statistics implementation.
+
+CPP-M2 adds `root-finding/scalar-reference.csv`. Its analytic scalar roots are
+consumed by the C++ test suite and correspond to problems already covered by
+the .NET reference implementation. Later implementations should consume the
+same cases rather than generating expected values from their own solver.

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.25)
 
 project(
     SasdMathToolkitCpp
-    VERSION 0.2.0
+    VERSION 0.3.0
     DESCRIPTION "Modern C++ implementation of SASD Math Toolkit"
     LANGUAGES CXX)
 
@@ -42,6 +42,11 @@ add_library(
     sasd_math_toolkit STATIC
     src/common/iteration_status.cpp
     src/execution/execution_options.cpp
+    src/polynomials/polynomial.cpp
+    src/root_finding/complex_root_solvers.cpp
+    src/root_finding/polynomial_root_solvers.cpp
+    src/root_finding/root_finding_options.cpp
+    src/root_finding/root_solvers.cpp
     src/statistics/descriptive_statistics.cpp)
 add_library(SASD::MathToolkit ALIAS sasd_math_toolkit)
 

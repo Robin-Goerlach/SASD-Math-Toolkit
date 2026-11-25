@@ -7,22 +7,23 @@ C#/.NET-Handbuch nicht voraus.
 
 ## Stand der Ausgabe
 
-Die Handbuchversion `0.2` begleitet CPP-M1. Die stabile
+Die Handbuchversion `0.3` begleitet CPP-M2. Die stabile
 .NET-Ausgabe besitzt bereits einen breiten numerischen Referenzkatalog. Die
 C++-Ausgabe enthält Build- und Paketgrundlage, gemeinsames Ergebnismodell,
-CPU-Ausführungsrichtlinie und deskriptive Statistik. Weitere Kapitel entstehen jeweils
-zusammen mit den zugehörigen getesteten C++-Algorithmen.
+CPU-Ausführungsrichtlinie, deskriptive Statistik, Polynome und Nullstellensuche.
+Weitere Kapitel entstehen jeweils zusammen mit den zugehörigen getesteten
+C++-Algorithmen.
 
 ## Inhalt
 
 1. [Erste Schritte](erste-schritte.md)
 2. [Diagnostik und parallele Ausführung](parallele-ausfuehrung.md)
 3. [Deskriptive Statistik](deskriptive-statistik.md)
+4. [Polynome und Nullstellensuche](polynome-nullstellensuche.md)
 
-Später folgen Polynome und Nullstellen, Interpolation, Analysis, dichte und
-dünnbesetzte lineare Algebra, Eigenwertmethoden, ODE/BVP, Approximation und
-Transformationen. Jedes Beispiel dieses Handbuchs wird als C++20 kompilierbar
-sein.
+Später folgen Interpolation, Analysis, dichte und dünnbesetzte lineare Algebra,
+Eigenwertmethoden, ODE/BVP, Approximation und Transformationen. Jedes Beispiel
+dieses Handbuchs wird als C++20 kompilierbar sein.
 
 ## Leitgedanke
 

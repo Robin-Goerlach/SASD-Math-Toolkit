@@ -9,7 +9,7 @@ must not be deleted merely because an item has a similarly named replacement.
 | `Guard` | Do not expose a general utility API. Absorb numerical precondition checks into each implementation. | Foundation validation only | Existing internal `NumericGuard` remains canonical |
 | Mean, median, variance | Migrate with stronger overflow handling, finite-input validation and explicit sample/population semantics. | CPP-M1 | Port after the C++ contract stabilizes |
 | Two-point linear interpolation | Add to the interpolation domain without duplicating Lagrange interpolation. | Planned interpolation milestone | Planned after C++ |
-| Bisection root finder | Do not duplicate. The Math Toolkit already has richer status-bearing root-finding contracts. | Planned against the existing shared contract | Existing implementation is canonical |
+| Bisection root finder | Do not copy the narrower toolbox implementation. Use the Math Toolkit's richer status-bearing contract. | CPP-M2 implementation complete | Existing implementation is canonical |
 | Demo and repository scaffolding | Do not migrate; they are not reusable mathematics. | Not applicable | Not applicable |
 
 Before the source repository can be retired:

@@ -7,7 +7,7 @@ ist aber keine Quellcodevorlage.
 
 ## Aktueller Stand
 
-CPP-M1 erweitert die Bibliothek auf Version `0.2.0`:
+CPP-M2 erweitert die Bibliothek auf Version `0.3.0`:
 
 - C++20- und CMake-Projektstruktur;
 - öffentlicher Root-Namespace `sasd::numerics`;
@@ -15,9 +15,11 @@ CPP-M1 erweitert die Bibliothek auf Version `0.2.0`:
 - explizite serielle, automatische und parallele CPU-Ausführung;
 - CTest-Tests, ausführbares Beispiel und Installations-Smoke-Test;
 - installierbares CMake-Paket `SasdMathToolkit`;
-- Doxygen-kompatible Kommentare und optionales API-Ziel.
+- Doxygen-kompatible Kommentare und optionales API-Ziel;
 - deskriptive Statistik mit stabilem Mittelwert, Median und Populations-/Stichprobenvarianz;
-- deterministische Mehrkernreduktionen für ausreichend große Mittelwert-/Varianzeingaben.
+- deterministische Mehrkernreduktionen für ausreichend große Mittelwert-/Varianzeingaben;
+- unveränderliche komplexfähige Polynome mit Horner-Auswertung und Deflation;
+- skalare, komplexe und polynomspezifische Nullstellensolver mit Diagnostik.
 
 Ein vollständiger numerischer Funktionskatalog wird noch nicht behauptet. C++
 erreicht 1.0 erst nach Abschluss des definierten Funktionsumfangs und der
@@ -29,6 +31,7 @@ sprachübergreifenden Konformitätsprüfungen.
 - [Build, Tests und Installation](BUILDING.md)
 - [Parallele Ausführung](PARALLELISM.md)
 - [Deskriptive Statistik](STATISTIK.md)
+- [Polynome und Nullstellensuche](NULLSTELLENSUCHE.md)
 - [Deutsches C++-Benutzerhandbuch](../../user-guide/cpp/de/README.md)
 - [Englische C++-Dokumentation](../en/README.md)
 

@@ -58,7 +58,7 @@ cmake --build build/install-consumer
 Consumers use:
 
 ```cmake
-find_package(SasdMathToolkit 0.2 CONFIG REQUIRED)
+find_package(SasdMathToolkit 0.3 CONFIG REQUIRED)
 target_link_libraries(my_application PRIVATE SASD::MathToolkit)
 ```
 

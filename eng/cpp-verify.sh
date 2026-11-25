@@ -51,6 +51,7 @@ sample="$build_dir/samples/sasd_math_toolkit_diagnostics_sample"
 sample_output="$artifacts_dir/sample-output.txt"
 "$sample" | tee "$sample_output"
 grep -q 'status: converged' "$sample_output"
+grep -q 'root residual:' "$sample_output"
 grep -q 'automatic workers' "$sample_output"
 
 echo "==> C++ diff whitespace check"
