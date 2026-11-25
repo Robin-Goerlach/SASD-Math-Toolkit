@@ -21,20 +21,51 @@ See [`docs/en/BORLAND-V1-COMPATIBILITY.md`](docs/en/BORLAND-V1-COMPATIBILITY.md)
 ```text
 SASD-Math-Toolkit/
 ├── src/
-│   └── dotnet/                 # C#/.NET implementation (first language)
+│   ├── dotnet/                 # stable C#/.NET implementation
+│   └── cpp/                    # independent modern C++ implementation
 ├── tests/
-│   └── dotnet/                 # automated numerical regression tests
+│   ├── dotnet/                 # .NET numerical regression tests
+│   └── cpp/                    # CTest-integrated C++ tests
 ├── samples/
-│   └── dotnet/                 # executable and graphical examples
+│   ├── dotnet/                 # .NET executable and graphical examples
+│   └── cpp/                    # C++ examples
 ├── spec/                       # language-neutral contracts and algorithm catalog
+├── conformance/                # shared reference cases and golden vectors
 ├── docs/
-│   ├── en/                     # primary technical documentation
-│   ├── de/                     # German technical documentation
-│   └── user-guide/             # Markdown handbook + LaTeX/PDF editions
+│   ├── en/, de/                # stable C#/.NET technical documentation
+│   ├── cpp/en/, cpp/de/        # independent C++ technical documentation
+│   └── user-guide/             # language-specific Markdown/LaTeX handbooks
 └── .github/workflows/          # build, test, package and publication validation
 ```
 
-Future language trees are peers of `dotnet`. Language-neutral behavior belongs in `spec/`, not in one language implementation.
+Every language tree is a peer. Production code, tests, samples, build systems
+and manuals remain language-specific. Only mathematical contracts in `spec/`
+and reference data in `conformance/` are shared.
+
+The implementation sequence is deliberate: the stable C#/.NET edition remains
+the reference, the C++ edition is completed next, and Fortran and JavaScript
+follow only after the C++ contract and conformance work are mature.
+
+## Current C++ foundation
+
+The independent C++ edition is at foundation version **0.1.0**. It currently
+provides the C++20/CMake project, the `sasd::numerics::common` termination and
+result vocabulary, a portable CPU execution policy, tests, installation
+metadata, a sample and separate German and English documentation. Automatic
+execution can use multiple CPU cores for algorithms with sufficiently large
+independent workloads; callers can cap or disable that parallelism. The C++
+edition does **not** yet claim the numerical feature
+coverage of the stable C#/.NET 1.0.0 edition.
+
+```bash
+cmake -S src/cpp -B build/cpp -DCMAKE_BUILD_TYPE=Release
+cmake --build build/cpp
+ctest --test-dir build/cpp --output-on-failure
+cmake --install build/cpp --prefix artifacts/cpp-install
+```
+
+See [`docs/cpp/en/README.md`](docs/cpp/en/README.md) or
+[`docs/cpp/de/README.md`](docs/cpp/de/README.md) for the C++ documentation.
 
 ## Current C# foundation
 
@@ -54,7 +85,7 @@ Implemented now:
 - Demonstration layer: deterministic self-contained HTML/SVG report plus a sparse GMRES/BiCGSTAB release smoke solve
 - Geometry seed: immutable `Vector2D`
 
-## Build, test and pack
+## Build, test and pack C#/.NET
 
 ```bash
 dotnet restore Sasd.Math.Toolkit.slnx
@@ -104,6 +135,8 @@ Target framework: **.NET 10**. The normal GitHub Actions gate performs Release r
 - Clean-room policy: [`docs/en/CLEAN-ROOM.md`](docs/en/CLEAN-ROOM.md)
 - English user handbook: [`docs/user-guide/en/README.md`](docs/user-guide/en/README.md)
 - Deutsches Benutzerhandbuch: [`docs/user-guide/de/README.md`](docs/user-guide/de/README.md)
+- C++ documentation: [`docs/cpp/en/README.md`](docs/cpp/en/README.md) / [`docs/cpp/de/README.md`](docs/cpp/de/README.md)
+- C++ user handbook: [`docs/user-guide/cpp/en/README.md`](docs/user-guide/cpp/en/README.md) / [`docs/user-guide/cpp/de/README.md`](docs/user-guide/cpp/de/README.md)
 
 The **Markdown handbook is the editorial source of truth and is updated continuously with each modernization milestone**. The LaTeX directory is the typesetting/build layer. The committed V1.0 PDFs are synchronized with the current Markdown chapters, including the 2026 dense/sparse modernization chapters, and have passed structural and visual release inspection. Future PDF editions continue to be regenerated deliberately at release-candidate/release boundaries.
 

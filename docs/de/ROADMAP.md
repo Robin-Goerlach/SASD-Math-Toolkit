@@ -79,7 +79,16 @@ Benchmarks, optionale BLAS-/LAPACK-Adapter, gemessenes SIMD, Package-/API-Kompat
 
 ## M4 – Weitere Sprachimplementierungen
 
-Äquivalente Sprachimplementierungen dürfen bei Bedarf parallel voranschreiten. Gemeinsames Verhalten soll zunehmend in maschinenlesbare `spec/`-Referenzvektoren und Cross-Language-Konformitätstests überführt werden.
+Die stabile C#/.NET-Implementierung bleibt die Referenz. C++ ist die nächste
+aktive Implementierung und wird abgeschlossen, bevor produktive Fortran- oder
+JavaScript-Bäume begonnen werden. Gemeinsames Verhalten wandert zunehmend in
+sprachneutrale Verträge unter `spec/` und Referenzfälle unter `conformance/`;
+Code, Tests, Beispiele, Buildsysteme und Handbücher bleiben je Sprache getrennt.
+
+Die C++-Implementierung erhält früh eine portable CPU-Ausführungsrichtlinie.
+Mehrere Kerne werden nur bei ausreichend großer, unabhängiger Arbeit genutzt.
+Für Diagnose, kleine Aufgaben und bereits auf höherer Ebene parallelisierte
+Anwendungen bleibt eine serielle Ausführung verfügbar.
 
 ## M5 – Optionale High-Performance-Backends
 

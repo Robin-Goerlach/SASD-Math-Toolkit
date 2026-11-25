@@ -83,7 +83,16 @@ Benchmarks, optional BLAS/LAPACK adapters, measured SIMD, package/API compatibil
 
 ## M4 — Multi-language implementations
 
-Equivalent implementations may proceed in parallel when useful. Shared behavior should increasingly move into machine-readable `spec/` reference vectors and cross-language conformance tests.
+The stable C#/.NET implementation remains the reference. C++ is the next active
+implementation and is completed before new Fortran or JavaScript production
+trees begin. Shared behavior increasingly moves into language-neutral `spec/`
+contracts and `conformance/` vectors; code, tests, samples, build systems and
+handbooks remain separate for every language.
+
+The C++ implementation establishes a portable CPU execution policy early.
+Algorithms use multiple cores only where work is independent and sufficiently
+large. Serial execution remains available for diagnostics, small workloads and
+applications that already parallelize at a higher level.
 
 ## M5 — Optional high-performance backends
 

@@ -1,13 +1,24 @@
 # Language-neutral specification
 
-`spec/` is the contract layer for future C#, C++, Fortran, Java and JavaScript implementations.
+`spec/` is the contract layer for the C#/.NET, C++, Fortran and JavaScript
+implementations.
+
+This directory describes mathematical behavior rather than language syntax.
+For example, a dimension mismatch is invalid input and must be rejected; the
+contract does not require every language to use the same exception class.
 
 Planned machine-readable material:
 
 - algorithm identifiers and capability metadata
 - common status/error semantics
-- golden input/output vectors
 - tolerance rules for conformance tests
 - serialization format for matrices, vectors, complex values and sampled signals
 
-Until a second language implementation begins, the English compatibility matrix is the human-readable source of truth for the V1 catalog.
+Machine-readable inputs and expected outputs belong in [`../conformance/`](../conformance/).
+Keeping the contract and the executable data separate makes it possible to
+explain a rule once while providing several focused datasets for it.
+
+The English C# compatibility matrix remains the human-readable source of truth
+for the V1 algorithm catalog until each subject has a dedicated neutral
+contract. Language-specific APIs, ownership rules and exception types belong in
+that language's documentation, not here.

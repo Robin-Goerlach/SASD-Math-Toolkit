@@ -1,0 +1,83 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{sasd-cpp-handbook}[2026/11/25 SASD Math Toolkit C++ handbook]
+
+% This style belongs to the independent C++ publication. Markdown remains the
+% editorial source; this package owns typography and PDF metadata only.
+\RequirePackage{fontspec}
+\setmainfont{DejaVu Serif}
+\setsansfont{DejaVu Sans}
+\setmonofont[Scale=MatchLowercase]{DejaVu Sans Mono}
+
+\RequirePackage{microtype}
+\RequirePackage[a4paper,inner=25mm,outer=20mm,top=23mm,bottom=25mm,headsep=8mm]{geometry}
+\RequirePackage{xcolor}
+\RequirePackage{amsmath,amssymb}
+\RequirePackage{booktabs}
+\RequirePackage{longtable}
+\RequirePackage{tabularx}
+\RequirePackage{array}
+\RequirePackage{enumitem}
+\RequirePackage{listings}
+\RequirePackage{fancyhdr}
+\RequirePackage{lastpage}
+\RequirePackage{xurl}
+\RequirePackage{hyperref}
+\RequirePackage{bookmark}
+
+\definecolor{sasdBlue}{HTML}{173F5F}
+\definecolor{sasdTeal}{HTML}{2A9D8F}
+\definecolor{sasdInk}{HTML}{26343F}
+\definecolor{sasdGray}{HTML}{66727D}
+\definecolor{sasdLight}{HTML}{F4F7F9}
+\definecolor{sasdLine}{HTML}{D5DEE5}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=sasdBlue,
+  urlcolor=sasdTeal,
+  citecolor=sasdBlue,
+  pdfauthor={Robin Goerlach; SASD-GmbH},
+  pdftitle={\HandbookPdfTitle},
+  pdfsubject={SASD Math Toolkit modern C++ handbook Version 0.1},
+  pdfkeywords={SASD, C++, C++20, numerical methods, mathematics, parallel computing}
+}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.5em}
+\setlength{\emergencystretch}{2.5em}
+\setlist[itemize]{leftmargin=1.55em,itemsep=0.18em,topsep=0.2em}
+\setlist[enumerate]{leftmargin=1.8em,itemsep=0.18em,topsep=0.2em}
+\renewcommand{\arraystretch}{1.14}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE]{\small\color{sasdGray}\textsc{SASD Math Toolkit C++}}
+\fancyhead[RO]{\small\color{sasdGray}\nouppercase{\leftmark}}
+\fancyfoot[LE,RO]{\small\color{sasdGray}\thepage\ / \pageref{LastPage}}
+\fancyfoot[LO,RE]{\small\color{sasdGray}\HandbookFooter}
+\renewcommand{\headrulewidth}{0.35pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\lstset{
+  language=C++,
+  basicstyle=\ttfamily\small,
+  backgroundcolor=\color{sasdLight},
+  frame=single,
+  rulecolor=\color{sasdLine},
+  framerule=0.5pt,
+  framesep=6pt,
+  xleftmargin=4pt,
+  xrightmargin=4pt,
+  showstringspaces=false,
+  breaklines=true,
+  columns=fullflexible,
+  keepspaces=true,
+  tabsize=4
+}
+
+% Compatibility helpers used by Pandoc-generated chapter fragments.
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\providecommand{\passthrough}[1]{#1}
+\providecommand{\pandocbounded}[1]{#1}
+
+\newcommand{\repo}{\href{https://github.com/Robin-Goerlach/SASD-Math-Toolkit}{github.com/Robin-Goerlach/SASD-Math-Toolkit}}

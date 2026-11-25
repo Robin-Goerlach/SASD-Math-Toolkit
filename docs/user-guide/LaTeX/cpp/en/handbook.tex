@@ -1,0 +1,62 @@
+\documentclass[11pt,a4paper,twoside,openright]{book}
+\usepackage[english]{babel}
+\newcommand{\HandbookPdfTitle}{SASD Math Toolkit - C++ Handbook Version 0.1}
+\newcommand{\HandbookFooter}{C++ Handbook Version 0.1 - English}
+\usepackage{sasd-cpp-handbook}
+
+\begin{document}
+\frontmatter
+
+\begin{titlepage}
+\pagecolor{sasdInk}\color{white}
+\vspace*{2cm}
+{\sffamily\bfseries\Large SASD-GmbH\par}
+\vspace{3cm}
+{\bfseries\fontsize{34}{40}\selectfont SASD Math Toolkit\par}
+\vspace{0.5cm}
+{\color{sasdTeal}\bfseries\fontsize{24}{29}\selectfont Modern C++\par}
+\vspace{1cm}
+{\Large User and Developer Handbook\par}
+{\large Version 0.1 / CPP-M0\par}
+\vfill
+{\large Portable numerics, explicit diagnostics and controlled multi-core execution.\par}
+\vspace{0.8cm}
+{\repo\par}
+\end{titlepage}
+\nopagecolor\color{sasdInk}
+
+\chapter*{Document status}
+\addcontentsline{toc}{chapter}{Document status}
+
+This independent C++ handbook describes foundation version \texttt{0.1.0}.
+Chapters are generated from the maintained Markdown sources under
+\texttt{docs/user-guide/cpp/en/}. It is neither a copy nor an appendix of the
+C\#/.NET handbook.
+
+\begin{tabularx}{\textwidth}{@{}>{\bfseries}p{0.32\textwidth}X@{}}
+Edition & Modern C++20\\
+Handbook version & 0.1\\
+Library version & \texttt{0.1.0}\\
+Root namespace & \texttt{sasd::numerics}\\
+Build system & CMake 3.25 or newer\\
+License & MIT\\
+Author / project & Robin Goerlach; SASD-GmbH\\
+\end{tabularx}
+
+\tableofcontents
+\clearpage
+\mainmatter
+
+\input{build/en/README.tex}
+\input{build/en/getting-started.tex}
+\input{build/en/parallel-execution.tex}
+
+\backmatter
+\chapter*{License and provenance}
+\addcontentsline{toc}{chapter}{License and provenance}
+SASD Math Toolkit is licensed under MIT. The C++ implementation and this
+handbook are independently written from mathematical definitions and the
+language-neutral SASD contracts; historical Borland source and historical
+manual text are not copied.
+
+\end{document}

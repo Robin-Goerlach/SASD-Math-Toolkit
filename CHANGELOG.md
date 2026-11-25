@@ -4,6 +4,17 @@ All notable release-facing changes to SASD Math Toolkit are recorded here.
 
 The project uses semantic versioning for package/release identifiers.
 
+## Unreleased
+
+### C++ 0.1.0 foundation
+
+- Added the independently versioned C++20 project under `src/cpp/`, with CMake build and install-package support.
+- Added the initial `sasd::numerics::common` diagnostic vocabulary, result envelope and numerical defaults.
+- Added an explicit automatic/sequential/parallel CPU execution policy and a portable, exception-safe internal C++20 worker primitive for suitable workloads.
+- Added isolated C++ tests, an executable sample, an installed-package consumer smoke test and GCC/Clang CI.
+- Added separate German and English C++ technical documentation and Markdown/LaTeX handbook sources.
+- Established `conformance/` as the language-neutral home for future shared test vectors without moving the stable C#/.NET 1.0 documentation.
+
 ## 1.0.0 — 2026-09-16
 
 ### First stable release

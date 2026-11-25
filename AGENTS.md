@@ -22,13 +22,19 @@ Do not copy or port historical source code. Do not reproduce substantial histori
 ## Repository map
 
 - `src/dotnet/Sasd.Math.Toolkit/` - C#/.NET reference implementation.
+- `src/cpp/` - independent modern C++ implementation and CMake package.
 - `tests/dotnet/Sasd.Math.Toolkit.Tests/` - executable numerical regression tests.
+- `tests/cpp/` - C++/CTest verification and installed-package consumer.
 - `samples/dotnet/Sasd.Math.Toolkit.Sample/` - demonstrations and smoke paths; no reusable library logic.
+- `samples/cpp/` - C++ examples; no reusable library logic.
 - `spec/` - language-neutral contracts/reference data as they are introduced.
+- `conformance/` - language-neutral machine-readable reference cases.
 - `docs/en/`, `docs/de/` - technical documentation.
+- `docs/cpp/en/`, `docs/cpp/de/` - independent C++ technical documentation.
 - `docs/user-guide/en/`, `docs/user-guide/de/` - continuously maintained Markdown handbook sources.
 - `docs/user-guide/LaTeX/` - publication/typesetting layer; regenerate committed PDFs only at deliberate RC/release boundaries unless the task explicitly requests otherwise.
 - `eng/codex-verify.sh` - canonical local verification entry point for Codex.
+- `eng/cpp-verify.sh` - focused C++ build/test/install verification entry point.
 
 ## Read before editing
 
@@ -93,6 +99,7 @@ A test should validate the mathematical result, not merely reproduce the impleme
 - Markdown is the editorial source of truth during active development.
 - Do not regenerate/commit handbook PDFs for ordinary feature commits.
 - Keep language-specific code/documentation separate. Language-neutral contracts belong in `spec/`.
+- The active implementation sequence is C#/.NET reference, then C++, then Fortran and JavaScript. Do not start the latter two before the C++ edition is complete unless the maintainer changes that decision.
 
 ## Verification workflow
 

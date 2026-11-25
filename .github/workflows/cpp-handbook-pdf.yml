@@ -1,0 +1,57 @@
+name: Build C++ handbook PDFs
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/cpp-handbook-pdf.yml'
+      - 'docs/user-guide/cpp/**/*.md'
+      - 'docs/user-guide/LaTeX/cpp/**'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cpp-handbook-pdf-main
+  cancel-in-progress: true
+
+jobs:
+  build-cpp-handbooks:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Install handbook toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc latexmk texlive-luatex texlive-latex-extra texlive-fonts-recommended texlive-lang-german fonts-dejavu poppler-utils
+
+      - name: Build German and English C++ handbooks
+        working-directory: docs/user-guide/LaTeX/cpp
+        run: make all
+
+      - name: Validate generated PDFs
+        shell: bash
+        run: |
+          set -euo pipefail
+          de_pdf='docs/user-guide/LaTeX/cpp/SASD-Math-Toolkit-Cpp-Handbuch-V0.1-DE.pdf'
+          en_pdf='docs/user-guide/LaTeX/cpp/SASD-Math-Toolkit-Cpp-Handbook-V0.1-EN.pdf'
+          test -s "$de_pdf"
+          test -s "$en_pdf"
+          pdfinfo "$de_pdf" | grep -q '^Pages:'
+          pdfinfo "$en_pdf" | grep -q '^Pages:'
+
+      - name: Upload C++ handbook PDFs for inspection
+        uses: actions/upload-artifact@v7
+        with:
+          name: sasd-math-toolkit-cpp-handbooks-v0.1
+          path: |
+            docs/user-guide/LaTeX/cpp/SASD-Math-Toolkit-Cpp-Handbuch-V0.1-DE.pdf
+            docs/user-guide/LaTeX/cpp/SASD-Math-Toolkit-Cpp-Handbook-V0.1-EN.pdf
+          if-no-files-found: error
+          retention-days: 30
+
+      # Generated PDFs remain CI artifacts during development. Committed PDF
+      # snapshots are updated only at an explicit C++ RC/release boundary.

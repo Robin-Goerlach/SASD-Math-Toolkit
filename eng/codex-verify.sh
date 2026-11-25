@@ -37,6 +37,7 @@ echo "==> Diff whitespace check"
 git diff --check
 
 if [[ "$mode" == "quick" ]]; then
+    ./eng/cpp-verify.sh quick
     echo "Quick verification passed."
     exit 0
 fi
@@ -88,6 +89,9 @@ dotnet run \
 test -s "$demo_file"
 grep -q '<svg' "$demo_file"
 grep -q 'Sparse reference solve' "$sample_output"
+
+echo "==> C++ full verification"
+./eng/cpp-verify.sh full
 
 echo "==> Final diff whitespace check"
 git diff --check

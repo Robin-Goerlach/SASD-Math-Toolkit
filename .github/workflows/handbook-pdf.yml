@@ -8,7 +8,11 @@ on:
       - '.github/workflows/handbook-pdf.yml'
       - 'docs/user-guide/de/**/*.md'
       - 'docs/user-guide/en/**/*.md'
-      - 'docs/user-guide/LaTeX/**'
+      - 'docs/user-guide/LaTeX/Makefile'
+      - 'docs/user-guide/LaTeX/README.md'
+      - 'docs/user-guide/LaTeX/sasd-handbook.sty'
+      - 'docs/user-guide/LaTeX/de/**'
+      - 'docs/user-guide/LaTeX/en/**'
 
 permissions:
   contents: read

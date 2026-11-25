@@ -6,6 +6,11 @@
 TestResults/
 coverage/
 artifacts/
+build/
+cmake-build-*/
+CMakeUserPresets.json
+compile_commands.json
+docs/user-guide/LaTeX/cpp/SASD-Math-Toolkit-Cpp-*.pdf
 *.user
 *.suo
 *.nupkg
